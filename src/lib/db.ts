@@ -14,7 +14,7 @@ const globalForPrisma = globalThis as unknown as {
 function createLocalClient(): PrismaClient {
   const url = process.env.DATABASE_URL ?? "file:./db/custom.db";
   return new PrismaClient({
-    adapter: new PrismaLibSql({ url }),
+    adapter: new PrismaLibSQL({ url }),
     log: ["error"],
   });
 }
