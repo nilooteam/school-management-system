@@ -3,7 +3,9 @@
   "name": "bahar-school-system",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-11-13",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
@@ -12,8 +14,11 @@
     {
       "binding": "DB",
       "database_name": "bahar-db",
-      "database_id": "484c357b-a663-439c-943e-03cd3857695a"
+      "database_id": "484c357b-a663-439c-943e-03cd3857695a",
+      "migrations_dir": "migrations"
     }
   ],
-  "observability": { "enabled": true }
+  "observability": {
+    "enabled": true
+  }
 }
