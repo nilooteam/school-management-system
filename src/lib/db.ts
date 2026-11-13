@@ -23,9 +23,10 @@ function createLocalClient(): PrismaClient {
 export const getDb = cache((): DbClient => {
   try {
     const { env } = getCloudflareContext();
-    if (env.DB) {
+    const d1 = (env as unknown as { DB?: any }).DB;
+    if (d1) {
       return new PrismaClient({
-        adapter: new PrismaD1(env.DB),
+        adapter: new PrismaD1(d1),
         log: ["error"],
       });
     }
