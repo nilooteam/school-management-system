@@ -31,19 +31,19 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
       if (body.name !== undefined) data.name = String(body.name).trim();
       if (body.code !== undefined) data.code = String(body.code).trim();
       // نوع مدرسه در این نسخه ثابت است: هنرستان.
-      data.type = "هنرستان";
+      if (body.type !== undefined) data.type = "هنرستان";
       if (body.phone !== undefined) data.phone = enDigits(String(body.phone)).trim() || null;
       if (body.establishedYear !== undefined) {
         data.establishedYear = body.establishedYear ? Number(enDigits(String(body.establishedYear))) : null;
       }
-      if (body.province !== undefined) data.province = String(body.province) || null;
-      if (body.county !== undefined) {
-        const county = String(body.county) || null;
-        const province = (body.province !== undefined ? String(body.province) : school.province) ?? undefined;
-        if (!isValidProvinceCounty(province, county ?? undefined)) {
-          return apiErr(400, "این شهرستان به استان انتخابی تعلق ندارد.", "BAD_COUNTY");
+      if (body.province !== undefined || body.county !== undefined) {
+        const province = (body.province !== undefined ? String(body.province) : school.province) ?? "";
+        const county = (body.county !== undefined ? String(body.county) : school.county) ?? "";
+        if (!isValidProvinceCounty(province, county || undefined)) {
+          return apiErr(400, "استان یا شهرستان معتبر ایران را انتخاب کنید.", "BAD_COUNTY");
         }
-        data.county = county;
+        if (body.province !== undefined) data.province = province || null;
+        if (body.county !== undefined) data.county = county || null;
       }
     }
 
