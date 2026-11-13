@@ -556,7 +556,6 @@ export async function restoreFromPayload(payload: unknown): Promise<RestoreResul
   await db.$transaction(async (tx) => {
     // حذف همه داده‌های فعلی — کامل و به ترتیب وابستگی
     for (const table of DELETE_ORDER) {
-      // @ts-expect-error
       await tx[table].deleteMany();
     }
     // درج داده‌های بکاپ به ترتیب وابستگی
@@ -568,7 +567,6 @@ export async function restoreFromPayload(payload: unknown): Promise<RestoreResul
       }
       const dateFields = DATE_FIELDS[table] ?? [];
       const fixed = rows.map((r) => fixDates(r, dateFields));
-      // @ts-expect-error
       await tx[table].createMany({ data: fixed, skipDuplicates: true });
       restored[table] = rows.length;
     }
