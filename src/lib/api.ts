@@ -81,14 +81,17 @@ export async function getSessionUser(req: NextRequest): Promise<SessionUser | nu
      امنیت: کوکی فقط برای نقش سرویسِ دارای مجوز enter_school_panel
      معتبر است، هرگز schoolId کاربران مدرسه‌ای را دور نمی‌زند و
      وجود/فعال‌بودن مدرسه در هر درخواست سمت سرور اعتبارسنجی می‌شود. */
-  // نصب تک‌هنرستانی: مدیران سامانه همیشه به هنرستان اصلی متصل‌اند.
+  // قفل دامنه نصب: هیچ نشست کاربری نمی‌تواند به مدرسه‌ای غیر از هنرستان اصلی تعلق داشته باشد.
+  const primarySchool = await db.school.findFirst({
+    where: { isActive: true },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+  if (!primarySchool) return null;
   if (["SUPER_ADMIN", "ADMIN"].includes(sessionUser.role)) {
-    const primarySchool = await db.school.findFirst({
-      where: { isActive: true },
-      orderBy: { createdAt: "asc" },
-      select: { id: true },
-    });
-    if (primarySchool) sessionUser.schoolId = primarySchool.id;
+    sessionUser.schoolId = primarySchool.id;
+  } else if (sessionUser.schoolId !== primarySchool.id) {
+    return null;
   }
 
   assertWriteAllowed(req, sessionUser);

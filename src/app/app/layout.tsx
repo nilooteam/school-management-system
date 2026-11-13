@@ -26,12 +26,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user || !user.isActive) redirect("/login");
   if (typeof payload.tv === "number" && user.tokenVersion !== payload.tv) redirect("/login");
 
-  const school = ["SUPER_ADMIN", "ADMIN"].includes(user.role)
-    ? await db.school.findFirst({
-        where: { isActive: true }, orderBy: { createdAt: "asc" },
-        select: { id: true, name: true, shadEnabled: true, custodianEnabled: true },
-      })
-    : user.school;
+  const primarySchool = await db.school.findFirst({
+    where: { isActive: true }, orderBy: { createdAt: "asc" },
+    select: { id: true, name: true, shadEnabled: true, custodianEnabled: true },
+  });
+  if (!primarySchool) redirect("/login");
+  if (!["SUPER_ADMIN", "ADMIN"].includes(user.role) && user.schoolId !== primarySchool.id) redirect("/login");
+  const school = primarySchool;
   const schoolModules = school
     ? { shadEnabled: school.shadEnabled, custodianEnabled: school.custodianEnabled }
     : null;
