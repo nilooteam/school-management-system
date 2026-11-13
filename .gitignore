@@ -40,8 +40,6 @@ server.log
 nohup.out
 .DS_Store
 
-# vercel / cloudflare
 .vercel
-.wrangler
 /.open-next/
 /src/generated/
