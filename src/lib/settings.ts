@@ -86,16 +86,23 @@ export const DEFAULT_SETTINGS: BaharSettings = {
 };
 
 const SETTINGS_KEY = "system";
+let _settingsCache: { at: number; value: BaharSettings } | null = null;
 
 export async function getSettings(): Promise<BaharSettings> {
+  if (_settingsCache && Date.now() - _settingsCache.at < 60_000) return _settingsCache.value;
+  let value: BaharSettings;
   try {
     const row = await db.setting.findUnique({ where: { key: SETTINGS_KEY } });
-    if (!row) return { ...DEFAULT_SETTINGS };
-    const parsed = JSON.parse(row.value) as Partial<BaharSettings>;
-    return { ...DEFAULT_SETTINGS, ...parsed };
+    if (!row) value = { ...DEFAULT_SETTINGS };
+    else {
+      const parsed = JSON.parse(row.value) as Partial<BaharSettings>;
+      value = { ...DEFAULT_SETTINGS, ...parsed };
+    }
   } catch {
-    return { ...DEFAULT_SETTINGS };
+    value = { ...DEFAULT_SETTINGS };
   }
+  _settingsCache = { at: Date.now(), value };
+  return value;
 }
 
 export async function saveSettings(patch: Partial<BaharSettings>): Promise<BaharSettings> {
@@ -106,5 +113,6 @@ export async function saveSettings(patch: Partial<BaharSettings>): Promise<Bahar
     update: { value: JSON.stringify(next) },
     create: { key: SETTINGS_KEY, value: JSON.stringify(next) },
   });
+  _settingsCache = null;
   return next;
 }
