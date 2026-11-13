@@ -18,6 +18,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       BAHAR_SESSION_SECRET: ${{ secrets.BAHAR_SESSION_SECRET }}
+      SESSION_SECRET: ${{ secrets.BAHAR_SESSION_SECRET }}
     steps:
       - name: Check out project
         uses: actions/checkout@v4
@@ -49,7 +50,7 @@ jobs:
 
       - name: Configure production session secret
         shell: bash
-        run: printf '%s' "$BAHAR_SESSION_SECRET" | bunx wrangler secret put SESSION_SECRET --name bahar-school-system
+        run: printf '%s' "$BAHAR_SESSION_SECRET" | bunx wrangler secret put SESSION_SECRET --name school-management-system
 
       - name: Build and deploy Cloudflare Worker
         run: |
