@@ -4,7 +4,7 @@ import {
   hashPassword, generatePassword, isValidNationalId, isValidShadNumber,
 } from "@/lib/auth";
 import {
-  requireUser, apiOk, apiErr, handleApiError, readJson, audit, ApiError, isDemoUser, actingSchoolIdFor, demoWriteBlock, toDate } from "@/lib/api";
+  requireUser, apiOk, apiErr, handleApiError, readJson, audit, ApiError, isDemoUser, demoWriteBlock, toDate } from "@/lib/api";
 import {
   ROLE_LABELS, DEFAULT_DEPUTY_PERMISSIONS, DEFAULT_TEACHER_PERMISSIONS,
   PERMISSION_CATALOG, DEFAULT_ADMIN_PERMISSIONS, ALL_SERVICE_PERMISSIONS,
@@ -30,11 +30,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const role = searchParams.get("role") ?? undefined;
     const q = searchParams.get("q")?.trim();
-    const schoolIdParam = searchParams.get("schoolId") ?? undefined;
     const includeInactive = searchParams.get("includeInactive") === "1";
-    // کوکی مدرسه فعال فقط با اعتبارسنجی نقش (قابل جعل از کلاینت است)
-    const actingCookie = actingSchoolIdFor(req, me);
-
     const isSuper = me.role === "SUPER_ADMIN";
     const isAdmin = me.role === "ADMIN";
     const isManager = me.role === "MANAGER";
@@ -49,18 +45,13 @@ export async function GET(req: NextRequest) {
       }
     }
     if (isAdmin && !hasPermission(me, "view_users") && !isManager) {
-      // ادمین داخل پنل مدرسه هم می‌تواند ببیند
-      if (!actingCookie || !hasPermission(me, "enter_school_panel")) {
-        throw new ApiError(403, "FORBIDDEN", "دسترسی «مشاهده کاربران» برای شما فعال نیست.");
-      }
+      throw new ApiError(403, "FORBIDDEN", "دسترسی «مشاهده کاربران» برای شما فعال نیست.");
     }
 
-    // مدرسه هدف: مدیر/معاون → مدرسه خودشان؛ ادمین → کوکی پنل یا پارامتر
+    // مدرسه هدف در این نسخه همیشه همان هنرستان نصب است.
     let schoolId: string | undefined;
     if (isService) {
-      // سوپرادمین با پارامتر هر مدرسه‌ای را می‌بیند؛ ادمین سرویس فقط مدرسه‌ای
-      // که وارد پنلش شده است — پارامتر آزاد برای ادمین یعنی دور زدن پنل.
-      schoolId = isSuper ? (actingCookie ?? schoolIdParam ?? undefined) : (actingCookie ?? undefined);
+      schoolId = me.schoolId ?? undefined;
     } else {
       schoolId = me.schoolId ?? undefined;
       if (!schoolId) throw new ApiError(400, "NO_SCHOOL", "به مدرسه‌ای متصل نیستید.");
@@ -126,18 +117,17 @@ export async function POST(req: NextRequest) {
     const isSuper = me.role === "SUPER_ADMIN";
     const isAdmin = me.role === "ADMIN";
     const isManager = me.role === "MANAGER";
-    const actingCookie = actingSchoolIdFor(req, me);
 
     // ── قواعد اختیار ──
     if (isAdmin || isSuper) {
-      // در پنل مدرسه (کوکی) ادمین می‌تواند نقش‌های مدرسه‌ای بسازد
-      const inSchoolPanel = !!actingCookie && hasPermission(me, "enter_school_panel");
+      // مدیر سامانه فقط در محدوده همین هنرستان کاربر می‌سازد.
+      const inSchoolPanel = isSuper;
       if (role === "ADMIN") {
         if (!isSuper) return apiErr(403, "فقط مدیر کل سامانه می‌تواند ادمین سرویس بسازد.", "FORBIDDEN");
         if (!hasPermission(me, "manage_admins")) return apiErr(403, "دسترسی ساخت ادمین ندارید.", "FORBIDDEN");
       } else if (role === "MANAGER") {
         if (!inSchoolPanel && !hasPermission(me, "create_schools") && !hasPermission(me, "create_users")) {
-          return apiErr(403, "ساخت مدیر مدرسه در صفحه «مدارس» یا پنل مدرسه انجام می‌شود.", "FORBIDDEN");
+          return apiErr(403, "ساخت مدیر هنرستان در تنظیمات اولیه سامانه انجام می‌شود.", "FORBIDDEN");
         }
       } else if (!hasPermission(me, "create_users") && !inSchoolPanel) {
         return apiErr(403, "دسترسی ساخت کاربر ندارید.", "FORBIDDEN");
@@ -150,7 +140,7 @@ export async function POST(req: NextRequest) {
     } else {
       // ── سایر نقش‌ها (معاون/معلم دارای مجوز) — فقط معلم/ولی قابل ساخت است ──
       // نقش‌های MANAGER/ADMIN/STUDENT از این مسیر قابل ساخت نیستند:
-      // مدیر مدرسه از صفحه «مدارس»، ادمین فقط توسط سوپرادمین،
+      // مدیر هنرستان فقط توسط مدیر سامانه، ادمین فقط توسط سوپرادمین،
       // و دانش‌آموز فقط از مسیر اختصاصی /api/students (با پرونده و شماره دانش‌آموزی) ساخته می‌شود.
       if (role === "TEACHER") {
         if (!hasPermission(me, "manage_teachers")) {
@@ -198,7 +188,7 @@ export async function POST(req: NextRequest) {
     // مدرسه مقصد
     let schoolId: string | null = null;
     if (me.role === "SUPER_ADMIN" || me.role === "ADMIN") {
-      schoolId = body.schoolId ? String(body.schoolId) : (actingCookie ?? null);
+      schoolId = me.schoolId;
     } else {
       schoolId = me.schoolId;
     }

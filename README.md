@@ -1,324 +1,47 @@
-# Bahar — School Management System
+# بهار — سامانه مدیریت هنرستان
 
-Bahar (بهار, "spring") is a comprehensive, multi-tenant school management
-system built for Iranian schools: students, teachers, classes, grades,
-attendance, finance, certificates, messaging and a public website for every
-school — in one install.
+این شاخه، نسخه اختصاصی بهار برای **یک هنرستان در ایران** است. سامانه به‌صورت یک نصب مستقل برای یک مدرسه اجرا می‌شود؛ امکان ساخت مدرسه دوم، جابه‌جایی بین مدارس، داشبورد شبکه و درخواست انتقال بین مدارس در این نسخه وجود ندارد.
 
-> The product UI is Persian-first (RTL, Jalali calendar). This README is in
-> English so the codebase is easy to evaluate and contribute to.
->
-> **Bahar is completely free.** There is no subscription, no paid plan and
-> no plan-gated feature anywhere in the system — every feature is
-> available to every school.
+## محدوده محصول
 
-## Features
+- **تک‌هنرستانی:** هر نصب فقط یک رکورد مدرسه اصلی دارد. ساخت و حذف مدرسه از API غیرفعال است. مدیران سامانه به همان هنرستان اصلی متصل می‌شوند.
+- **فقط فارسی:** زبان رابط کاربری و سایت عمومی فارسی و راست‌چین است. بسته‌های ترجمه، انتخاب‌گر زبان و ابزار ساخت زبان حذف شده‌اند.
+- **فقط ایران:** منطقه زمانی `Asia/Tehran`، زبان محلی `fa-IR`، تقویم هجری شمسی، کد ملی ایرانی، شماره موبایل ایران و واحد پول ریال/تومان در پروفایل ثابت ایران قرار دارند.
+- **مناسب هنرستان:** پایه‌های دهم، یازدهم و دوازدهم و شاخه‌های فنی‌وحرفه‌ای و کاردانش در پروفایل پیش‌فرض تعریف شده‌اند.
+- **نمره‌دهی:** مقیاس رسمی از ۲۰ و تقویم شمسی ثابت است.
 
-- **People & structure** — schools (tenants), users with role-based access
-  (super admin, admin, manager, deputy, teacher, student, parent, custodian),
-  students with a 360° profile, parents, classes, subjects, teaching
-  assignments and timetables.
-- **Admissions** — a full enrolment pipeline for website leads (new →
-  contacted → tour → waitlist → admitted → enrolled) with one-click
-  conversion of an admitted applicant into a real student account.
-- **Daily operations** — attendance (students and staff), grades and monthly
-  report cards, assignments with targeted delivery, submission receipts and
-  exemptions, school events with iCal export, leaves, meetings and tasks.
-- **Teaching** — question bank, online quizzes with auto-grading, lesson
-  plans with a planned-vs-taught coverage dashboard, substitute-teacher
-  planner, and a school library with loans and overdue tracking.
-- **Exams & reports** — in-person exam operations (deterministic shuffled
-  seating across rooms, invigilators, printable admit cards), descriptive
-  (qualitative) report cards for elementary grades, a report-comment bank
-  with rule-based auto-drafts, and printable student ID cards.
-- **Students & families** — behavior records, badges and houses, wellbeing
-  check-ins and risk scoring, seating charts, transport routes with daily
-  boarding checklists, gate passes, preschool daily reports with an
-  authorized-pickup registry, a health card and clinic visit log with
-  instant parent notification, forms & consent collection, after-school
-  clubs with capacity and waitlists, a cashless canteen wallet with
-  parent top-ups and daily spending limits, a weekly meal plan, an
-  auto-assembled digital portfolio of every achievement, and alumni
-  records.
-- **Communication** — announcements with audience targeting and read
-  receipts, direct messages, notifications, an SMS panel, and
-  credential/announcement delivery through the **Shad** messenger gateway
-  (with an internal simulated mode), plus a Telegram bot.
-- **Finance & HR** — student fees with overdue sweeps, staff payroll with
-  printable payslips, and full data portability (imports, Excel/CSV exports
-  for students, staff, grades, attendance and fees, complete backup/restore).
-- **Year lifecycle** — academic-year rollover: promote classes to the next
-  year or graduate them into alumni records, in one transaction.
-- **Certificates** — designed certificate templates with public QR
-  verification.
-- **Public school site** — every school gets a public page with 19 templates
-  (plus 7 legacy template ids that keep rendering), each template family
-  with its own design language and several colour palettes, and lead
-  capture; internal announcements stay private unless they are addressed to
-  everyone.
-- **Printing** — a global print/PDF framework: every panel page prints
-  clean A4 output with an official header (school, section, print date),
-  repeating table headers and unbroken cards, plus dedicated print sheets
-  where they matter — report cards, exam papers with a separate answer
-  key, admit cards, payslips, certificates and student ID cards.
-- **Platform** — a network (EMIS) rollup dashboard for platform admins,
-  per-school country profiles (calendar system, grading scale — 20 / 100 /
-  GPA / letter — currency label and week start, applied to grade exports),
-  country packs and language packs, a blog/CMS, media library, scheduled
-  reports, a full audit log, and one-click backup/restore.
-- **Engagement & guidance** — a school TV board (kiosk mode: announcements,
-  events, birthdays, meals and the house league champion, auto-rotating), a
-  wall of fame with a live house league, an academic-guidance engine
-  (transparent weighted stream recommendations for counsellors, students and
-  parents), a student study planner with habit streaks, and an auto-assembled
-  digital yearbook — all printable.
-- **Physical health & capabilities** — every student has a physical-health
-  profile (sports participation status: full / limited / exempt with an
-  exact restriction note, asthma, heart condition, seizures, diabetes,
-  mobility, vision and hearing notes, regular medications, blood type,
-  allergies and a review date). The flags surface where they matter:
-  the attendance sheet shows a health alert next to the student's name,
-  and a school-wide restrictions roster gives PE teachers the full
-  picture before class.
-- **Data management** — records entered anywhere in the app can be
-  deleted again: every module exposes a scoped, role-gated delete (single
-  records, plus bulk clears such as a whole day's attendance sheet), and
-  list screens carry matching delete actions with confirmation.
-- **Security** — password login with captcha and lockout, TOTP two-factor,
-  one-time codes, and **Passkeys (WebAuthn)** for passwordless sign-in,
-  managed per user from the profile.
-- **Clients** — responsive web app and PWA, plus optional Android (WebView)
-  and Windows (Electron) shells under `scripts/`.
+## امکانات مدرسه
 
-## Newer modules (free-system branch)
+مدیریت هنرجویان و اولیا، هنرآموزان و کارکنان، کلاس‌ها و رشته‌ها، دروس و برنامه هفتگی، حضور و غیاب، نمرات و کارنامه، تکالیف و آزمون‌ها، پرونده و سلامت هنرجو، انضباط، اطلاعیه‌ها و پیام‌ها، امور مالی، اموال و امکانات، سرویس‌ها، کتابخانه، خوابگاه، گواهی‌ها، گزارش‌ها، پشتیبان‌گیری و وب‌سایت همان هنرستان.
 
-- **MCP server** — JSON-RPC 2.0 at `/api/mcp` (10 read tools, 3 write
-  tools) so agents can work with Bahar. Authentication is exactly the
-  existing Bahar session cookie and role system; there is no separate
-  token and no auth bypass. Data is always scoped to the caller's
-  school, and students/parents only see themselves/their children.
-  See the `/app/mcp` page for the tool list and connection notes.
-- **Dormitory** — buildings, rooms with capacity, assignments guarded
-  by capacity and one-active-assignment-per-student, and dormitory
-  leaves with staff approve/reject (`/app/dormitory`).
-- **Buffet shop** — product catalogue, stock, and sales that decrement
-  stock and the student wallet in one transaction, honouring the
-  parent's daily limit (`/api/shop`, shop section on the wallet page).
-- **Accessibility** — text size, high-contrast mode, low-distraction
-  mode and reduce-motion as a product feature, applied app-wide via
-  data attributes, plus a skip link to main content (`/app/accessibility`).
-- **Country packs** — every school runs under a country profile
-  (calendar system, grading scale — 20 / 100 / GPA / letter — currency
-  label and week start, applied to grade exports), and a shipped pack
-  adds that country's first-level divisions with their capitals.
-  **47 packs are shipped.** Full packs: **IR** (31 provinces, 401
-  cities, 52,225 province-level villages from GeoNames), **US** (50
-  states, 3,142 counties), **NL** (12 provinces, 342 municipalities),
-  **BE** (10 provinces, 42 arrondissements). Division packs: **DE**
-  (16), **FR** (18), **IT** (20), **CA** (13), **AU** (8), **ES** (19),
-  **BR** (27), **TR** (81), **GB** (4), **SE** (21), **KR** (17),
-  **PL** (16), **AE** (7), **SA** (13), **AO** (21), **AM** (11),
-  **AR** (24), **AT** (9), **AW** (8), **AX** (16), **BA** (12),
-  **BB** (11), **BD** (8), **BF** (13), **BG** (28), **BH** (4),
-  **BJ** (12), plus AF, AZ, CN, EG, IQ, JP, KH, KZ, MN, NP, PK, UZ.
-  Every figure comes from a cited official source (national statistics
-  offices and government portals). On top of that, a **world name
-  registry of 249 countries** (Persian + English names from ICU/CLDR)
-  is shipped and shown on `/app/countries` — names only, never counted
-  as a pack. New packs are imported by super admins via
-  `/api/countries` (`/app/countries`) and checked with
-  `bun scripts/validate-pack.ts country <file.json>`.
-- **Language coverage** — Persian is the source language. A complete
-  pack today reports three counts: the UI catalogue of **3,407 app
-  keys**, **302 public-site sentences** (landing, public chrome, kit
-  step titles) and **39 long texts** (FAQ answers and kit prose).
-  16 translated packs are shipped: **English, Arabic, Urdu, Turkish,
-  Spanish, French, German, Italian, Portuguese, Russian, Bengali,
-  Hindi, Chinese, Japanese, Korean, Azerbaijani**. Site sentences are
-  302/302 in ten packs and 301/302 in six (a single string,
-  `site.lang.more`, still falls back to Persian), and long texts are
-  39/39 in every pack. App keys: English, Portuguese, Russian,
-  Bengali and Japanese are at 3,332/3,407 and the other eleven at
-  3,306/3,407 — the only gaps are the keys of the newest features
-  (absence excuses, parent summons, exam seats, repeat-absence
-  follow-up), which are being completed pack by pack; untranslated
-  keys fall back to Persian, so no screen is ever blank. On top of
-  that, a **world name registry of 183 languages**
-  (Persian + English + native names from ICU/CLDR) is shipped and
-  shown on `/app/languages` — it is names only, never counted as a
-  translated pack. `/api/languages/coverage` and the `/app/languages`
-  page list every missing key per pack. The landing switches language
-  from a header select (`bahar_site_lang` cookie, Persian fallback)
-  and `/api/site-strings` serves a pack's site sentences. Check any
-  pack with `bun scripts/validate-pack.ts lang <file.json>`.
-- **Language coverage** — Persian is the source language. A complete
-  pack carries **4,268 app keys**, **302 public-site sentences** and
-  **39 long texts** — 4,609 strings in total. **29 translated packs
-  are shipped**: English, Arabic, Urdu, Turkish, Spanish, French,
-  German, Italian, Portuguese, Russian, Bengali, Hindi, Chinese,
-  Japanese, Korean, Azerbaijani, Abkhaz, Afar, Afrikaans, Akan,
-  Amharic, Aragonese, Assamese, Aymara, Bashkir, Belarusian,
-  Bulgarian, Bihari and Bislama. Untranslated keys fall back to
-  Persian, so no screen is ever blank. A **world name registry of 183
-  languages** (Persian + English + native names from ICU/CLDR) is
-  shipped and shown on `/app/languages` — names only, never counted
-  as a translated pack. `/api/languages/coverage` and the
-  `/app/languages` page list every missing key per pack. The landing
-  switches language from a header select (`bahar_site_lang` cookie,
-  Persian fallback) and `/api/site-strings` serves a pack's site
-  sentences. Check any pack with
-  `bun scripts/validate-pack.ts lang <file.json>`.
-- **Attendance, excuses and exams** — attendance can be recorded by
-  staff sheet, per-student daily QR, a school daily QR poster (also
-  writable to an NFC tag), a rotating class code, kiosk mode or a
-  geofence check-in, and external systems (turnstiles, CCTV/face
-  devices) can push events through hashed integration keys; Bahar
-  itself stores no biometrics, automated records are create-only and
-  the staff sheet is the correction path. Parents file absence
-  excuses in-app; approval flips the day to "excused", and deputies
-  can summon a guardian from the same screen, with acknowledgement
-  tracking. A repeat-absence panel lists students with repeated
-  unexcused absences and one-click summon. Exam seat plans define
-  rooms (rows × columns, single/double desks), class sets, sessions
-  and placement strategy (by class, or mixed anti-cheating), then
-  print entry cards at a quarter of A5 — eight per A4 sheet — plus an
-  invigilator roster; students and parents see their own card in the
-  app.
-- **Planning tools** — three more read-only tools on real data, no new
-  tables, no writes: homework balance (weekly assignment load per
-  class, overload weeks and same-day pileups, lightest-week
-  suggestion; `/app/homework-balance`), study groups (snake-draft
-  balanced grouping by grade average, per subject or overall;
-  `/app/study-groups`), and exam revision plans (spaced 7/3/1-day
-  sessions before upcoming exams, weakest subjects first;
-  `/app/revision-plan`).
-- **Labs** — read-only differentiator tools on real data: what-if
-  simulation, replayable history from the audit log, a permission
-  playground (dry-run evaluation, no writes), a data-quality scan,
-  a dependency view, and capacity forecasts labelled as simple
-  scenarios, not predictions (`/app/labs`).
-- **Specialised tracks** — higher-education and vocational programmes
-  with enrolments, theses (proposal → defended), internships with
-  hour tracking, and workshop sessions with attendance (`/app/tracks`).
-- **Plugin ecosystem** — a published plugin contract (manifest shape,
-  8 declared hooks, permissions limited to the existing permission
-  catalogue), a marketplace with per-school install/disable, and a
-  developer sandbox that validates manifests without storing them
-  (`/app/plugins`). Plugin code is **not** executed in the app; the
-  agent API surface is the MCP server.
-- **Meta design pass** — the design language is Meta's (pill buttons,
-  24–32px cards, tight type hierarchy) with Bahar's own spring-green
-  palette, not Meta blue. `scripts/meta-design-check.mjs` audits pages
-  for PageHeader, token buttons/inputs and hard-coded colours; new
-  pages pass it, and older pages are migrated one by one (icon-only
-  buttons and legacy badge colours are intentional, not oversights).
-- **Sample schools (separate seed only)** — three populous sample
-  schools (54 classes, 1,524 sample students, plus dorm, shop and
-  track data per school) live in a seed script **outside this repo**
-  and are never committed here and never shipped in downloads. The
-  script is for demo/dev databases only.
+## فناوری
 
-## Tech stack
+- Next.js App Router و React
+- Prisma
+- SQLite/LibSQL برای نصب مستقل
+- Cloudflare Workers و D1 برای استقرار ابری
+- رابط فارسی RTL و تقویم جلالی
 
-- Next.js 16 (App Router, standalone output) + React 19 + TypeScript
-- Tailwind CSS 4 + shadcn/ui (Radix), framer-motion, recharts
-- Prisma 6 + SQLite
-- Cookie sessions signed with HMAC (scrypt password hashing), optional
-  TOTP two-factor and email/SMS one-time login codes
-- Bun or Node.js runtime
+## اجرای محلی
 
-## Quick start
+نیازمندی‌ها: Bun و یک پایگاه داده مطابق تنظیمات محیط.
 
 ```bash
 bun install
-
-cp .env.example .env        # then set SESSION_SECRET (see below)
-
-bunx prisma generate
-bunx prisma db push         # creates db/custom.db from the schema
-bun scripts/seed.ts         # optional sample data (development only)
-
-bun run dev                 # http://localhost:3000
+cp .env.example .env
+bun run db:generate
+bun run db:push
+bun run dev
 ```
 
-Production (self-hosted):
+برای ساخت نسخه تولید:
 
 ```bash
-bun run build               # next build + standalone bundle
-bun run start               # serves the standalone server
+bun run build
 ```
 
-A sample `Caddyfile` for reverse proxying is included.
+## نکات مهم مهاجرت
 
-## Configuration
-
-| Variable         | Purpose                                                                 |
-| ---------------- | ----------------------------------------------------------------------- |
-| `DATABASE_URL`   | Prisma datasource, e.g. `file:./db/custom.db`                           |
-| `SESSION_SECRET` | **Required in production.** Signs session cookies, captcha, OTP and 2FA tokens. Use a long random value and keep it out of git. If unset on a self-hosted install, a random secret is generated once and stored in `db/session-secret.txt` (git-ignored). |
-| `SEED_DEMO`      | Set to `1` to let the seed script assign the public demo password to the two demo accounts. Never enable in production. |
-
-Platform settings (site title, OTP providers, Telegram bot, Shad gateway,
-demo mode, …) live in the database and are managed from the super-admin
-settings screen. Demo accounts are **disabled by default** and have no
-default password.
-
-## Security notes
-
-- Never commit `.env`, `db/*.db`, `db/backups/*` or `db/uploads/*` — the
-  shipped `.gitignore` already excludes them. The database contains password
-  hashes and personal data of students and staff.
-- Backups produced by the app strip plaintext temp passwords and
-  second-factor secrets; password hashes are kept so users can still sign
-  in after a restore.
-- Temp passwords are one-time delivery secrets (sent via Shad) and are
-  cleared from the database on first successful sign-in or password change.
-- Found a vulnerability? Please open a private report instead of a public
-  issue.
-
-## Project layout
-
-```
-src/app          pages and API routes (App Router)
-src/components   UI components
-src/lib          auth, backup, scheduler, shad/telegram gateways, i18n, …
-prisma           schema (120 models) and seed
-scripts          seed/dev helpers, Python Shad gateway, Android & Windows shells
-docs             design language and internal notes
-```
-
-## License
-
-MIT — see [LICENSE](LICENSE).
-
-## Deployment
-
-Bahar is platform-neutral: it runs on any Node.js host (VPS, shared
-hosting with Node support, Docker, a local machine) as a standalone
-server backed by a plain SQLite file, and the same codebase also runs
-on Cloudflare Workers with a D1 database — the driver is chosen at
-runtime from the environment, nothing is Workers-only. A demo
-deployment runs on Cloudflare Workers (via OpenNext) with a D1
-database; uploaded files and backups are stored as BLOBs in D1 there,
-and on the filesystem elsewhere. The demo deployment builds
-automatically from the `main` branch.
-
-**Schema note:** the free-system work adds models (MCP needs none;
-dormitory, shop, tracks, plugins and countries/language packs extend
-the schema). After merging, run `prisma db push` (or the equivalent
-D1 migration) before deploying, or the new tables will not exist in
-the live database.
-
-**Build note:** the Workers demo build is
-`npx prisma generate && node scripts/patch-prisma-client-exports.mjs && npx next build && npx opennextjs-cloudflare build --skipNextBuild`.
-The Prisma client is generated with the standard `prisma-client-js`
-generator into `node_modules/.prisma/client` and imported as
-`@prisma/client`, so the bundlers externalize it instead of compiling the
-large generated client into the app graph (compiling it from source made
-production builds run out of memory, exit 137). The patch script reorders
-the generated client's export conditions so the `workerd` entry wins in
-the Workers bundle — its Node entry loads the query-compiler Wasm from
-disk and compiles it dynamically, which Workers forbids. Interactive
-Prisma transactions (`db.$transaction(async tx => ...)`) are not
-supported by the D1 adapter — the data layer therefore uses sequential
-writes or the batch form (`db.$transaction([...])`) only.
+- اگر دیتابیس فعلی بیش از یک رکورد مدرسه دارد، قبل از استقرار این شاخه از دیتابیس نسخه پشتیبان بگیرید و داده‌های مدارس اضافی را با برنامه مهاجرت کنترل‌شده ادغام کنید. این تغییرات کد به‌تنهایی داده‌های قدیمی را حذف یا ادغام نمی‌کنند.
+- اسکریپت `scripts/seed.ts` دیتابیس را پاک‌سازی و داده نمونه می‌سازد؛ آن را روی دیتابیس واقعی اجرا نکنید.
+- حذف بسته‌های کشور و زبان از سورس انجام شده است؛ تنظیمات نصب و اسرار محیطی مانند `SESSION_SECRET` و `CRON_SECRET` باید همچنان جداگانه تنظیم شوند.

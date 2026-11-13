@@ -101,9 +101,9 @@ async function main() {
   });
   const school1 = await db.school.create({
     data: {
-      name: "دبیرستان نمونه دولتی بهار",
+      name: "هنرستان فنی‌وحرفه‌ای بهار",
       code: "BH-1001",
-      type: "دولتی (نمونه)",
+      type: "هنرستان",
       city: "تهران", province: "تهران",
       address: "تهران، خیابان بهار، کوچه شکوفه، شماره ۱۰",
       phone: "02188000001",
@@ -448,55 +448,6 @@ async function main() {
       },
     });
     sentCount++;
-  }
-
-  // ────────────── مدرسه ۲ ──────────────
-  console.log("🏫 مدرسه ۲…");
-  const manager2 = await createUser({
-    nationalId: makeNationalId("800000001"),
-    firstName: "مهدی", lastName: "یزدانی", role: "MANAGER",
-    gender: "MALE", birthYear: 1980, shadNumber: "09170000001",
-    education: "کارشناسی ارشد فیزیک",
-  });
-  const school2 = await db.school.create({
-    data: {
-      name: "دبیرستان غیرانتفاعی نور",
-      code: "NR-2002",
-      type: "غیرانتفاعی",
-      city: "شیراز", province: "فارس",
-      phone: "07137000002",
-      establishedYear: 1398,
-      managerId: manager2.user.id,
-    },
-  });
-  await db.user.update({ where: { id: manager2.user.id }, data: { schoolId: school2.id } });
-
-  const s2Subject = await db.subject.create({ data: { schoolId: school2.id, name: "ریاضی", weeklyHours: 3 } });
-  const s2Teacher = await createUser({
-    nationalId: makeNationalId("810000001"),
-    firstName: "شیما", lastName: "افشار", role: "TEACHER",
-    gender: "FEMALE", birthYear: 1992, shadNumber: "09170000002",
-    education: "کارشناسی ریاضی", permissions: ["take_attendance", "enter_grades"],
-    schoolId: school2.id,
-  });
-  const s2Class = await db.class.create({
-    data: { schoolId: school2.id, name: "نهم الف", grade: "نهم", field: null, academicYear: "1404-1405", capacity: 25, homeroomTeacherId: s2Teacher.user.id },
-  });
-  await db.teachingAssignment.create({
-    data: { schoolId: school2.id, teacherId: s2Teacher.user.id, classId: s2Class.id, subjectId: s2Subject.id, academicYear: "1404-1405" },
-  });
-  for (let i = 1; i <= 5; i++) {
-    const st = await createUser({
-      nationalId: makeNationalId(`8200000${String(i).padStart(2, "0")}`),
-      firstName: ["آرمان", "نیما", "غزل", "کیانا", "بردیا"][i - 1],
-      lastName: ["شریفی", "مرادی", "امینی", "خسروی", "فراهانی"][i - 1],
-      role: "STUDENT", gender: i % 2 ? "MALE" : "FEMALE", birthYear: 2010,
-      shadNumber: `09170000${String(10 + i).padStart(2, "0")}`,
-      schoolId: school2.id,
-    });
-    await db.student.create({
-      data: { userId: st.user.id, schoolId: school2.id, classId: s2Class.id, studentNumber: String(300 + i), entryYear: "1404" },
-    });
   }
 
   // ── لاگ‌های نمونه ──

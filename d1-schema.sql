@@ -2858,20 +2858,7 @@ CREATE TABLE IF NOT EXISTS "HelpAnswer" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "HelpAnswer_postId_fkey" FOREIGN KEY ("postId") REFERENCES "HelpPost" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
--- CreateTable
-CREATE TABLE IF NOT EXISTS "TransferRequest" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "requesterId" TEXT NOT NULL,
-    "toSchool" TEXT NOT NULL,
-    "reason" TEXT,
-    "status" TEXT NOT NULL DEFAULT 'PENDING',
-    "handledById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "TransferRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
+
 -- CreateTable
 CREATE TABLE IF NOT EXISTS "ScienceProject" (
     "id" TEXT NOT NULL PRIMARY KEY,
@@ -3096,8 +3083,6 @@ CREATE INDEX IF NOT EXISTS "TutorOffer_schoolId_subject_idx" ON "TutorOffer"("sc
 CREATE INDEX IF NOT EXISTS "HelpPost_schoolId_createdAt_idx" ON "HelpPost"("schoolId", "createdAt");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "HelpAnswer_postId_idx" ON "HelpAnswer"("postId");
--- CreateIndex
-CREATE INDEX IF NOT EXISTS "TransferRequest_schoolId_status_idx" ON "TransferRequest"("schoolId", "status");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "ScienceProject_schoolId_idx" ON "ScienceProject"("schoolId");
 -- CreateIndex

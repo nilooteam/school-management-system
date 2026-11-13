@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { db } from "@/lib/db";
 import { verifyToken, SESSION_COOKIE_NAME } from "@/lib/auth";
-import { hasPermission, parsePermissions } from "@/lib/roles";
+import { parsePermissions } from "@/lib/roles";
 import { getSettings } from "@/lib/settings";
 
 // ============================================================
@@ -81,22 +81,14 @@ export async function getSessionUser(req: NextRequest): Promise<SessionUser | nu
      امنیت: کوکی فقط برای نقش سرویسِ دارای مجوز enter_school_panel
      معتبر است، هرگز schoolId کاربران مدرسه‌ای را دور نمی‌زند و
      وجود/فعال‌بودن مدرسه در هر درخواست سمت سرور اعتبارسنجی می‌شود. */
-  if (!sessionUser.schoolId) {
-    const actingCookie = req.cookies.get("bahar_acting_school")?.value;
-    if (
-      actingCookie &&
-      (sessionUser.role === "SUPER_ADMIN" ||
-        (sessionUser.role === "ADMIN" && hasPermission(sessionUser, "enter_school_panel")))
-    ) {
-      const acting = await db.school.findUnique({
-        where: { id: actingCookie },
-        select: { id: true, isActive: true },
-      });
-      if (acting?.isActive) {
-        sessionUser.schoolId = acting.id;
-        sessionUser.actingSchoolId = acting.id;
-      }
-    }
+  // نصب تک‌هنرستانی: مدیران سامانه همیشه به هنرستان اصلی متصل‌اند.
+  if (["SUPER_ADMIN", "ADMIN"].includes(sessionUser.role)) {
+    const primarySchool = await db.school.findFirst({
+      where: { isActive: true },
+      orderBy: { createdAt: "asc" },
+      select: { id: true },
+    });
+    if (primarySchool) sessionUser.schoolId = primarySchool.id;
   }
 
   assertWriteAllowed(req, sessionUser);
@@ -146,12 +138,8 @@ export function requireSchoolId(user: SessionUser): string {
  * کوکی از سمت کلاینت قابل جعل است؛ فقط برای نقش سرویسِ دارای مجوز enter_school_panel معتبر است
  * و هرگز نباید schoolId کاربران مدرسه‌ای (مدیر/معاون/معلم) را دور بزند.
  */
-export function actingSchoolIdFor(req: NextRequest, me: SessionUser): string | null {
-  const cookie = req.cookies.get("bahar_acting_school")?.value ?? null;
-  if (!cookie) return null;
-  if (me.role === "SUPER_ADMIN") return cookie;
-  if (me.role === "ADMIN" && hasPermission(me, "enter_school_panel")) return cookie;
-  return null;
+export function actingSchoolIdFor(_req: NextRequest, me: SessionUser): string | null {
+  return me.schoolId;
 }
 
 export function apiOk(data: unknown = { ok: true }): NextResponse {

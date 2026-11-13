@@ -4,7 +4,7 @@
 // دقیقاً همین ساختار را با مقادیر کشور خود پر کنند.
 // منابع داده: تقسیمات کشوری ~۱۴۰۲ (۳۱ استان، ~۴۲۹ شهرستان)،
 // نقشه GADM 4.1 (scripts/geo/build-iran-map.ts)، تقویم شمسی،
-// کد ملی با رقم کنترل mod-11، موبایل ۰۹…، تومان، پایه ۷ تا ۱۲.
+// کد ملی با رقم کنترل mod-11، موبایل ۰۹…، تومان، پایه ۱۰ تا ۱۲.
 // ============================================================
 import type { CountryProfile } from "./types";
 import { IRAN_PROVINCES } from "@/lib/iran-data";
@@ -41,9 +41,9 @@ export const IRAN_PROFILE: CountryProfile = {
     workDays: [1, 2, 3, 4, 5], // شنبه تا چهارشنبه
     labels: ["", "شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"],
   },
-  gradeLevels: ["هفتم", "هشتم", "نهم", "دهم", "یازدهم", "دوازدهم"],
-  fields: ["عمومی", "ریاضی", "تجربی", "انسانی", "فنی"],
-  schoolTypes: ["دولتی", "غیرانتفاعی", "نمونه", "هوشمند", "چند برنامه‌ای"],
+  gradeLevels: ["دهم", "یازدهم", "دوازدهم"],
+  fields: ["فنی‌وحرفه‌ای", "کاردانش"],
+  schoolTypes: ["هنرستان"],
   regions: IRAN_PROVINCES.map((p) => ({ name: p.fa, center: p.center, counties: p.counties })),
   // نقشه ایران به‌صورت داخلی (built-in) در iran-map-picker از «lib/iran-map» لود می‌شود؛
   // اینجا map را خالی می‌گذاریم تا ۳۸KB داده SVG وارد باندل همه صفحات نشود.
@@ -63,28 +63,6 @@ export const IRAN_PROFILE: CountryProfile = {
 };
 
 /** نام‌های بومی تقویم‌ها برای راهنما */
-export const CALENDAR_LABELS: Record<string, string> = {
-  persian: "هجری شمسی (جلالی)",
-  gregory: "میلادی",
-  islamic: "هجری قمری (عمومی)",
-  "islamic-umalqura": "هجری قمری — ام‌القرا",
-  "islamic-civil": "هجری قمری — مدنی",
-  "islamic-tbla": "هجری قمری — جدولی",
-  hebrew: "عبری",
-  ethiopic: "اتیوپیایی",
-  ethioaa: "اتیوپیایی — آمتی عالم",
-  coptic: "قبطی",
-  indian: "هندی (ساکا)",
-  buddhist: "بودیستی (تایلندی)",
-  chinese: "چینی",
-  dangi: "کره‌ای (دانگی)",
-  japanese: "ژاپنی",
-  roc: "مین‌گو (تایوان)",
-};
+export const CALENDAR_LABELS: Record<string, string> = { persian: "هجری شمسی (جلالی)" };
 
-export const ALGORITHM_LABELS: Record<string, string> = {
-  "iran-mod11": "ایرانی — رقم کنترل باقیمانده بر ۱۱",
-  luhn: "Luhn (الگوریتم کارت اعتباری)",
-  digits: "فقط الگوی رقم‌ها (بدون رقم کنترل)",
-  none: "بدون اعتبارسنجی (هر رشته)",
-};
+export const ALGORITHM_LABELS: Record<string, string> = { "iran-mod11": "ایرانی — رقم کنترل باقیمانده بر ۱۱" };

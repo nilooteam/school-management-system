@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { requireUser, apiOk, apiErr, handleApiError, readJson, audit, actingSchoolIdFor, demoWriteBlock} from "@/lib/api";
+import { requireUser, apiOk, apiErr, handleApiError, readJson, audit, demoWriteBlock} from "@/lib/api";
 import { getSettings, saveSettings } from "@/lib/settings";
 import { signToken, sessionCookie } from "@/lib/auth";
 import { PERMISSION_CATALOG, ROLE_LABELS, hasPermission } from "@/lib/roles";
@@ -17,8 +17,7 @@ export async function GET(req: NextRequest) {
     const view = new URL(req.url).searchParams.get("view") ?? "health";
 
     if (view === "health") {
-      const actingSchoolId = actingSchoolIdFor(req, me);
-      const schoolId = actingSchoolId ?? me.schoolId;
+      const schoolId = me.schoolId;
       const [dbOk, recentErrors, lastBackup, failedOutbox, openTickets] = await Promise.all([
         db.$queryRaw`SELECT 1 as ok`.then(() => true).catch(() => false),
         db.auditLog.findMany({ where: { action: { contains: "خطا" } }, orderBy: { createdAt: "desc" }, take: 10 }),
@@ -73,12 +72,11 @@ export async function GET(req: NextRequest) {
         return apiErr(403, "مشاهده تاریخچه ورود کاربران نیاز به دسترسی «مشاهده کاربران» دارد.", "FORBIDDEN");
       }
       const target = new URL(req.url).searchParams.get("userId");
-      // ادمین سرویس فقط لاگین‌های مدرسه‌ای را می‌بیند که وارد پنلش شده است
-      const acting = me.role === "ADMIN" ? actingSchoolIdFor(req, me) : null;
+      const schoolId = me.schoolId;
       const logins = await db.loginEvent.findMany({
         where: {
           ...(target ? { userId: target } : {}),
-          ...(acting ? { user: { schoolId: acting } } : {}),
+          ...(schoolId ? { user: { schoolId } } : {}),
         },
         orderBy: { createdAt: "desc" },
         take: 100,
@@ -94,9 +92,9 @@ export async function GET(req: NextRequest) {
       }
       // نشست‌های فعال = ورودهای موفق ۱۴ روز اخیر (عمر توکن)
       const since = new Date(Date.now() - 14 * 86400000);
-      const actingSessions = me.role === "ADMIN" ? actingSchoolIdFor(req, me) : null;
+      const schoolId = me.schoolId;
       const sessions = await db.loginEvent.findMany({
-        where: { status: "SUCCESS", createdAt: { gte: since }, ...(actingSessions ? { user: { schoolId: actingSessions } } : {}) },
+        where: { status: "SUCCESS", createdAt: { gte: since }, ...(schoolId ? { user: { schoolId } } : {}) },
         orderBy: { createdAt: "desc" },
         take: 200,
         include: { user: { select: { id: true, firstName: true, lastName: true, role: true, nationalId: true, schoolId: true } } },
@@ -203,16 +201,6 @@ export async function POST(req: NextRequest) {
       await saveSettings({ featureFlags: flags });
       await audit({ user: me, action: "تغییر فلگ قابلیت", meta: { key, enabled } });
       return apiOk({ flags });
-    }
-
-    /* ── قفل مدرسه ── */
-    if (action === "lock-school") {
-      if (me.role !== "SUPER_ADMIN") return apiErr(403, "فقط سوپرادمین.", "FORBIDDEN");
-      const schoolId = String(body.schoolId ?? "");
-      const locked = body.locked === true;
-      await db.school.update({ where: { id: schoolId }, data: { isActive: !locked } });
-      await audit({ user: me, action: locked ? "قفل مدرسه" : "بازگشایی مدرسه", entityType: "SCHOOL", entityId: schoolId });
-      return apiOk({ ok: true });
     }
 
     return apiErr(400, "عملیات نامعتبر.", "BAD_ACTION");

@@ -231,7 +231,6 @@ model School {
   clubProposals ClubProposal[]
   tutorOffers TutorOffer[]
   helpPosts HelpPost[]
-  transferRequests TransferRequest[]
   scienceProjects ScienceProject[]
   leagueTeams LeagueTeam[]
   leagueMatches LeagueMatch[]
@@ -3187,20 +3186,6 @@ model HelpAnswer {
   isBest Boolean @default(false)
   createdAt DateTime @default(now())
   @@index([postId])
-}
-model TransferRequest {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  studentId String
-  requesterId String
-  toSchool String
-  reason String?
-  status String @default("PENDING")
-  handledById String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([schoolId, status])
 }
 model ScienceProject {
   id String @id @default(cuid())

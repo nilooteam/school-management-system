@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { requireUser, apiOk, apiErr, handleApiError, readJson, audit, isDemoUser } from "@/lib/api";
-import { hasPermission } from "@/lib/roles";
 import { isValidProvinceCounty } from "@/lib/iran";
 import { enDigits } from "@/lib/persian";
 
@@ -13,20 +12,20 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     const me = await requireUser(req);
     if (await isDemoUser(me)) return apiErr(403, "این قابلیت در حساب دمو غیرفعال است.", "DEMO_READONLY");
     const { id } = await ctx.params;
+    if (me.schoolId && me.schoolId !== id) return apiErr(404, "مدرسه یافت نشد.", "NOT_FOUND");
     const body = await readJson<Record<string, string | boolean | undefined>>(req);
     const school = await db.school.findUnique({ where: { id } });
     if (!school) return apiErr(404, "مدرسه یافت نشد.", "NOT_FOUND");
 
     const isSuper = me.role === "SUPER_ADMIN";
-    const isAdminEditor = me.role === "ADMIN" && hasPermission(me, "edit_schools");
     const isOwnManager = me.role === "MANAGER" && me.schoolId === id;
 
-    if (!isSuper && !isAdminEditor && !isOwnManager) {
+    if (!isSuper && !isOwnManager) {
       return apiErr(403, "ویرایش این مدرسه برای شما مجاز نیست.", "FORBIDDEN");
     }
 
     const data: Record<string, unknown> = {};
-    const canFull = isSuper || isAdminEditor;
+    const canFull = isSuper;
 
     if (canFull) {
       if (body.name !== undefined) data.name = String(body.name).trim();

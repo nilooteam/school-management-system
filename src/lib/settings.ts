@@ -32,7 +32,6 @@ export type BaharSettings = {
   maintenanceMode: boolean; // حالت تعمیراتی
   maintenanceMessage: string;
   featureFlags: Record<string, boolean>; // فعال/غیرفعال‌کردن تدریجی قابلیت‌ها
-  countryPackCode: string; // کد بسته کشور فعال (دیفالت IR — ایران)
   require2faRoles: string[]; // نقش‌هایی که 2FA برایشان "توصیه اجباری" است (هشدار در ورود)
   // ── ورود دومرحله‌ای با کد یکبارمصرف (راند ۱۸) — دیفالت خاموش ──
   otpEnabled: boolean;
@@ -74,7 +73,6 @@ export const DEFAULT_SETTINGS: BaharSettings = {
   maintenanceMode: false,
   maintenanceMessage: "سامانه در حال به‌روزرسانی است؛ به‌زودی برمی‌گردیم.",
   featureFlags: {},
-  countryPackCode: "IR",
   require2faRoles: ["MANAGER", "SUPER_ADMIN", "ADMIN"],
   otpEnabled: false,
   otpChannel: "email",

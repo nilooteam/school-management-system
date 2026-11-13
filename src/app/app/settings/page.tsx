@@ -4,13 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Settings, HardDriveDownload, Download, Trash2, Upload, Loader2, Palette,
-  Shield, CheckCircle2, RefreshCcw, FileJson, Smartphone, Monitor, Languages,
-  Globe2 } from "lucide-react";
+  Shield, CheckCircle2, RefreshCcw, FileJson, Smartphone, Monitor } from "lucide-react";
 import { useApi, apiPut, apiDelete } from "@/lib/client";
 import { PageHeader, LoadingBlock, ErrorBox, EmptyState, StatusBadge } from "@/components/shared/bits";
 import { Markdown } from "@/components/shared/markdown";
-import { LanguagesCard } from "@/components/settings/languages-card";
-import { CountryCard } from "@/components/settings/country-card";
 import { OtpCard } from "@/components/settings/otp-card";
 import { TelegramSetupCard } from "@/components/settings/telegram-setup-card";
 import { formatDateTimeFa, faNumber, faDigits } from "@/lib/persian";
@@ -64,11 +61,11 @@ type SettingsResponse = {
 export default function SettingsPage() {
   const { t } = useLang();
   const { data, loading, error, refetch } = useApi<SettingsResponse>("/api/settings");
-  const [tab, setTab] = useState<"general" | "backup" | "design" | "languages" | "country">("general");
+  const [tab, setTab] = useState<"general" | "backup" | "design">("general");
   // لینک هدر: /app/settings?tab=languages باید مستقیم تب زبان را باز کند
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("tab");
-    if (q === "general" || q === "backup" || q === "design" || q === "languages" || q === "country") setTab(q);
+    if (q === "general" || q === "backup" || q === "design") setTab(q);
   }, []);
   const [form, setForm] = useState<Settings | null>(null);
   const [saving, setSaving] = useState(false);
@@ -205,8 +202,6 @@ export default function SettingsPage() {
 
   const tabs = [
     { id: "general", label: t("settings.general"), icon: Settings },
-    { id: "languages", label: t("settings.languages"), icon: Languages },
-    { id: "country", label: t("settings.tab.country"), icon: Globe2 },
     { id: "backup", label: t("settings.backup"), icon: HardDriveDownload },
     { id: "design", label: t("settings.tab.design"), icon: Palette },
   ] as const;
@@ -452,10 +447,6 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
-
-      {/* ───── زبان‌ها ───── */}
-      {tab === "languages" && <LanguagesCard canCreate={data?.canEdit ?? false} />}
-      {tab === "country" && <CountryCard canCreate={data?.canEdit ?? false} />}
 
       {/* ───── پشتیبان‌گیری ───── */}
       {tab === "backup" && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -189,42 +189,20 @@ export function Landing({
   androidUrl,
   windowsUrl,
   shadEnabled = true,
-  siteLang = "fa",
-  browserLang = "fa",
-  siteDir = "rtl",
   siteStrings = {},
   longStrings = {},
-  siteLangs = [{ code: "fa", nativeName: "فارسی", direction: "rtl" as const }],
 }: {
   isLoggedIn: boolean;
   androidUrl?: string | null;
   windowsUrl?: string | null;
   /** شاد فقط برای بسته ایران — سایر ریجن‌ها هیچ نامی از آن ندارند */
   shadEnabled?: boolean;
-  /** زبان سایت عمومی (کوکی bahar_site_lang) + جملات آن + فهرست زبان‌ها */
-  siteLang?: string;
-  /** زبان مرورگر از Accept-Language — برای هدر لندینگ: فقط فارسی + انگلیسی + مرورگر */
-  browserLang?: string;
-  siteDir?: "rtl" | "ltr";
-  siteStrings?: Record<string, string>;
-  longStrings?: Record<string, string>;
-  siteLangs?: { code: string; nativeName: string; direction: "rtl" | "ltr" }[];
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   // جملهٔ سایت: ترجمهٔ بسته، وگرنه فارسی پایه، وگرنه خودِ کلید
   const t = (key: string): string => siteStrings[key] ?? SITE_CATALOG[key] ?? key;
   const lt = (key: string): string | undefined => longStrings[key] ?? LONG_CATALOG[key];
-
-  useEffect(() => {
-    document.documentElement.lang = siteLang;
-    document.documentElement.dir = siteDir;
-  }, [siteLang, siteDir]);
-
-  function changeSiteLang(code: string) {
-    document.cookie = `bahar_site_lang=${code}; path=/; max-age=31536000`;
-    location.reload();
-  }
 
   // شاد خاموش → ماژول جایگزین خنثی (شبکه ۱۶تایی و عنوان بخش دست‌نخورده)
   const modules = shadEnabled
@@ -266,17 +244,6 @@ export function Landing({
           </nav>
 
           <div className="flex items-center gap-1.5">
-            <select
-              aria-label={t("site.lang")}
-              value={siteLang}
-              onChange={(e) => changeSiteLang(e.target.value)}
-              className="b-btn b-btn-ghost b-btn-sm !px-2"
-            >
-              {siteLangs.filter((l) => l.code === "fa" || l.code === "en" || l.code === browserLang || l.code === siteLang).map((l) => (
-                <option key={l.code} value={l.code}>{l.nativeName}</option>
-              ))}
-            </select>
-            <a href="/languages" className="b-btn b-btn-ghost b-btn-sm !px-2">{t("site.lang.more") ?? "بیشتر"}</a>
             <ThemeToggle />
             <Link href={isLoggedIn ? "/app" : "/login"} className="b-btn b-btn-ink b-btn-sm">
               {isLoggedIn ? t("site.panel") : t("site.login")}
@@ -544,7 +511,6 @@ export function Landing({
             <ul className="flex flex-col gap-2 t-sm text-steel">
               <li><Link href="/introduce" className="hover:text-spring">{t("site.intro")}</Link></li>
               <li><Link href="/blog" className="hover:text-spring">{t("site.blogTitle")}</Link></li>
-              <li><Link href="/languages" className="hover:text-spring">{t("site.langKit")}</Link></li>
               <li><Link href="/login" className="hover:text-spring">{t("site.login")}</Link></li>
             </ul>
           </div>

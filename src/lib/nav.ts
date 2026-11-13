@@ -49,7 +49,6 @@ export type NavItem = {
 
 export const NAV: NavItem[] = [
   { href: "/app", label: "داشبورد", tKey: "shell.dashboard", short: "خانه", icon: LayoutDashboard, roles: ["*"], tint: 0, group: "personal" },
-  { href: "/app/schools", label: "مدارس", tKey: "nav.schools", short: "مدارس", icon: School, roles: ["SUPER_ADMIN", "ADMIN"], permission: "view_schools", tint: 1, group: "admin" },
   { href: "/app/users", label: "کاربران", tKey: "nav.users", short: "کاربران", icon: Users, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"], tint: 2, group: "admin" },
   { href: "/app/students", label: "دانش‌آموزان", tKey: "nav.students", short: "دانش‌آموز", icon: GraduationCap, roles: ["MANAGER", "DEPUTY"], permission: "manage_students", tint: 3, group: "students" },
   { href: "/app/classes", label: "کلاس‌ها", tKey: "nav.classes", short: "کلاس‌ها", icon: BookOpen, roles: ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN"], tint: 0, group: "education" },
@@ -68,7 +67,6 @@ export const NAV: NavItem[] = [
   { href: "/app/club-proposals", label: "پیشنهاد باشگاه", tKey: "nav.clubProp", short: "باشگاه تازه", icon: Sparkles, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/tutor-offers", label: "تدریس همتا", tKey: "nav.tutor", short: "تدریس همتا", icon: GraduationCap, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/help-board", label: "پرسش و پاسخ درسی", tKey: "nav.help", short: "پرسش درسی", icon: MessagesSquare, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
-  { href: "/app/transfer-requests", label: "انتقال مدرسه", tKey: "nav.transfer", short: "انتقال", icon: ArrowLeftRight, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/science-fair", label: "جشنوارهٔ علمی", tKey: "nav.science", short: "جشنواره", icon: FlaskConical, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/sports-league", label: "لیگ داخلی", tKey: "nav.league", short: "لیگ", icon: Trophy, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/meal-orders", label: "پیش‌سفارش غذا", tKey: "nav.meals2", short: "غذا", icon: UtensilsCrossed, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
@@ -154,8 +152,6 @@ export const NAV: NavItem[] = [
   { href: "/app/dormitory", label: "خوابگاه", tKey: "nav.dormitory", short: "خوابگاه", icon: Building2, roles: ["*"], tint: 3, group: "services" },
   { href: "/app/mcp", label: "سرور MCP", tKey: "nav.mcp", short: "MCP", icon: Terminal, roles: ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN", "TEACHER"], tint: 0, group: "admin" },
   { href: "/app/accessibility", label: "دسترس‌پذیری", tKey: "nav.accessibility", short: "دسترس‌پذیری", icon: Accessibility, roles: ["*"], tint: 1, group: "personal" },
-  { href: "/app/countries", label: "بسته‌های کشور", tKey: "nav.countries", short: "کشورها", icon: Globe, roles: ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"], tint: 2, group: "admin" },
-  { href: "/app/languages", label: "زبان‌ها و پوشش ترجمه", tKey: "nav.languages", short: "زبان‌ها", icon: Globe, roles: ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"], tint: 3, group: "admin" },
   { href: "/app/labs", label: "آزمایشگاه‌ها", tKey: "nav.labs", short: "آزمایشگاه", icon: FlaskConical, roles: ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"], tint: 0, group: "admin" },
   { href: "/app/tracks", label: "مسیرهای تخصصی", tKey: "nav.tracks", short: "مسیرها", icon: GraduationCap, roles: ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN", "TEACHER"], tint: 1, group: "education" },
   { href: "/app/plugins", label: "افزونه‌ها", tKey: "nav.plugins", short: "افزونه", icon: Puzzle, roles: ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"], tint: 2, group: "admin" },
@@ -173,8 +169,6 @@ export const NAV: NavItem[] = [
   { href: "/app/preschool", label: "پیش‌دبستانی", tKey: "nav.preschool", short: "پیش‌دبستانی", icon: Baby, roles: ["*"], tint: 2, group: "students" },
   { href: "/app/health", label: "سلامت جسمانی و درمانگاه", tKey: "nav.health", short: "سلامت", icon: HeartPulse, roles: ["*"], tint: 3, group: "students" },
   { href: "/app/lesson-plans", label: "طرح درس", tKey: "nav.lessonPlans", short: "طرح درس", icon: NotebookPen, roles: ["TEACHER", "MANAGER", "DEPUTY"], tint: 1, group: "education" },
-  { href: "/app/network", label: "داشبورد شبکه", tKey: "nav.network", short: "شبکه", icon: Network, roles: ["SUPER_ADMIN", "ADMIN"], tint: 0, group: "admin" },
-  { href: "/app/locale-settings", label: "پروفایل کشور", tKey: "nav.localeSettings", short: "کشور", icon: Globe, roles: ["MANAGER", "SUPER_ADMIN", "ADMIN"], tint: 2, group: "admin" },
   { href: "/app/website", label: "سایت مدرسه", tKey: "nav.website", short: "سایت", icon: Globe, roles: ["MANAGER", "SUPER_ADMIN", "ADMIN"], tint: 0, group: "services" },
   { href: "/app/messages", label: "پیام‌ها", tKey: "nav.messages", short: "پیام‌ها", icon: MessageCircle, roles: ["*"], badgeKey: "unread", tint: 1, group: "comms" },
   { href: "/app/shad", label: "شاد", tKey: "nav.shad", short: "شاد", icon: Send, roles: ["MANAGER", "DEPUTY"], permission: "send_shad", tint: 2, group: "services" },

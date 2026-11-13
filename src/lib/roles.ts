@@ -13,8 +13,8 @@ export const ROLES = {
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 
 export const ROLE_LABELS: Record<string, string> = {
-  SUPER_ADMIN: "مدیر کل سامانه",
-  ADMIN: "ادمین سرویس",
+  SUPER_ADMIN: "مدیر سامانه",
+  ADMIN: "مدیر اجرایی سامانه",
   MANAGER: "مدیر مدرسه",
   DEPUTY: "معاون",
   TEACHER: "معلم",
@@ -82,33 +82,15 @@ export type ServicePermGroup = {
 
 export const SERVICE_PERMISSION_GROUPS: ServicePermGroup[] = [
   {
-    group: "مدیریت مدارس",
-    desc: "دسترسی به چرخه کامل مدارس سرویس",
-    items: [
-      { key: "view_schools", label: "مشاهده مدارس", desc: "فهرست مدارس و آمار آنها" },
-      { key: "create_schools", label: "ایجاد مدرسه", desc: "ثبت مدرسه جدید با مدیر" },
-      { key: "edit_schools", label: "ویرایش مدرسه", desc: "ویرایش مشخصات، لوگو، شهرستان" },
-      { key: "delete_schools", label: "حذف مدرسه", desc: "حذف کامل مدرسه و داده‌ها" },
-      { key: "enter_school_panel", label: "ورود به پنل مدرسه", desc: "مدیریت درون‌مدرسه‌ای مثل مدیر" },
-    ],
-  },
-  {
-    group: "مدیریت کاربران",
-    desc: "کاربران کل سرویس",
+    group: "مدیریت کاربران هنرستان",
+    desc: "کاربران همین هنرستان",
     items: [
       { key: "view_users", label: "مشاهده کاربران", desc: "فهرست همه کاربران سرویس" },
-      { key: "create_users", label: "ساخت کاربر", desc: "ایجاد کاربر در هر مدرسه" },
-      { key: "edit_users", label: "ویرایش کاربر", desc: "ویرایش همه مشخصات کاربران" },
+      { key: "create_users", label: "ساخت کاربر", desc: "ایجاد کاربر در هنرستان" },
+      { key: "edit_users", label: "ویرایش کاربر", desc: "ویرایش مشخصات کاربران همین هنرستان" },
       { key: "delete_users", label: "حذف کاربر", desc: "حذف کامل کاربر از سامانه" },
       { key: "reset_passwords", label: "بازنشانی رمز", desc: "ساخت رمز تصادفی جدید" },
       { key: "manage_admins", label: "مدیریت ادمین‌ها", desc: "ساخت/ویرایش ادمین سرویس (جز سطح دسترسی سوپرادمین)" },
-    ],
-  },
-  {
-    group: "اطلاعیه سراسری",
-    desc: "پیام‌های سطح سرویس به همه مدارس",
-    items: [
-      { key: "platform_announcements", label: "ارسال اطلاعیه سراسری", desc: "هدف‌گیری بر اساس نقش و نقشه ایران" },
     ],
   },
   {
@@ -156,10 +138,10 @@ export const ALL_SERVICE_PERMISSIONS: string[] = SERVICE_PERMISSION_GROUPS.flatM
 
 /** مجموعه دسترسی پیش‌فرض ادمین سرویس جدید (بدون حساس‌ها) */
 export const DEFAULT_ADMIN_PERMISSIONS: string[] = [
-  "view_schools", "view_users", "view_tickets", "reply_tickets", "view_audit", "view_shad",
+  "view_users", "view_tickets", "reply_tickets", "view_audit", "view_shad",
 ];
 
-/** نقش‌های سطح سرویس (بدون مدرسه) */
+/** نقش‌های مدیریتی سامانه برای همین نصب تک‌هنرستانی */
 export const SERVICE_ROLES: string[] = ["SUPER_ADMIN", "ADMIN"];
 /** نقش‌های پرسنلی مدرسه */
 export const STAFF_ROLES: string[] = ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN"];
