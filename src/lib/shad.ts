@@ -42,7 +42,6 @@ async function gatewayUrl(): Promise<string> {
   } catch { /* خالی — تنظیمات در دسترس نیست */ }
   return DEFAULT_GATEWAY_URL;
 }
-const SESSION_SECRET = getSessionSecret();
 
 export class ShadApiError extends Error {
   code: string;
@@ -58,7 +57,7 @@ export type ShadMode = "NONE" | "INTERNAL" | "EXTERNAL";
 /* ---------- AES-256-GCM برای ذخیره امن توکن (حالت EXTERNAL) ---------- */
 
 function aesKey(): Buffer {
-  return crypto.scryptSync(SESSION_SECRET, "bahar-shad-token", 32);
+  return crypto.scryptSync(getSessionSecret(), "bahar-shad-token", 32);
 }
 
 function encryptToken(token: string): string {
@@ -92,7 +91,7 @@ function decryptToken(payload: string): string | null {
 
 function hashCode(code: string): string {
   return crypto
-    .createHmac("sha256", SESSION_SECRET)
+    .createHmac("sha256", getSessionSecret())
     .update(`shad-code:${code}`)
     .digest("hex");
 }
