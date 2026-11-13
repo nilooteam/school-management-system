@@ -19,7 +19,6 @@
 - Next.js App Router و React
 - Prisma
 - SQLite/LibSQL برای نصب مستقل
-- Cloudflare Workers و D1 برای استقرار ابری
 - رابط فارسی RTL و تقویم جلالی
 
 ## اجرای محلی
