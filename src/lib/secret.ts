@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
+import { getCloudflareContext } from "@opennextjs-cloudflare";
 
 // ============================================================
 // Bahar | Single source of truth for the application signing secret.
@@ -22,6 +23,10 @@ import path from "path";
 let cached: string | null = null;
 
 export function getSessionSecret(): string {
+  try {
+    const cfSecret = (getCloudflareContext().env as { SESSION_SECRET?: unknown }).SESSION_SECRET;
+    if (typeof cfSecret === "string" && cfSecret.trim().length >= 32) return cfSecret.trim();
+  } catch { /* not inside a Workers request context — fall through to the existing sources */ }
   if (cached) return cached;
 
   const fromEnv = (process.env.SESSION_SECRET ?? "").trim();
