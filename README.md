@@ -18,12 +18,12 @@
 
 - Next.js App Router و React
 - Prisma
-- SQLite/LibSQL برای نصب مستقل
+- Cloudflare D1 در محیط تولید و SQLite/LibSQL برای توسعه محلی
 - رابط فارسی RTL و تقویم جلالی
 
 ## اجرای محلی
 
-نیازمندی‌ها: Bun و یک پایگاه داده مطابق تنظیمات محیط.
+نیازمندی‌ها: Bun و یک پایگاه داده مطابق تنظیمات محیط. در محیط محلی از SQLite/LibSQL و در Cloudflare Workers از D1 استفاده می‌شود.
 
 ```bash
 bun install
