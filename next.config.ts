@@ -31,10 +31,8 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  // Include Prisma's runtime WebAssembly engine in standalone output.
-  outputFileTracingIncludes: { "/**": ["./node_modules/.prisma/client/*.wasm"] },
   reactStrictMode: false,
+  serverExternalPackages: ["@prisma/client", ".prisma/client"],
   // Presence of the webpack() customization below makes Next 16 demand an
   // explicit builder choice; this empty config keeps the default
   // (Turbopack) build valid for standalone/any-host builds.
