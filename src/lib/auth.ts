@@ -8,7 +8,6 @@ import { enDigits } from "@/lib/persian";
 // نشست کوکی امضاشده HMAC (بدون وابستگی بیرونی)
 // ============================================================
 
-const SESSION_SECRET = getSessionSecret();
 
 const COOKIE_NAME = "bahar_session";
 const SESSION_DAYS = 14; // پیش‌فرض — در ورود از تنظیمات سامانه (settings.sessionDays) خوانده می‌شود
@@ -67,7 +66,7 @@ export function signToken(payload: Record<string, unknown>, days: number = SESSI
   const exp = Math.floor(Date.now() / 1000) + safeDays * 24 * 3600;
   const body = b64url(JSON.stringify({ ...payload, exp }));
   const sig = crypto
-    .createHmac("sha256", SESSION_SECRET)
+    .createHmac("sha256", getSessionSecret())
     .update(`${header}.${body}`)
     .digest("base64url");
   return `${header}.${body}.${sig}`;
@@ -78,7 +77,7 @@ export function verifyToken(token: string): Record<string, unknown> | null {
     const [header, body, sig] = token.split(".");
     if (!header || !body || !sig) return null;
     const expected = crypto
-      .createHmac("sha256", SESSION_SECRET)
+      .createHmac("sha256", getSessionSecret())
       .update(`${header}.${body}`)
       .digest("base64url");
     if (expected.length !== sig.length) return null;
