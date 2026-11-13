@@ -43,3 +43,7 @@ nohup.out
 .vercel
 /.open-next/
 /src/generated/
+
+# Cloudflare local development files
+.dev.vars
+.wrangler/
