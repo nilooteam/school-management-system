@@ -197,6 +197,8 @@ export function Landing({
   windowsUrl?: string | null;
   /** شاد فقط برای بسته ایران — سایر ریجن‌ها هیچ نامی از آن ندارند */
   shadEnabled?: boolean;
+  siteStrings?: Record<string, string>;
+  longStrings?: Record<string, string>;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
