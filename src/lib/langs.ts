@@ -1,27 +1,5 @@
-// ============================================================
-// بهار | کاتالوگ زبان (Bahar Language Catalog)
-// کلیدهای قابل‌ترجمه بسته‌های زبان کاستوم + متن فارسی پایه
-// ============================================================
-// ساختار کلیدها: DOMAIN_KEY
-// هر کلیدی که در بسته زبان تعریف نشده باشد → متن فارسی پایه (fallback)
+// کاتالوگ‌های ثابت فارسی بهار؛ هیچ بسته یا سازوکار ترجمه چندزبانه‌ای در این نسخه وجود ندارد.
 
-export type LangDirection = "rtl" | "ltr";
-
-export interface LanguagePackMeta {
-  code: string;
-  name: string;
-  nativeName: string;
-  direction: LangDirection;
-  author?: string;
-  version?: string;
-  notes?: string;
-}
-
-export interface LanguagePack extends LanguagePackMeta {
-  strings: Record<string, string>;
-}
-
-/** کاتالوگ کامل کلیدهای قابل‌ترجمه (با متن فارسی پایه) */
 export const CATALOG: Record<string, string> = {
   // ---------- پوسته اپ (Shell) ----------
   "shell.dashboard": "داشبورد",
@@ -1327,7 +1305,6 @@ export const CATALOG: Record<string, string> = {
   "settings.general": "عمومی",
   "settings.security": "امنیت",
   "settings.branding": "هویت بصری",
-  "settings.languages": "زبان‌ها",
   "settings.backup": "پشتیبان‌گیری",
   "settings.telegram": "تلگرام",
   "settings.saved": "تنظیمات ذخیره شد",
@@ -3749,7 +3726,6 @@ export const CATALOG: Record<string, string> = {
   "settings.save.action": "ذخیره تنظیمات",
   "settings.save.readOnly": "مشاهده‌ای — ویرایش تنظیمات فقط برای مدیر کل سامانه",
   "settings.save.reset": "بازگردانی مقادیر",
-  "settings.tab.country": "کشور",
   "settings.tab.design": "زبان طراحی",
   "settings.telegram.enable": "فعال‌سازی ربات تلگرام",
   "settings.telegram.tokenFirst": "(ابتدا توکن را ذخیره کنید)",
@@ -4329,79 +4305,6 @@ export const CATALOG: Record<string, string> = {
 /** کلیدهای مجاز — برای اعتبارسنجی بسته زبان */
 export const CATALOG_KEYS = Object.keys(CATALOG);
 
-/** اعتبارسنجی بسته زبان — خروجی: خطاها + هشدارها + آمار */
-export function validateLanguagePack(input: {
-  code?: unknown;
-  name?: unknown;
-  nativeName?: unknown;
-  direction?: unknown;
-  author?: unknown;
-  version?: unknown;
-  notes?: unknown;
-  strings?: unknown;
-}): { ok: boolean; errors: string[]; warnings: string[]; stats: { keyCount: number; coverage: number; unknownKeys: string[] } } {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-
-  if (typeof input.code !== "string" || !/^[a-z][a-z0-9-]{1,14}$/i.test(input.code.trim())) {
-    errors.push("کد زبان نامعتبر است — ۲ تا ۱۵ حرف/عدد/خط تیره (مثل en، tr، kurdish-sorani)");
-  }
-  if (typeof input.name !== "string" || input.name.trim().length < 2 || input.name.trim().length > 60) {
-    errors.push("نام زبان (فارسی) لازم است — ۲ تا ۶۰ نویسه");
-  }
-  if (typeof input.nativeName !== "string" || input.nativeName.trim().length < 1 || input.nativeName.trim().length > 60) {
-    errors.push("نام بومی زبان لازم است — ۱ تا ۶۰ نویسه");
-  }
-  if (input.direction !== "rtl" && input.direction !== "ltr") {
-    errors.push('جهت متن باید "rtl" یا "ltr" باشد');
-  }
-  if (input.strings === undefined || input.strings === null || typeof input.strings !== "object" || Array.isArray(input.strings)) {
-    errors.push('فیلد "strings" باید یک شیء JSON از کلید→متن باشد');
-    return { ok: false, errors, warnings, stats: { keyCount: 0, coverage: 0, unknownKeys: [] } };
-  }
-
-  const strings = input.strings as Record<string, unknown>;
-  const unknownKeys: string[] = [];
-  let keyCount = 0;
-
-  for (const [key, value] of Object.entries(strings)) {
-    if (!CATALOG_KEYS.includes(key)) {
-      unknownKeys.push(key);
-      continue; // کلید ناشناخته — هشدار می‌گیرد ولی رد نمی‌شود
-    }
-    if (typeof value !== "string") {
-      errors.push(`مقدار کلید «${key}» باید متن (رشته) باشد`);
-      continue;
-    }
-    if (value.length > 300) {
-      errors.push(`مقدار کلید «${key}» بیش از حد بلند است (حداکثر ۳۰۰ نویسه)`);
-      continue;
-    }
-    if (/<script|javascript:|(?:^|\s)on\w+\s*=/i.test(value)) {
-      errors.push(`مقدار کلید «${key}» شامل کد/اسکریپت مجاز نیست`);
-      continue;
-    }
-    keyCount++;
-  }
-
-  if (unknownKeys.length > 0) {
-    warnings.push(`${unknownKeys.length} کلید ناشناخته نادیده گرفته می‌شود: ${unknownKeys.slice(0, 5).join("، ")}${unknownKeys.length > 5 ? "…" : ""}`);
-  }
-  if (keyCount === 0) {
-    errors.push("هیچ کلید معتبری از کاتالوگ ترجمه نشده است");
-  }
-  const missing = CATALOG_KEYS.length - keyCount;
-  if (missing > 0) {
-    warnings.push(`${missing} کلید ترجمه نشده و به فارسی بازمی‌گردد (fallback)`);
-  }
-
-  const coverage = Math.round((keyCount / CATALOG_KEYS.length) * 100);
-  return { ok: errors.length === 0, errors, warnings, stats: { keyCount, coverage, unknownKeys } };
-}
-
-/** کاتالوگ جملات سایت عمومی (لندینگ + سربرگ/پاصفحهٔ عمومی + عنوان گام‌های کیت‌ها)
-    با متن فارسی پایه. توجه: پاسخ‌های بلند FAQ، متن‌های راهنمای کیت‌ها و
-    محتوای بلاگ «محتوا» هستند نه جملهٔ رابط کاربری، و فارسی می‌مانند. */
 export const SITE_CATALOG: Record<string, string> = {
   // ---------- سربرگ و برند ----------
   "site.brand.tagline": "سامانه مدیریت مدرسه",
@@ -4413,10 +4316,7 @@ export const SITE_CATALOG: Record<string, string> = {
   "site.login": "ورود",
   "site.panel": "ورود به پنل",
   "site.account": "ورود به حساب",
-  "site.lang": "زبان",
-  "site.lang.more": "زبان‌های بیشتر",
   "site.intro": "معرفی بهار",
-  "site.langKit": "کیت ساخت زبان",
   "site.blogTitle": "بلاگ بهار",
   // ---------- هیرو ----------
   "site.hero.badge": "یک حساب · سه پلتفرم",
@@ -4717,37 +4617,8 @@ export const SITE_CATALOG: Record<string, string> = {
   "site.kit.countries.uVillage": "روستا",
   "site.kit.countries.footerKit": "کیت کشور نسخه",
 };
-
 export const SITE_KEYS = Object.keys(SITE_CATALOG);
 
-/** اعتبارسنجی جملات سایت یک بسته — قوانین مشابه بستهٔ اپ (متن ≤ ۳۰۰ نویسه، بدون اسکریپت). */
-export function validateSitePack(input: { siteStrings?: unknown }): { ok: boolean; errors: string[]; warnings: string[]; stats: { keyCount: number; coverage: number; unknownKeys: string[] } } {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-  const strings = input.siteStrings;
-  if (strings === undefined || strings === null || typeof strings !== "object" || Array.isArray(strings)) {
-    return { ok: false, errors: ["فیلد «siteStrings» باید یک شیء JSON از کلید→متن باشد"], warnings, stats: { keyCount: 0, coverage: 0, unknownKeys: [] } };
-  }
-  const unknownKeys: string[] = [];
-  let keyCount = 0;
-  for (const [key, value] of Object.entries(strings as Record<string, unknown>)) {
-    if (!SITE_KEYS.includes(key)) { unknownKeys.push(key); continue; }
-    if (typeof value !== "string") { errors.push(`مقدار کلید سایت «${key}» باید متن باشد`); continue; }
-    if (value.length > 300) { errors.push(`مقدار کلید سایت «${key}» بیش از حد بلند است (حداکثر ۳۰۰ نویسه)`); continue; }
-    if (/<script|javascript:|(?:^|\s)on\w+\s*=/i.test(value)) { errors.push(`مقدار کلید سایت «${key}» شامل کد/اسکریپت مجاز نیست`); continue; }
-    keyCount++;
-  }
-  if (unknownKeys.length > 0) warnings.push(`${unknownKeys.length} کلید سایت ناشناخته نادیده گرفته می‌شود: ${unknownKeys.slice(0, 5).join("، ")}${unknownKeys.length > 5 ? "…" : ""}`);
-  const missing = SITE_KEYS.length - keyCount;
-  if (missing > 0) warnings.push(`${missing} جملهٔ سایت ترجمه نشده و به فارسی بازمی‌گردد (fallback)`);
-  const coverage = Math.round((keyCount / SITE_KEYS.length) * 100);
-  return { ok: errors.length === 0, errors, warnings, stats: { keyCount, coverage, unknownKeys } };
-}
-
-/** محدودیت حجم JSON بسته زبان */
-export const LANG_PACK_MAX_BYTES = 400 * 1024; // ۴۰۰KB
-
-/** کاتالوگ متن‌های بلند (پاسخ‌های FAQ، پاراگراف‌های کیت، قدم‌های راهنما) — بدون سقف ۳۰۰ نویسه؛ ترجمه‌ها ممکن است بلندتر از فارسی باشند */
 export const LONG_CATALOG: Record<string, string> = {
   "long.faq.a1": "نام کاربری شما «کد ملی» است و رمز عبور به‌صورت تصادفی توسط سامانه ساخته می‌شود و از طریق پیام‌رسان شاد به شماره ثبت‌شده شما ارسال می‌گردد. برای همه کاربران — از مدیر مدرسه تا دانش‌آموز — روش ورود یکسان است. بعد از ورود اول، از بخش پروفایل رمز خود را تغییر دهید؛ این کار برای امنیت حساب الزامی است.",
   "long.faq.a10": "در کنار کارنامه نهایی، بهار هر ماه یک خلاصه عملکرد برای هر دانش‌آموز می‌سازد: میانگین نمرات همان ماه، روزهای حضور و غیبت و تکالیف آن ماه. این خلاصه برای دانش‌آموز و ولی در بخش نمرات نمایش داده می‌شود تا روند پیشرفت ماه‌به‌ماه دیده شود.",
@@ -4763,53 +4634,5 @@ export const LONG_CATALOG: Record<string, string> = {
   "long.faq.a7": "مدیر مدرسه هنگام ساخت یا ویرایش هر معاون و معلم، دقیقاً مشخص می‌کند به چه بخش‌هایی دسترسی داشته باشد؛ مثل ثبت نمرات، حضور و غیاب، مدیریت دانش‌آموزان یا رویدادها. هر تغییر دسترسی بلافاصله اعمال می‌شود و در گزارش فعالیت ثبت می‌گردد.",
   "long.faq.a8": "مدیر مدرسه یک‌بار حساب شاد خود را به سامانه متصل می‌کند؛ از آن پس بهار نام کاربری و رمز هر کاربر جدید را به شماره شاد ثبت‌شده او می‌فرستد. این فقط یک امکان جانبی برای راحتی کار است و در صورت عدم اتصال، مدیر رمز را از راه دیگری به کاربر می‌رساند.",
   "long.faq.a9": "بله. علاوه بر نصب مستقیم از مرورگر، فایل پروژه اندرویدی بهار در اختیار مدرسه قرار می‌گیرد که با اندروید استودیو به‌راحتی به APK تبدیل می‌شود؛ بدون نیاز به گوگل‌پلی.",
-  "long.kit.countries.algoNote": "فیلد example باید واقعاً از الگوریتم رد شود — اعتبارسنجی بسته آن را می‌سنجد (کد ملی جعلی = رد بسته).",
-  "long.kit.countries.calNote": "مهم: کلیدهای تاریخ حضور و غیاب با تقویم فعال ذخیره می‌شوند (ایران: «1404-07-10» شمسی؛ میلادی: «2025-10-08»). بسته کشوری را قبل از شروع سال تحصیلی فعال کنید تا کلیدها از همان ابتدا یکدست باشند. تبدیل خودکار داده‌های تقویمیِ موجود انجام نمی‌شود (مستندسازی صریح این محدودیت).",
-  "long.kit.countries.cta": "قالب را دانلود کنید، فیلدها را با مقادیر کشور خود پر کنید و در تنظیمات → تب «کشور» بارگذاری کنید. اعتبارسنجی دقیق فارسی راهنمایان است. بازگشت به ایران همیشه یک کلیک فاصله دارد.",
-  "long.kit.countries.fieldIntro": "هر جدول زیر یک بخش از فایل JSON است. ستون «مقدار ایران» همان چیزی است که در قالب می‌بینید — الگوبرداری کنید و ستون «قاعده» را برای کشور خود رعایت کنید.",
-  "long.kit.countries.hero": "همه ویژگی‌های وابسته به ملیت — تقویم، شناسه ملی، موبایل، استان‌ها و شهرستان‌ها، نقشه، واحد پول، پایه‌های تحصیلی و هفته کاری — در یک فایل JSON. کشور پیش‌فرض ایران است؛ با بارگذاری بسته کشور، کل سامانه با جزئیات کشور شما کار می‌کند.",
-  "long.kit.countries.mapIntro": "نقشه ایرانِ بهار از GADM 4.1 با ساده‌سازی Douglas-Peucker ساخته شده — همین خط تولید را برای کشور خود اجرا کنید:",
-  "long.kit.countries.mapNote": "نقشه در قالب ایران داخل فایل هست (مرجع) — ببینید، الگو بگیرید. بدون نقشه هم همه‌چیز کار می‌کند؛ فقط انتخاب منطقه با دراپ‌داون است.",
-  "long.kit.countries.mapStep1": "GeoJSON مرز استان‌های کشورتان را از GADM / Natural Earth / OSM دانلود کنید (سطح ADM1).",
-  "long.kit.countries.mapStep2": "با mapshaper.org یا اسکریپت ساده‌سازی، هر استان را به مسیر SVG سبک (زیر ۳۰KB) تبدیل کنید.",
-  "long.kit.countries.mapStep3": "برای هر استان: { name, d, cx, cy } — d مسیر SVG (شروع با M)، cx/cy مرکز برای برچسب hover.",
-  "long.kit.countries.mapStep4": "viewBox را بر اساس bounds کلی تنظیم کنید (مثل ایران: ۷۶۰×۶۸۸).",
-  "long.kit.countries.mapStep5": "بخش map را به JSON اضافه کنید — اگر name هر استان با regions نام‌های یکی باشد، دکمه نقشه همان استان را انتخاب می‌کند.",
-  "long.kit.countries.step1": "فایل template.json دقیقاً پروفایل ایران است — ۳۱ استان و ۴۲۹ شهرستان، تقویم شمسی، کد ملی mod-11، موبایل ۰۹…، تومان، پایه هفتم تا دوازدهم و هفته شنبه تا چهارشنبه. هر فیلد را با مقادیر کشور خود جایگزین کنید.",
-  "long.kit.countries.step2": "زیر هر بخش از این صفحه، فیلدها با نوع، محدوده و مثال ایران مستند شده‌اند. فیلد جا‌مانده = رد شدن بسته در اعتبارسنجی (خطای دقیق فارسی می‌گیرید).",
-  "long.kit.countries.step3": "استان‌ها/ایالت‌ها + شهرستان‌ها را در regions بریزید. اگر نقشه SVG هم می‌خواهید، از GeoJSON رسمی کشورتان با ساده‌سازی Douglas-Peucker مسیر بسازید (دستور دقیق پایین صفحه). نقشه اختیاری است — بدون آن فقط دراپ‌داون نمایش داده می‌شود.",
-  "long.kit.countries.step4": "مدیر کل در تنظیمات → تب «کشور» فایل را بارگذاری می‌کند. اعتبارسنجی خشک (؟validate=1) ساختار، تقویم، regexها، مناطق و نقشه را می‌سنجد و آمار می‌دهد — خطاها فارسی و دقیق‌اند.",
-  "long.kit.countries.step5": "با «فعال‌سازی»، تقویم کل سامانه (نمایش تاریخ‌ها + کلیدهای حضور و غیاب)، اعتبارسنجی کد ملی/موبایل در ورود و ثبت‌نام، دراپ‌داون‌های استان و پایه، واحد پول و هفته کاری همه به کشور جدید می‌روند. بازگشت به ایران همیشه با یک کلیک هست.",
-  "long.kit.languages.cta": "تمپلیت را دانلود کنید، ترجمه کنید و از طریق مدیر سامانه فعال کنید — همه کاربران شما بلافاصله زبان جدید را انتخاب می‌کنند.",
-  "long.kit.languages.hero": "رابط کاربری بهار به‌صورت پیش‌فرض فارسی است — اما با «بسته زبان» می‌توانید کل پنل را به هر زبانی ترجمه کنید: انگلیسی، عربی، ترکی، کردی، گیلکی، بلوچی یا زبان محلی مدرسه شما. ساختار JSON ساده است، ترجمه ناقص هم مجاز است و کلیدهای ترجمه‌نشده به فارسی برمی‌گردند. برای شروع سریع، بسته آماده انگلیسی (۲۰۰ کلید اپ؛ جملات سایت و متن‌های بلند در دست تکمیل) را دانلود کنید و به‌عنوان الگو استفاده کنید.",
-  "long.kit.languages.step1": "فایل تمپلیت رسمی بهار را دانلود کنید — شامل همه کلیدهای قابل‌ترجمه با ساختار استاندارد JSON و راهنمای داخل فایل.",
-  "long.kit.languages.step2": "متن فارسی هر کلید را به زبان مقصد ترجمه کنید. کلیدهایی که ترجمه نمی‌شوند حذف شوند — آن موارد به‌صورت خودکار به فارسی برمی‌گردند و هیچ چیزی خراب نمی‌شود.",
-  "long.kit.languages.step3": "کد یکتای زبان (مثل en یا kurdish-sorani)، نام فارسی، نام بومی و جهت متن (rtl/ltr) را در فیلدهای بالای فایل بنویسید.",
-  "long.kit.languages.step4": "مدیر کل در تنظیمات → «زبان‌ها و ترجمه» فایل را بارگذاری می‌کند؛ سامانه اعتبارسنجی می‌کند، درصد پوشش را می‌سنجد و بسته را فعال می‌کند.",
-  "long.kit.languages.step5": "به‌محض فعال شدن، زبان جدید در انتخاب‌گر زبان همه کاربران (وب، اندروید، ویندوز) ظاهر می‌شود و جهت رابط کاربری خودکار تنظیم می‌شود.",
-  "long.kit.languages.structureNote": "بسته‌ها قبل از ذخیره اعتبارسنجی می‌شوند (نوع فیلدها، طول متن‌ها، نبودِ کد اجرایی) و فقط مدیر کل سامانه می‌تواند آن‌ها را بارگذاری و فعال کند. نمایش متن‌ها همیشه با فرار امن HTML انجام می‌شود.",
 };
-
 export const LONG_KEYS = Object.keys(LONG_CATALOG);
-
-/** اعتبارسنجی متن‌های بلند یک بسته: ساختار + نبودِ کد اجرایی؛ نبودِ کلید فقط هشدار است (بازگشت به فارسی) */
-export function validateLongPack(longStrings: unknown): { ok: boolean; errors: string[]; warnings: string[]; stats: { keyCount: number; coverage: number; unknownKeys: string[] } } {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-  if (longStrings == null) return { ok: true, errors, warnings, stats: { keyCount: 0, coverage: 0, unknownKeys: [] } };
-  if (typeof longStrings !== "object" || Array.isArray(longStrings)) {
-    return { ok: false, errors: ["longStrings must be an object"], warnings, stats: { keyCount: 0, coverage: 0, unknownKeys: [] } };
-  }
-  const obj = longStrings as Record<string, unknown>;
-  const unknownKeys: string[] = [];
-  let keyCount = 0;
-  for (const [k, v] of Object.entries(obj)) {
-    if (!LONG_KEYS.includes(k)) { unknownKeys.push(k); continue; }
-    if (typeof v !== "string") { errors.push(`${k}: must be a string`); continue; }
-    if (/<script|javascript:|on\w+=/i.test(v)) { errors.push(`${k}: script-like content rejected`); continue; }
-    keyCount++;
-  }
-  for (const k of LONG_KEYS) if (!(k in obj)) warnings.push(`${k}: missing (falls back to Persian)`);
-  const coverage = LONG_KEYS.length === 0 ? 100 : Math.round((keyCount / LONG_KEYS.length) * 100);
-  return { ok: errors.length === 0, errors, warnings, stats: { keyCount, coverage, unknownKeys } };
-}
