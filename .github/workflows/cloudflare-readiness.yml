@@ -1,0 +1,56 @@
+name: Cloudflare readiness
+
+on:
+  push:
+    branches:
+      - refactor/single-iranian-vocational-school
+    paths-ignore:
+      - "migrations/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate-migrate-build:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "file:./db/custom.db"
+      SESSION_SECRET: "ci-only-not-a-production-secret-change-me-0000000000000000"
+    steps:
+      - name: Check out project
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/single-iranian-vocational-school
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Validate Prisma schema
+        run: bunx prisma validate
+
+      - name: Generate initial D1 migration
+        run: |
+          mkdir -p migrations
+          bun run db:d1:generate
+
+      - name: Commit generated migration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add migrations/0001_initial.sql
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate initial Cloudflare D1 schema migration"
+            git push
+          fi
+
+      - name: Build Next.js application
+        run: bun run build
+
+      - name: Build Cloudflare Worker
+        run: bunx opennextjs-cloudflare build
