@@ -4,8 +4,6 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { Markdown } from "@/components/shared/markdown";
 import { formatDateFa, faNumber } from "@/lib/persian";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { SiteLangSelect } from "@/components/shared/site-lang-select";
 import { cookies } from "next/headers";
 import { SITE_CATALOG } from "@/lib/langs";
 import { siteStringsFor } from "@/lib/langs/shipped";
@@ -75,7 +73,7 @@ export default async function BlogPostPage({ params }: Props) {
             <Image src="/logo.svg" alt="بهار" width={28} height={28} />
             <b className="text-base">{tx("site.blog.label", "بلاگ")}</b>
           </Link>
-          <div className="ms-auto flex items-center gap-1.5"><SiteLangSelect current={siteLang} /><ThemeToggle /><Link href="/" className="b-btn b-btn-soft b-btn-sm">{tx("site.blog.home", "خانه")}</Link></div>
+          <div className="ms-auto flex items-center gap-1.5"><ThemeToggle /><Link href="/" className="b-btn b-btn-soft b-btn-sm">{tx("site.blog.home", "خانه")}</Link></div>
         </div>
       </header>
 
