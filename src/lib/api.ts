@@ -17,7 +17,8 @@ export type SessionUser = {
   firstName: string;
   lastName: string;
   schoolId: string | null;
-  /** راند ۱۹: مدرسهٔ فعال سوپرادمین/ادمین (پنل مدرسه) — پس از ادغام در schoolId */
+  /** فیلد سازگاری برای مصرف‌کنندگان قدیمی؛ در نسخه تک‌هنرستانی همیشه null است. */
+  actingSchoolId?: string | null;
   mustChangePassword: boolean;
   isActive: boolean;
   shadNumber: string | null;
