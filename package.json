@@ -97,5 +97,6 @@
     "wrangler": "^4.152.0"
   },
   "description": "Bahar — a comprehensive school management system (multi-tenant, Persian-first).",
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "bun@1.4.4"
 }
