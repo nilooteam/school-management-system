@@ -34,6 +34,9 @@ jobs:
       - name: Validate Prisma schema
         run: bunx prisma validate
 
+      - name: Type-check application
+        run: bunx tsc --noEmit
+
       - name: Generate initial D1 migration
         run: |
           mkdir -p migrations
