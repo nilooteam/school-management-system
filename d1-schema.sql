@@ -1,3 +1,9 @@
+-- بهار: حذف جداول بسته‌های زبان/کشور و گردش انتقال بین مدارس در نسخه تک‌هنرستانی.
+-- این جداول دیگر در کد استفاده نمی‌شوند.
+DROP TABLE IF EXISTS "CountryPack";
+DROP TABLE IF EXISTS "LanguagePack";
+DROP TABLE IF EXISTS "TransferRequest";
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL PRIMARY KEY,
