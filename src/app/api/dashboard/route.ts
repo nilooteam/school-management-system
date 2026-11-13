@@ -45,24 +45,25 @@ export async function GET(req: NextRequest) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         monthKeys.push(d.toISOString().slice(0, 7));
       }
-      const allSchools = await db.school.findMany({ select: { createdAt: true } });
-      const schoolGrowth = monthKeys.map((k) => ({
-        month: k,
-        count: allSchools.filter((s) => s.createdAt.toISOString().slice(0, 7) <= k).length,
-      }));
-      // رشد کاربران و دانش‌آموزان با همان کلیدهای ماهانهٔ رشد مدارس (انباشته تا پایان هر ماه)
-      const [allUsersCreated, allStudentsCreated] = await Promise.all([
-        db.user.findMany({ select: { createdAt: true } }),
-        db.student.findMany({ select: { createdAt: true } }),
+      const growthByMonth = async (table: "School" | "User" | "Student") => {
+        const rows = await db.$queryRawUnsafe<{ m: string | null; c: number }[]>(`SELECT strftime('%Y-%m', "createdAt") AS m, COUNT(*) AS c FROM "${table}" GROUP BY m ORDER BY m`);
+        const byMonth = new Map<string, number>();
+        let running = 0;
+        for (const r of rows) {
+          if (!r.m) continue;
+          if (r.m < monthKeys[0]) running += Number(r.c);
+          else byMonth.set(r.m, Number(r.c));
+        }
+        return monthKeys.map((k) => {
+          running += byMonth.get(k) ?? 0;
+          return { month: k, count: running };
+        });
+      };
+      const [schoolGrowth, usersGrowth, studentsGrowth] = await Promise.all([
+        growthByMonth("School"),
+        growthByMonth("User"),
+        growthByMonth("Student"),
       ]);
-      const usersGrowth = monthKeys.map((k) => ({
-        month: k,
-        count: allUsersCreated.filter((u) => u.createdAt.toISOString().slice(0, 7) <= k).length,
-      }));
-      const studentsGrowth = monthKeys.map((k) => ({
-        month: k,
-        count: allStudentsCreated.filter((u) => u.createdAt.toISOString().slice(0, 7) <= k).length,
-      }));
 
       const settings = await getSettings();
       let autoCreated = false;
