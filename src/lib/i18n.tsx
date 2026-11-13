@@ -7,7 +7,7 @@ export interface ActiveLang {
   code: "fa";
   name: "فارسی";
   nativeName: "فارسی";
-  direction: "rtl";
+  direction: "rtl" | "ltr";
   strings: Record<string, string>;
 }
 const FA: ActiveLang = { code: "fa", name: "فارسی", nativeName: "فارسی", direction: "rtl", strings: {} };
