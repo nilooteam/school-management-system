@@ -35,8 +35,10 @@ async function canPreview(schoolId: string): Promise<boolean> {
 
 export async function generateMetadata({ params }: Props) {
   const { subdomain } = await params;
-  const site = await db.schoolSite.findUnique({
-    where: { subdomain },
+  const primarySchool = await db.school.findFirst({ where: { isActive: true }, orderBy: { createdAt: "asc" }, select: { id: true } });
+  if (!primarySchool) return { title: "مدرسه یافت نشد | بهار" };
+  const site = await db.schoolSite.findFirst({
+    where: { subdomain, schoolId: primarySchool.id },
     include: { school: { select: { name: true, motto: true } } },
   });
   if (!site) return { title: "مدرسه یافت نشد | بهار" };
@@ -52,8 +54,10 @@ export default async function SchoolSitePage({ params, searchParams }: Props) {
   const sp = await searchParams;
   const previewRequested = sp.preview === "1";
 
-  const site = await db.schoolSite.findUnique({
-    where: { subdomain },
+  const primarySchool = await db.school.findFirst({ where: { isActive: true }, orderBy: { createdAt: "asc" }, select: { id: true } });
+  if (!primarySchool) notFound();
+  const site = await db.schoolSite.findFirst({
+    where: { subdomain, schoolId: primarySchool.id },
     include: { school: true },
   });
   if (!site) notFound();

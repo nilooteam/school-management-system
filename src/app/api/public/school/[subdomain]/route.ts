@@ -11,8 +11,10 @@ type Ctx = { params: Promise<{ subdomain: string }> };
 export async function GET(_req: NextRequest, ctx: Ctx) {
   try {
     const { subdomain } = await ctx.params;
-    const site = await db.schoolSite.findUnique({
-      where: { subdomain },
+    const primarySchool = await db.school.findFirst({ where: { isActive: true }, orderBy: { createdAt: "asc" }, select: { id: true } });
+    if (!primarySchool) throw new ApiError(404, "NOT_FOUND", "سایت هنرستان یافت نشد.");
+    const site = await db.schoolSite.findFirst({
+      where: { subdomain, schoolId: primarySchool.id },
       include: { school: true },
     });
     if (!site || !site.published) {
@@ -92,8 +94,10 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
 export async function POST(req: NextRequest, ctx: Ctx) {
   try {
     const { subdomain } = await ctx.params;
-    const site = await db.schoolSite.findUnique({
-      where: { subdomain },
+    const primarySchool = await db.school.findFirst({ where: { isActive: true }, orderBy: { createdAt: "asc" }, select: { id: true } });
+    if (!primarySchool) throw new ApiError(404, "NOT_FOUND", "سایت هنرستان یافت نشد.");
+    const site = await db.schoolSite.findFirst({
+      where: { subdomain, schoolId: primarySchool.id },
       include: { school: { select: { id: true, name: true, isActive: true } } },
     });
     if (!site || !site.published || !site.school.isActive) {

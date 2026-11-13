@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { requireUser, apiOk, apiErr, handleApiError, readJson, audit, ApiError, isDemoUser, actingSchoolIdFor } from "@/lib/api";
+import { requireUser, apiOk, apiErr, handleApiError, readJson, audit, ApiError, isDemoUser, requireSchoolId } from "@/lib/api";
 import { defaultSiteConfig, parseSiteConfig, templateOf, isKnownTemplateId, isHexColor, SITE_TEMPLATES, type SiteConfig } from "@/lib/school-site";
 import { slugify } from "@/lib/persian";
 
@@ -8,12 +8,7 @@ import { slugify } from "@/lib/persian";
 export async function GET(req: NextRequest) {
   try {
     const me = await requireUser(req);
-    const actingCookie = actingSchoolIdFor(req, me) ?? undefined;
-    const schoolIdParam = new URL(req.url).searchParams.get("schoolId");
-    const schoolId = me.role === "SUPER_ADMIN" || me.role === "ADMIN"
-      ? (actingCookie ?? (me.role === "SUPER_ADMIN" ? schoolIdParam ?? undefined : undefined))
-      : me.schoolId;
-    if (!schoolId) throw new ApiError(400, "NO_SCHOOL", "مدرسه‌ای انتخاب نشده است.");
+    const schoolId = requireSchoolId(me);
 
     const school = await db.school.findUnique({
       where: { id: schoolId },
@@ -52,20 +47,14 @@ export async function PUT(req: NextRequest) {
     const me = await requireUser(req);
     if (await isDemoUser(me)) return apiErr(403, "این قابلیت در حساب دمو غیرفعال است.", "DEMO_READONLY");
     const body = await readJson<Record<string, unknown>>(req);
-    const actingCookie = actingSchoolIdFor(req, me) ?? undefined;
-    // ADMIN فقط در پنل مدرسه (کوکی معتبر) یا با مجوز edit_schools می‌تواند ویرایش کند
-    const schoolId = me.role === "SUPER_ADMIN"
-      ? (String(body.schoolId ?? "") || actingCookie || undefined)
-      : me.role === "MANAGER" ? me.schoolId ?? undefined
-      : actingCookie;
-    if (!schoolId) throw new ApiError(400, "NO_SCHOOL", "مدرسه‌ای انتخاب نشده است.");
+    const schoolId = requireSchoolId(me);
 
     const school = await db.school.findUnique({ where: { id: schoolId }, include: { site: true } });
     if (!school) throw new ApiError(404, "NOT_FOUND", "مدرسه یافت نشد.");
 
     const isOwnManager = me.role === "MANAGER" && me.schoolId === schoolId;
     const isSuper = me.role === "SUPER_ADMIN";
-    const isAdminEditor = me.role === "ADMIN" && !!actingCookie && actingCookie === schoolId;
+    const isAdminEditor = me.role === "ADMIN";
     if (!isOwnManager && !isSuper && !isAdminEditor) {
       throw new ApiError(403, "FORBIDDEN", "ویرایش سایت مدرسه فقط توسط مدیر آن مدرسه یا ادمین سامانه ممکن است.");
     }

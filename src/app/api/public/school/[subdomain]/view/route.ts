@@ -12,8 +12,10 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     if (!rateLimit(`siteview:${ipOf(req)}:${subdomain}`, 10, 10 * 60_000)) {
       return apiErr(429, "ثبت بازدید بیش از حد مجاز است.", "RATE_LIMITED");
     }
-    const site = await db.schoolSite.findUnique({
-      where: { subdomain },
+    const primarySchool = await db.school.findFirst({ where: { isActive: true }, orderBy: { createdAt: "asc" }, select: { id: true } });
+    if (!primarySchool) throw new ApiError(404, "NOT_FOUND", "سایت هنرستان یافت نشد.");
+    const site = await db.schoolSite.findFirst({
+      where: { subdomain, schoolId: primarySchool.id },
       select: { id: true, published: true, school: { select: { isActive: true } } },
     });
     if (!site || !site.published) {
