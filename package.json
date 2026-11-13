@@ -12,9 +12,10 @@
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "deploy": "bun run db:d1:apply && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-    "db:d1:generate": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script --output migrations/0001_initial.sql"
+    "db:d1:generate": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script --output migrations/0001_initial.sql",
+    "db:d1:apply": "wrangler d1 migrations apply bahar-db --remote"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
