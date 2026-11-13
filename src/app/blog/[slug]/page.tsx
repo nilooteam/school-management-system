@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { Markdown } from "@/components/shared/markdown";
 import { formatDateFa, faNumber } from "@/lib/persian";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { cookies } from "next/headers";
 import { SITE_CATALOG } from "@/lib/langs";
 import { siteStringsFor } from "@/lib/langs/shipped";
