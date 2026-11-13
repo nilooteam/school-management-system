@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { db } from "@/lib/db";
 import { verifyToken, SESSION_COOKIE_NAME } from "@/lib/auth";
-import { parsePermissions } from "@/lib/roles";
+import { hasPermission, parsePermissions } from "@/lib/roles";
 import { getSettings } from "@/lib/settings";
 
 // ============================================================
