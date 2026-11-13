@@ -1,0 +1,3499 @@
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "nationalId" TEXT NOT NULL,
+    "passwordHash" TEXT NOT NULL,
+    "tempPassword" TEXT,
+    "mustChangePassword" BOOLEAN NOT NULL DEFAULT true,
+    "role" TEXT NOT NULL,
+    "permissions" TEXT NOT NULL DEFAULT '[]',
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "fatherName" TEXT,
+    "gender" TEXT,
+    "birthDate" DATETIME,
+    "birthPlace" TEXT,
+    "phone" TEXT,
+    "homePhone" TEXT,
+    "shadNumber" TEXT,
+    "email" TEXT,
+    "address" TEXT,
+    "postalCode" TEXT,
+    "photoUrl" TEXT,
+    "profileImageType" TEXT,
+    "avatarConfig" TEXT,
+    "education" TEXT,
+    "fieldOfStudy" TEXT,
+    "jobTitle" TEXT,
+    "hireDate" DATETIME,
+    "staffCode" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "lastLoginAt" DATETIME,
+    "failedAttempts" INTEGER NOT NULL DEFAULT 0,
+    "lockedUntil" DATETIME,
+    "tokenVersion" INTEGER NOT NULL DEFAULT 0,
+    "langCode" TEXT,
+    "twoFactorSecret" TEXT,
+    "twoFactorEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "backupCodes" TEXT,
+    "schoolId" TEXT,
+    "createdBy" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "User_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "School" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "type" TEXT,
+    "address" TEXT,
+    "phone" TEXT,
+    "city" TEXT,
+    "province" TEXT,
+    "county" TEXT,
+    "establishedYear" INTEGER,
+    "motto" TEXT,
+    "about" TEXT,
+    "logoUrl" TEXT,
+    "managerId" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "calendarSystem" TEXT NOT NULL DEFAULT 'JALALI',
+    "gradingScale" TEXT NOT NULL DEFAULT 'SCORE20',
+    "currencyLabel" TEXT NOT NULL DEFAULT 'تومان',
+    "weekStart" TEXT NOT NULL DEFAULT 'SATURDAY',
+    "shadEnabled" BOOLEAN NOT NULL DEFAULT true,
+    "custodianEnabled" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "School_managerId_fkey" FOREIGN KEY ("managerId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Class" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "grade" TEXT NOT NULL,
+    "field" TEXT,
+    "academicYear" TEXT NOT NULL,
+    "capacity" INTEGER NOT NULL DEFAULT 30,
+    "roomNumber" TEXT,
+    "homeroomTeacherId" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Class_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Class_homeroomTeacherId_fkey" FOREIGN KEY ("homeroomTeacherId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Student" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "classId" TEXT,
+    "schoolId" TEXT NOT NULL,
+    "studentNumber" TEXT NOT NULL,
+    "entryYear" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "previousSchool" TEXT,
+    "healthNotes" TEXT,
+    "birthOrder" INTEGER,
+    "siblingsHere" BOOLEAN NOT NULL DEFAULT false,
+    "tags" TEXT NOT NULL DEFAULT '[]',
+    "customFields" TEXT NOT NULL DEFAULT '{}',
+    "houseId" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Student_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Student_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Student_houseId_fkey" FOREIGN KEY ("houseId") REFERENCES "House" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "StudentParent" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "parentUserId" TEXT NOT NULL,
+    "relation" TEXT NOT NULL DEFAULT 'FATHER',
+    "isPrimary" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "StudentParent_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "StudentParent_parentUserId_fkey" FOREIGN KEY ("parentUserId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Subject" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "code" TEXT,
+    "grade" TEXT,
+    "weeklyHours" INTEGER NOT NULL DEFAULT 2,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Subject_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TeachingAssignment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "teacherId" TEXT NOT NULL,
+    "classId" TEXT NOT NULL,
+    "subjectId" TEXT NOT NULL,
+    "academicYear" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "TeachingAssignment_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "TeachingAssignment_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "TeachingAssignment_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "TeachingAssignment_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ScheduleSlot" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "classId" TEXT NOT NULL,
+    "dayOfWeek" INTEGER NOT NULL,
+    "period" INTEGER NOT NULL,
+    "subjectId" TEXT,
+    "teacherId" TEXT,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ScheduleSlot_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ScheduleSlot_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "ScheduleSlot_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Attendance" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "classId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "period" INTEGER NOT NULL DEFAULT 0,
+    "subjectId" TEXT,
+    "status" TEXT NOT NULL,
+    "method" TEXT NOT NULL DEFAULT 'MANUAL',
+    "sourceLabel" TEXT,
+    "note" TEXT,
+    "recordedById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Attendance_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Attendance_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Attendance_recordedById_fkey" FOREIGN KEY ("recordedById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "GradeRecord" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "subjectId" TEXT NOT NULL,
+    "classId" TEXT NOT NULL,
+    "term" INTEGER NOT NULL,
+    "kind" TEXT NOT NULL,
+    "score" REAL NOT NULL,
+    "maxScore" REAL NOT NULL DEFAULT 20,
+    "weight" REAL NOT NULL DEFAULT 1,
+    "locked" BOOLEAN NOT NULL DEFAULT false,
+    "note" TEXT,
+    "enteredById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "GradeRecord_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "GradeRecord_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "GradeRecord_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "GradeRecord_enteredById_fkey" FOREIGN KEY ("enteredById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Assignment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "classId" TEXT NOT NULL,
+    "subjectId" TEXT,
+    "teacherId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "dueDate" DATETIME NOT NULL,
+    "targetStudentIds" TEXT NOT NULL DEFAULT '[]',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Assignment_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Assignment_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Assignment_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SchoolEvent" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "startAt" DATETIME NOT NULL,
+    "endAt" DATETIME,
+    "kind" TEXT NOT NULL DEFAULT 'OTHER',
+    "audience" TEXT NOT NULL DEFAULT 'ALL',
+    "classId" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "SchoolEvent_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "SchoolEvent_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "SchoolEvent_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Announcement" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "scope" TEXT NOT NULL DEFAULT 'SCHOOL',
+    "schoolId" TEXT,
+    "title" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "audienceRoles" TEXT NOT NULL DEFAULT '[]',
+    "targetProvinces" TEXT NOT NULL DEFAULT '[]',
+    "targetCounties" TEXT NOT NULL DEFAULT '[]',
+    "classId" TEXT,
+    "pinned" BOOLEAN NOT NULL DEFAULT false,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Announcement_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Announcement_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Announcement_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Message" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "senderId" TEXT NOT NULL,
+    "recipientId" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "sentAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "readAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Message_recipientId_fkey" FOREIGN KEY ("recipientId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ShadSession" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "authTokenEnc" TEXT,
+    "accountGuid" TEXT,
+    "accountName" TEXT,
+    "apiSessionId" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "authorizedAt" DATETIME,
+    "expiresAt" DATETIME,
+    "authorizedBy" TEXT,
+    "verificationCodeHash" TEXT,
+    "codeExpiresAt" DATETIME,
+    "codeSentAt" DATETIME,
+    "codeAttempts" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ShadSession_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "ShadSession_authorizedBy_fkey" FOREIGN KEY ("authorizedBy") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ShadOutbox" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "sessionId" TEXT,
+    "recipientUserId" TEXT,
+    "recipientName" TEXT,
+    "recipientShadNumber" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "purpose" TEXT NOT NULL DEFAULT 'CREDENTIALS',
+    "status" TEXT NOT NULL DEFAULT 'QUEUED',
+    "error" TEXT,
+    "sentAt" DATETIME,
+    "attempts" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ShadOutbox_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "ShadOutbox_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "ShadSession" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AuditLog" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT,
+    "userName" TEXT,
+    "action" TEXT NOT NULL,
+    "entityType" TEXT,
+    "entityId" TEXT,
+    "meta" TEXT,
+    "schoolId" TEXT,
+    "ip" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "AuditLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Setting" (
+    "key" TEXT NOT NULL PRIMARY KEY,
+    "value" TEXT NOT NULL,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "ProfileChangeRequest" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "changes" TEXT NOT NULL,
+    "reason" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "reviewedById" TEXT,
+    "reviewNote" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "reviewedAt" DATETIME,
+    CONSTRAINT "ProfileChangeRequest_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ProfileChangeRequest_reviewedById_fkey" FOREIGN KEY ("reviewedById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Ticket" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "code" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "subject" TEXT NOT NULL,
+    "category" TEXT NOT NULL DEFAULT 'GENERAL',
+    "priority" TEXT NOT NULL DEFAULT 'NORMAL',
+    "status" TEXT NOT NULL DEFAULT 'OPEN',
+    "schoolId" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Ticket_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TicketMessage" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "ticketId" TEXT NOT NULL,
+    "senderId" TEXT,
+    "fromAdmin" BOOLEAN NOT NULL DEFAULT false,
+    "body" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "TicketMessage_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "TicketMessage_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BlogPost" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "excerpt" TEXT,
+    "body" TEXT NOT NULL,
+    "coverUrl" TEXT,
+    "tags" TEXT NOT NULL DEFAULT '[]',
+    "status" TEXT NOT NULL DEFAULT 'DRAFT',
+    "authorId" TEXT,
+    "viewCount" INTEGER NOT NULL DEFAULT 0,
+    "publishedAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "BlogPost_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BlogComment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "postId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "approved" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "BlogComment_postId_fkey" FOREIGN KEY ("postId") REFERENCES "BlogPost" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SchoolSite" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "subdomain" TEXT NOT NULL,
+    "templateId" TEXT NOT NULL DEFAULT 'classic',
+    "published" BOOLEAN NOT NULL DEFAULT false,
+    "config" TEXT NOT NULL DEFAULT '{}',
+    "views" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "SchoolSite_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SchoolLead" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "parentName" TEXT,
+    "phone" TEXT NOT NULL,
+    "grade" TEXT,
+    "message" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'NEW',
+    "note" TEXT,
+    "convertedStudentId" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "SchoolLead_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "StudentFee" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "dueDate" DATETIME,
+    "status" TEXT NOT NULL DEFAULT 'UNPAID',
+    "paidAt" DATETIME,
+    "note" TEXT,
+    "lastOverdueNoticeAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "StudentFee_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "StudentFee_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Backup" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "filename" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'MANUAL',
+    "sizeBytes" INTEGER NOT NULL DEFAULT 0,
+    "recordCount" INTEGER NOT NULL DEFAULT 0,
+    "note" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Backup_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Notification" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "category" TEXT NOT NULL DEFAULT 'INFO',
+    "title" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "link" TEXT,
+    "kind" TEXT NOT NULL DEFAULT 'SYSTEM',
+    "readAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BehaviorRecord" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "classId" TEXT,
+    "schoolId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL,
+    "reason" TEXT NOT NULL,
+    "note" TEXT,
+    "points" INTEGER NOT NULL DEFAULT 0,
+    "recordedById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "BehaviorRecord_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "BehaviorRecord_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "BehaviorRecord_recordedById_fkey" FOREIGN KEY ("recordedById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Badge" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT,
+    "key" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "icon" TEXT NOT NULL,
+    "tier" TEXT NOT NULL DEFAULT 'BRONZE',
+    "effectKind" TEXT NOT NULL DEFAULT 'NONE',
+    "effectValue" TEXT,
+    "points" INTEGER NOT NULL DEFAULT 10,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Badge_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "StudentBadge" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "badgeId" TEXT NOT NULL,
+    "awardedById" TEXT,
+    "isFeatured" BOOLEAN NOT NULL DEFAULT false,
+    "awardedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "StudentBadge_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "StudentBadge_badgeId_fkey" FOREIGN KEY ("badgeId") REFERENCES "Badge" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "StudentBadge_awardedById_fkey" FOREIGN KEY ("awardedById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Question" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "subjectId" TEXT,
+    "grade" TEXT,
+    "topic" TEXT NOT NULL,
+    "difficulty" TEXT NOT NULL DEFAULT 'MEDIUM',
+    "kind" TEXT NOT NULL DEFAULT 'MULTI',
+    "body" TEXT NOT NULL,
+    "options" TEXT NOT NULL DEFAULT '[]',
+    "answer" TEXT,
+    "explanation" TEXT,
+    "imageUrl" TEXT,
+    "usageCount" INTEGER NOT NULL DEFAULT 0,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Question_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Question_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Question_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ResourceLink" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "subjectId" TEXT,
+    "grade" TEXT,
+    "topic" TEXT,
+    "title" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "description" TEXT,
+    "kind" TEXT NOT NULL DEFAULT 'ARTICLE',
+    "addedById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ResourceLink_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ResourceLink_subjectId_fkey" FOREIGN KEY ("subjectId") REFERENCES "Subject" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "ResourceLink_addedById_fkey" FOREIGN KEY ("addedById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Meeting" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT,
+    "requestedById" TEXT NOT NULL,
+    "staffId" TEXT NOT NULL,
+    "topic" TEXT NOT NULL,
+    "note" TEXT,
+    "slotStart" DATETIME NOT NULL,
+    "slotEnd" DATETIME NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "reviewNote" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Meeting_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Meeting_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Meeting_requestedById_fkey" FOREIGN KEY ("requestedById") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Meeting_staffId_fkey" FOREIGN KEY ("staffId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ChangelogEntry" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "version" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "publishedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "LeaveRequest" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'PERSONAL',
+    "fromDate" DATETIME NOT NULL,
+    "toDate" DATETIME NOT NULL,
+    "reason" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "reviewedById" TEXT,
+    "reviewNote" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "LeaveRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "LeaveRequest_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TelegramLink" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "chatId" TEXT NOT NULL,
+    "username" TEXT,
+    "linkCode" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "TelegramLink_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Task" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'TODO',
+    "priority" TEXT NOT NULL DEFAULT 'NORMAL',
+    "dueDate" DATETIME,
+    "assigneeId" TEXT,
+    "createdById" TEXT,
+    "studentId" TEXT,
+    "classId" TEXT,
+    "sourceKind" TEXT,
+    "sourceId" TEXT,
+    "doneAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Task_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Task_assigneeId_fkey" FOREIGN KEY ("assigneeId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Task_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Task_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AutomationRule" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "trigger" TEXT NOT NULL,
+    "config" TEXT NOT NULL DEFAULT '{}',
+    "action" TEXT NOT NULL,
+    "actionConfig" TEXT NOT NULL DEFAULT '{}',
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "runCount" INTEGER NOT NULL DEFAULT 0,
+    "lastRunAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "AutomationRule_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AutomationLog" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "ruleId" TEXT NOT NULL,
+    "schoolId" TEXT NOT NULL,
+    "trigger" TEXT NOT NULL,
+    "summary" TEXT NOT NULL,
+    "result" TEXT NOT NULL DEFAULT 'DONE',
+    "detail" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "AutomationLog_ruleId_fkey" FOREIGN KEY ("ruleId") REFERENCES "AutomationRule" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Room" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'CLASSROOM',
+    "capacity" INTEGER NOT NULL DEFAULT 30,
+    "floor" INTEGER,
+    "note" TEXT,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Room_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Booking" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "roomId" TEXT,
+    "assetId" TEXT,
+    "byId" TEXT NOT NULL,
+    "purpose" TEXT NOT NULL,
+    "startAt" DATETIME NOT NULL,
+    "endAt" DATETIME NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'APPROVED',
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Booking_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Booking_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Booking_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Booking_byId_fkey" FOREIGN KEY ("byId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Asset" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "category" TEXT NOT NULL DEFAULT 'OTHER',
+    "location" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'OK',
+    "custodianId" TEXT,
+    "purchaseDate" DATETIME,
+    "value" INTEGER,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Asset_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Asset_custodianId_fkey" FOREIGN KEY ("custodianId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "MaintenanceTicket" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "assetId" TEXT,
+    "roomId" TEXT,
+    "location" TEXT,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "priority" TEXT NOT NULL DEFAULT 'NORMAL',
+    "status" TEXT NOT NULL DEFAULT 'OPEN',
+    "slaHours" INTEGER NOT NULL DEFAULT 48,
+    "reportedById" TEXT NOT NULL,
+    "assignedToId" TEXT,
+    "resolvedAt" DATETIME,
+    "resolutionNote" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "MaintenanceTicket_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "MaintenanceTicket_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "MaintenanceTicket_reportedById_fkey" FOREIGN KEY ("reportedById") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TagDef" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "color" TEXT NOT NULL DEFAULT '#00825e',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "TagDef_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "CustomFieldDef" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "entity" TEXT NOT NULL DEFAULT 'STUDENT',
+    "key" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'TEXT',
+    "options" TEXT NOT NULL DEFAULT '[]',
+    "required" BOOLEAN NOT NULL DEFAULT false,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "CustomFieldDef_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "StudentDocument" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL,
+    "label" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "receivedAt" DATETIME,
+    "expiresAt" DATETIME,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "StudentDocument_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "StudentGoal" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "metric" TEXT NOT NULL DEFAULT 'CUSTOM',
+    "targetValue" TEXT,
+    "currentValue" TEXT,
+    "dueDate" DATETIME,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "StudentGoal_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Intervention" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "startedById" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'MEETING',
+    "description" TEXT NOT NULL,
+    "outcome" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "resolvedAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Intervention_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Intervention_startedById_fkey" FOREIGN KEY ("startedById") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "PortfolioItem" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'PROJECT',
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "url" TEXT,
+    "fileUrl" TEXT,
+    "date" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "PortfolioItem_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "House" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "color" TEXT NOT NULL DEFAULT '#00825e',
+    "motto" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "House_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Poll" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "question" TEXT NOT NULL,
+    "description" TEXT,
+    "audience" TEXT NOT NULL DEFAULT 'ALL',
+    "allowMultiple" BOOLEAN NOT NULL DEFAULT false,
+    "anonymous" BOOLEAN NOT NULL DEFAULT true,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "closesAt" DATETIME,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Poll_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Poll_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "PollOption" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "pollId" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "PollOption_pollId_fkey" FOREIGN KEY ("pollId") REFERENCES "Poll" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "PollVote" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "pollId" TEXT NOT NULL,
+    "optionId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "PollVote_pollId_fkey" FOREIGN KEY ("pollId") REFERENCES "Poll" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "PollVote_optionId_fkey" FOREIGN KEY ("optionId") REFERENCES "PollOption" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "PollVote_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Suggestion" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "userId" TEXT,
+    "authorName" TEXT,
+    "body" TEXT NOT NULL,
+    "category" TEXT NOT NULL DEFAULT 'OTHER',
+    "status" TEXT NOT NULL DEFAULT 'NEW',
+    "adminNote" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Suggestion_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "CertificateTemplate" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'CUSTOM',
+    "title" TEXT NOT NULL,
+    "bodyTemplate" TEXT NOT NULL,
+    "footerNote" TEXT,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "CertificateTemplate_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Certificate" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "templateId" TEXT,
+    "kind" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "serial" TEXT NOT NULL,
+    "verifyCode" TEXT NOT NULL,
+    "issuedById" TEXT NOT NULL,
+    "issuedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "revokedAt" DATETIME,
+    "note" TEXT,
+    CONSTRAINT "Certificate_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Certificate_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "Certificate_issuedById_fkey" FOREIGN KEY ("issuedById") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ImportJob" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'STUDENTS',
+    "filename" TEXT NOT NULL,
+    "totalRows" INTEGER NOT NULL DEFAULT 0,
+    "successRows" INTEGER NOT NULL DEFAULT 0,
+    "failedRows" INTEGER NOT NULL DEFAULT 0,
+    "errors" TEXT NOT NULL DEFAULT '[]',
+    "status" TEXT NOT NULL DEFAULT 'RUNNING',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ImportJob_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ImportJob_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SavedView" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "page" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "config" TEXT NOT NULL DEFAULT '{}',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "SavedView_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "LoginEvent" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT,
+    "nationalId" TEXT,
+    "ip" TEXT NOT NULL,
+    "userAgent" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'SUCCESS',
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "LoginEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "VisitorLog" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "nationalId" TEXT,
+    "phone" TEXT,
+    "purpose" TEXT NOT NULL,
+    "hostName" TEXT,
+    "expected" BOOLEAN NOT NULL DEFAULT false,
+    "expectedDate" DATETIME,
+    "status" TEXT NOT NULL DEFAULT 'EXPECTED',
+    "checkInAt" DATETIME,
+    "checkOutAt" DATETIME,
+    "note" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "VisitorLog_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "LostFoundItem" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'FOUND',
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "location" TEXT,
+    "foundAt" DATETIME NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'FOUND',
+    "claimedByName" TEXT,
+    "claimedAt" DATETIME,
+    "reporterUserId" TEXT,
+    "reporterName" TEXT,
+    "contact" TEXT,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "LostFoundItem_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "GradeHistory" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "gradeRecordId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "oldScore" REAL,
+    "newScore" REAL NOT NULL,
+    "oldNote" TEXT,
+    "newNote" TEXT,
+    "changedById" TEXT,
+    "source" TEXT NOT NULL DEFAULT 'CREATE',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "GradeHistory_changedById_fkey" FOREIGN KEY ("changedById") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "GradeHistory_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ScheduledReport" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL,
+    "schedule" TEXT NOT NULL DEFAULT 'WEEKLY',
+    "dayOfWeek" INTEGER,
+    "hour" INTEGER NOT NULL DEFAULT 8,
+    "audience" TEXT NOT NULL DEFAULT 'MANAGERS',
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "lastRunAt" DATETIME,
+    "nextRunAt" DATETIME,
+    "createdBy" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ScheduledReport_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "RiskScore" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "period" TEXT NOT NULL,
+    "score" INTEGER NOT NULL,
+    "level" TEXT NOT NULL DEFAULT 'LOW',
+    "breakdown" TEXT NOT NULL DEFAULT '{}',
+    "computedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "RiskScore_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "WellbeingCheckin" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "studentId" TEXT NOT NULL,
+    "authorizedBy" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "mood" INTEGER NOT NULL,
+    "note" TEXT,
+    "flagged" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "WellbeingCheckin_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "WellbeingCheckin_authorizedBy_fkey" FOREIGN KEY ("authorizedBy") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Book" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "author" TEXT,
+    "isbn" TEXT,
+    "category" TEXT,
+    "shelf" TEXT,
+    "totalCopies" INTEGER NOT NULL DEFAULT 1,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Book_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BookLoan" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "bookId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "loanedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "dueAt" DATETIME NOT NULL,
+    "returnedAt" DATETIME,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "BookLoan_bookId_fkey" FOREIGN KEY ("bookId") REFERENCES "Book" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "BookLoan_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Quiz" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "subjectId" TEXT,
+    "classId" TEXT,
+    "questionIds" TEXT NOT NULL DEFAULT '[]',
+    "durationMin" INTEGER NOT NULL DEFAULT 20,
+    "status" TEXT NOT NULL DEFAULT 'DRAFT',
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Quiz_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "QuizAttempt" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "quizId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "answers" TEXT NOT NULL DEFAULT '{}',
+    "score" REAL,
+    "startedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "submittedAt" DATETIME,
+    CONSTRAINT "QuizAttempt_quizId_fkey" FOREIGN KEY ("quizId") REFERENCES "Quiz" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "QuizAttempt_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TransportRoute" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "driverName" TEXT,
+    "driverPhone" TEXT,
+    "vehiclePlate" TEXT,
+    "vehicleDesc" TEXT,
+    "capacity" INTEGER NOT NULL DEFAULT 20,
+    "stops" TEXT NOT NULL DEFAULT '[]',
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "TransportRoute_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TransportAssignment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "routeId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "stopName" TEXT,
+    "monthlyFee" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "TransportAssignment_routeId_fkey" FOREIGN KEY ("routeId") REFERENCES "TransportRoute" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "TransportAssignment_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "StaffAttendance" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "checkIn" TEXT,
+    "checkOut" TEXT,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "StaffAttendance_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "GatePass" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "exitTime" TEXT,
+    "reason" TEXT NOT NULL,
+    "pickupBy" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "requestedById" TEXT,
+    "decidedById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "GatePass_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SchoolForm" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "fields" TEXT NOT NULL DEFAULT '[]',
+    "audience" TEXT NOT NULL DEFAULT 'PARENTS',
+    "classId" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'OPEN',
+    "deadline" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "SchoolForm_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "FormSubmission" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "formId" TEXT NOT NULL,
+    "studentId" TEXT,
+    "userId" TEXT NOT NULL,
+    "answers" TEXT NOT NULL DEFAULT '{}',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "FormSubmission_formId_fkey" FOREIGN KEY ("formId") REFERENCES "SchoolForm" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "FormSubmission_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AlumniProfile" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "graduationYear" TEXT,
+    "university" TEXT,
+    "field" TEXT,
+    "outcome" TEXT,
+    "phone" TEXT,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "AlumniProfile_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AssignmentSubmission" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "assignmentId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "content" TEXT NOT NULL DEFAULT '',
+    "status" TEXT NOT NULL DEFAULT 'SUBMITTED',
+    "receiptCode" TEXT NOT NULL,
+    "submittedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "AssignmentSubmission_assignmentId_fkey" FOREIGN KEY ("assignmentId") REFERENCES "Assignment" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "AssignmentSubmission_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AnnouncementRead" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "announcementId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "readAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "AnnouncementRead_announcementId_fkey" FOREIGN KEY ("announcementId") REFERENCES "Announcement" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "AnnouncementRead_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SeatingPlan" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "classId" TEXT NOT NULL,
+    "layout" TEXT NOT NULL DEFAULT '{}',
+    "updatedById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "SeatingPlan_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TransportBoarding" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "assignmentId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "boardedAt" DATETIME,
+    "alightedAt" DATETIME,
+    "markedById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "TransportBoarding_assignmentId_fkey" FOREIGN KEY ("assignmentId") REFERENCES "TransportAssignment" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ReportCommentTemplate" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "category" TEXT NOT NULL DEFAULT 'GENERAL',
+    "text" TEXT NOT NULL,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "ReportComment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "term" INTEGER NOT NULL DEFAULT 1,
+    "text" TEXT NOT NULL,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ReportComment_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ExamSession" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "subjectName" TEXT,
+    "startsAt" DATETIME NOT NULL,
+    "durationMin" INTEGER NOT NULL DEFAULT 90,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "ExamSeat" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "sessionId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "room" TEXT NOT NULL DEFAULT 'سالن اصلی',
+    "seatNo" TEXT NOT NULL,
+    CONSTRAINT "ExamSeat_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "ExamSession" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ExamSeat_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ExamInvigilator" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "sessionId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "room" TEXT NOT NULL DEFAULT 'سالن اصلی',
+    CONSTRAINT "ExamInvigilator_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "ExamSession" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "DescriptiveGrade" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "subjectId" TEXT,
+    "competency" TEXT NOT NULL,
+    "level" TEXT NOT NULL,
+    "term" INTEGER NOT NULL DEFAULT 1,
+    "note" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "DescriptiveGrade_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SalaryRecord" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "yearMonth" TEXT NOT NULL,
+    "base" INTEGER NOT NULL DEFAULT 0,
+    "allowances" INTEGER NOT NULL DEFAULT 0,
+    "deductions" INTEGER NOT NULL DEFAULT 0,
+    "note" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "SalaryRecord_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "DailyReport" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "meals" TEXT NOT NULL DEFAULT '',
+    "napMin" INTEGER,
+    "mood" TEXT NOT NULL DEFAULT 'GOOD',
+    "medication" TEXT,
+    "note" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "DailyReport_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "PickupPerson" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "relation" TEXT NOT NULL,
+    "phone" TEXT,
+    "carPlate" TEXT,
+    "isAuthorized" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "PickupPerson_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "LessonPlan" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "teacherId" TEXT NOT NULL,
+    "classId" TEXT,
+    "subjectId" TEXT,
+    "topic" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "objectives" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PLANNED',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "StudentHealth" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "bloodType" TEXT,
+    "allergies" TEXT,
+    "conditions" TEXT,
+    "emergencyContact" TEXT,
+    "vaccinations" TEXT NOT NULL DEFAULT '[]',
+    "sportsStatus" TEXT NOT NULL DEFAULT 'FULL',
+    "sportsNote" TEXT,
+    "asthma" BOOLEAN NOT NULL DEFAULT false,
+    "heartCondition" BOOLEAN NOT NULL DEFAULT false,
+    "seizures" BOOLEAN NOT NULL DEFAULT false,
+    "diabetes" BOOLEAN NOT NULL DEFAULT false,
+    "mobilityNote" TEXT,
+    "visionNote" TEXT,
+    "hearingNote" TEXT,
+    "medications" TEXT,
+    "reviewDate" TEXT,
+    "updatedById" TEXT,
+    "updatedAt" DATETIME NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "StudentHealth_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ClinicVisit" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "complaint" TEXT NOT NULL,
+    "action" TEXT,
+    "sentHome" BOOLEAN NOT NULL DEFAULT false,
+    "notifyParent" BOOLEAN NOT NULL DEFAULT true,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ClinicVisit_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Club" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "coach" TEXT,
+    "weekday" INTEGER NOT NULL DEFAULT 1,
+    "timeLabel" TEXT,
+    "capacity" INTEGER NOT NULL DEFAULT 30,
+    "minGrade" TEXT,
+    "maxGrade" TEXT,
+    "fee" INTEGER NOT NULL DEFAULT 0,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "ClubEnrollment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "clubId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'ENROLLED',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ClubEnrollment_clubId_fkey" FOREIGN KEY ("clubId") REFERENCES "Club" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ClubEnrollment_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "StudentWallet" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "balance" INTEGER NOT NULL DEFAULT 0,
+    "dailyLimit" INTEGER,
+    "updatedAt" DATETIME NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "StudentWallet_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "WalletTx" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "walletId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "note" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "WalletTx_walletId_fkey" FOREIGN KEY ("walletId") REFERENCES "StudentWallet" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ShopProduct" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "category" TEXT NOT NULL DEFAULT '',
+    "price" INTEGER NOT NULL,
+    "stock" INTEGER NOT NULL DEFAULT 0,
+    "allergens" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "ShopSale" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "total" INTEGER NOT NULL,
+    "walletTxId" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "ShopSaleItem" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "saleId" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "price" INTEGER NOT NULL,
+    "qty" INTEGER NOT NULL,
+    CONSTRAINT "ShopSaleItem_saleId_fkey" FOREIGN KEY ("saleId") REFERENCES "ShopSale" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ShopSaleItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "ShopProduct" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "MealPlan" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "weekday" INTEGER NOT NULL,
+    "breakfast" TEXT NOT NULL DEFAULT '',
+    "lunch" TEXT NOT NULL DEFAULT '',
+    "snack" TEXT NOT NULL DEFAULT ''
+);
+
+-- CreateTable
+CREATE TABLE "DormBuilding" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "address" TEXT NOT NULL DEFAULT '',
+    "supervisorId" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "DormRoom" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "buildingId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "floor" INTEGER NOT NULL DEFAULT 0,
+    "capacity" INTEGER NOT NULL,
+    "notes" TEXT NOT NULL DEFAULT '',
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "DormRoom_buildingId_fkey" FOREIGN KEY ("buildingId") REFERENCES "DormBuilding" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "DormAssignment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "roomId" TEXT NOT NULL,
+    "bedLabel" TEXT NOT NULL DEFAULT '',
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "startDate" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "endDate" DATETIME,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "DormAssignment_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "DormRoom" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "DormLeave" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "fromDate" DATETIME NOT NULL,
+    "toDate" DATETIME NOT NULL,
+    "reason" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "decidedById" TEXT,
+    "decisionNote" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "TrackProgramme" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "field" TEXT NOT NULL DEFAULT '',
+    "degreeLevel" TEXT,
+    "description" TEXT NOT NULL DEFAULT '',
+    "startYear" TEXT NOT NULL DEFAULT '',
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "TrackEnrollment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "programmeId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "enrolledAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "TrackEnrollment_programmeId_fkey" FOREIGN KEY ("programmeId") REFERENCES "TrackProgramme" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Thesis" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "programmeId" TEXT,
+    "studentId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "supervisorId" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PROPOSAL',
+    "defenseDate" DATETIME,
+    "grade" REAL,
+    "note" TEXT NOT NULL DEFAULT '',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Thesis_programmeId_fkey" FOREIGN KEY ("programmeId") REFERENCES "TrackProgramme" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Internship" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "programmeId" TEXT,
+    "studentId" TEXT NOT NULL,
+    "workplace" TEXT NOT NULL,
+    "mentorName" TEXT NOT NULL DEFAULT '',
+    "startDate" DATETIME NOT NULL,
+    "endDate" DATETIME NOT NULL,
+    "hoursTotal" INTEGER NOT NULL,
+    "hoursDone" INTEGER NOT NULL DEFAULT 0,
+    "status" TEXT NOT NULL DEFAULT 'PLANNED',
+    "evaluation" TEXT NOT NULL DEFAULT '',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Internship_programmeId_fkey" FOREIGN KEY ("programmeId") REFERENCES "TrackProgramme" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "WorkshopSession" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "programmeId" TEXT,
+    "title" TEXT NOT NULL,
+    "instructorId" TEXT,
+    "date" DATETIME NOT NULL,
+    "capacity" INTEGER NOT NULL DEFAULT 30,
+    "location" TEXT NOT NULL DEFAULT '',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "WorkshopSession_programmeId_fkey" FOREIGN KEY ("programmeId") REFERENCES "TrackProgramme" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "WorkshopAttendance" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "sessionId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "present" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "WorkshopAttendance_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "WorkshopSession" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Plugin" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "code" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "author" TEXT NOT NULL DEFAULT '',
+    "description" TEXT NOT NULL DEFAULT '',
+    "version" TEXT NOT NULL DEFAULT '1.0.0',
+    "homepage" TEXT NOT NULL DEFAULT '',
+    "manifest" TEXT NOT NULL DEFAULT '{}',
+    "status" TEXT NOT NULL DEFAULT 'DRAFT',
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "PluginInstall" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "pluginId" TEXT NOT NULL,
+    "schoolId" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "settings" TEXT NOT NULL DEFAULT '{}',
+    "installedById" TEXT,
+    "installedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "PluginInstall_pluginId_fkey" FOREIGN KEY ("pluginId") REFERENCES "Plugin" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "PasskeyCredential" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "credentialId" TEXT NOT NULL,
+    "publicKey" TEXT NOT NULL,
+    "counter" INTEGER NOT NULL DEFAULT 0,
+    "transports" TEXT,
+    "deviceLabel" TEXT NOT NULL DEFAULT 'Passkey',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "lastUsedAt" DATETIME,
+    CONSTRAINT "PasskeyCredential_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "GuidanceRecord" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "scores" TEXT NOT NULL DEFAULT '{}',
+    "recommended" TEXT,
+    "counselorNote" TEXT,
+    "updatedById" TEXT,
+    "updatedAt" DATETIME NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "GuidanceRecord_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ClassObservation" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "teacherId" TEXT NOT NULL,
+    "observerId" TEXT NOT NULL,
+    "classId" TEXT,
+    "date" DATETIME NOT NULL,
+    "topic" TEXT,
+    "scores" TEXT NOT NULL DEFAULT '{}',
+    "average" REAL NOT NULL DEFAULT 0,
+    "strengths" TEXT,
+    "growthAreas" TEXT,
+    "comment" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ClassObservation_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ClassObservation_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ClassObservation_observerId_fkey" FOREIGN KEY ("observerId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ClassObservation_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "MeetingMinute" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "authorId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'STAFF',
+    "date" DATETIME NOT NULL,
+    "attendees" TEXT NOT NULL DEFAULT '[]',
+    "agenda" TEXT,
+    "decisions" TEXT,
+    "actions" TEXT NOT NULL DEFAULT '[]',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "MeetingMinute_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "MeetingMinute_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AbsenceExcuse" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "parentUserId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "decidedById" TEXT,
+    "decidedAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "AbsenceExcuse_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "AbsenceExcuse_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ParentSummon" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "parentUserId" TEXT NOT NULL,
+    "excuseId" TEXT,
+    "reason" TEXT NOT NULL,
+    "whenText" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "createdById" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ParentSummon_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ParentSummon_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ExamSeatPlan" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "sessions" INTEGER NOT NULL DEFAULT 1,
+    "config" TEXT NOT NULL,
+    "createdById" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ExamSeatPlan_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ExamSeatAssignment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "planId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "sessionNo" INTEGER NOT NULL,
+    "roomName" TEXT NOT NULL,
+    "seatNo" INTEGER NOT NULL,
+    "rowNo" INTEGER NOT NULL,
+    "colNo" INTEGER NOT NULL,
+    CONSTRAINT "ExamSeatAssignment_planId_fkey" FOREIGN KEY ("planId") REFERENCES "ExamSeatPlan" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ExamSeatAssignment_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AttendanceSettings" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "qrEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "codeEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "kioskEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "externalEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "geoEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "geoLat" REAL,
+    "geoLng" REAL,
+    "geoRadiusM" INTEGER NOT NULL DEFAULT 200,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "AttendanceSettings_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "IntegrationKey" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "method" TEXT NOT NULL DEFAULT 'OTHER',
+    "keyHash" TEXT NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "lastUsedAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "IntegrationKey_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "StudyTask" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "minutes" INTEGER NOT NULL DEFAULT 30,
+    "done" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "StudyTask_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SmsLog" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "audience" TEXT NOT NULL,
+    "classId" TEXT,
+    "text" TEXT NOT NULL,
+    "recipientCount" INTEGER NOT NULL DEFAULT 0,
+    "status" TEXT NOT NULL DEFAULT 'SENT_MOCK',
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "VirtualSession" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "classId" TEXT,
+    "subjectId" TEXT,
+    "title" TEXT NOT NULL,
+    "provider" TEXT NOT NULL DEFAULT 'SKYROOM',
+    "link" TEXT NOT NULL,
+    "startsAt" DATETIME NOT NULL,
+    "durationMin" INTEGER NOT NULL DEFAULT 45,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "ConsentRequest" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "eventId" TEXT,
+    "classId" TEXT,
+    "deadline" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ConsentRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ConsentResponse" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "requestId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "parentUserId" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ConsentResponse_requestId_fkey" FOREIGN KEY ("requestId") REFERENCES "ConsentRequest" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "ConsentResponse_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "HeldItem" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "item" TEXT NOT NULL,
+    "reason" TEXT,
+    "takenById" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'HELD',
+    "returnedAt" DATETIME,
+    "returnedTo" TEXT,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "HeldItem_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "HeldItem_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "DocumentRequest" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL,
+    "purpose" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "staffNote" TEXT,
+    "handledById" TEXT,
+    "readyAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "DocumentRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "DocumentRequest_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "DutyLog" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "authorId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "category" TEXT NOT NULL DEFAULT 'NOTE',
+    "text" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "DutyLog_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Locker" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "number" TEXT NOT NULL,
+    "location" TEXT,
+    "studentId" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'FREE',
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Locker_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "UniformRecord" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "item" TEXT NOT NULL,
+    "size" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'MEASURED',
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "UniformRecord_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AssemblyItem" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "segment" TEXT NOT NULL,
+    "title" TEXT,
+    "presenterName" TEXT,
+    "className" TEXT,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "AssemblyItem_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "DutyAssignment" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "duty" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "DutyAssignment_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Election" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'NOMINATION',
+    "startsAt" TEXT,
+    "endsAt" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Election_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ElectionCandidate" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "electionId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "className" TEXT,
+    "manifesto" TEXT,
+    "approved" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ElectionCandidate_electionId_fkey" FOREIGN KEY ("electionId") REFERENCES "Election" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ElectionVote" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "electionId" TEXT NOT NULL,
+    "candidateId" TEXT NOT NULL,
+    "voterUserId" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ElectionVote_electionId_fkey" FOREIGN KEY ("electionId") REFERENCES "Election" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Campaign" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "goalText" TEXT,
+    "startsAt" TEXT,
+    "endsAt" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "Campaign_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "CampaignSignup" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "campaignId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "CampaignSignup_campaignId_fkey" FOREIGN KEY ("campaignId") REFERENCES "Campaign" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ClassRoleAssign" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "classId" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "termLabel" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ClassRoleAssign_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "VehiclePermit" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "ownerUserId" TEXT,
+    "ownerName" TEXT NOT NULL,
+    "plate" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'PARENT',
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "VehiclePermit_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "KeyCheckout" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "keyLabel" TEXT NOT NULL,
+    "holderName" TEXT NOT NULL,
+    "holderUserId" TEXT,
+    "outAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "inAt" DATETIME,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "KeyCheckout_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "CleaningDuty" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "classId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "studentIds" TEXT NOT NULL DEFAULT '[]',
+    "done" BOOLEAN NOT NULL DEFAULT false,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "CleaningDuty_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "MentorPair" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "mentorStudentId" TEXT NOT NULL,
+    "menteeStudentId" TEXT NOT NULL,
+    "focus" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "MentorPair_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ReadingLog" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "bookTitle" TEXT NOT NULL,
+    "author" TEXT,
+    "pages" INTEGER NOT NULL DEFAULT 0,
+    "finished" BOOLEAN NOT NULL DEFAULT false,
+    "rating" INTEGER,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ReadingLog_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "JournalEntry" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "authorUserId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "mood" TEXT,
+    "text" TEXT NOT NULL,
+    "shared" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "JournalEntry_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BookListing" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "ownerStudentId" TEXT NOT NULL,
+    "ownerName" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "grade" TEXT,
+    "price" INTEGER,
+    "status" TEXT NOT NULL DEFAULT 'AVAILABLE',
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "BookListing_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SportRecord" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "discipline" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "unit" TEXT,
+    "date" TEXT NOT NULL,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "SportRecord_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "VolunteerEntry" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "activity" TEXT NOT NULL,
+    "hours" REAL NOT NULL DEFAULT 1,
+    "date" TEXT NOT NULL,
+    "approved" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "VolunteerEntry_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "CallLog" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "staffUserId" TEXT NOT NULL,
+    "studentId" TEXT,
+    "contactName" TEXT NOT NULL,
+    "direction" TEXT NOT NULL DEFAULT 'OUT',
+    "summary" TEXT NOT NULL,
+    "followUp" TEXT,
+    "date" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "CallLog_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "GradeAppeal" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "subject" TEXT NOT NULL,
+    "gradeId" TEXT,
+    "reason" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "response" TEXT,
+    "handledById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "GradeAppeal_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SupplyRequest" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "requesterName" TEXT NOT NULL,
+    "item" TEXT NOT NULL,
+    "qty" INTEGER NOT NULL DEFAULT 1,
+    "reason" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "handledById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "SupplyRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "PrintRequest" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "requesterName" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "copies" INTEGER NOT NULL DEFAULT 1,
+    "pages" INTEGER NOT NULL DEFAULT 1,
+    "color" BOOLEAN NOT NULL DEFAULT false,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "PrintRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TransportRequest" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'CHANGE_STOP',
+    "details" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "handledById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "TransportRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "MakeupClass" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "classId" TEXT NOT NULL,
+    "subject" TEXT NOT NULL,
+    "teacherName" TEXT,
+    "originalDate" TEXT NOT NULL,
+    "newDate" TEXT NOT NULL,
+    "room" TEXT,
+    "note" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "MakeupClass_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ClassVisit" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "parentUserId" TEXT NOT NULL,
+    "parentName" TEXT NOT NULL,
+    "studentId" TEXT,
+    "classId" TEXT,
+    "date" TEXT NOT NULL,
+    "reason" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "handledById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ClassVisit_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "InstallmentRequest" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "parts" INTEGER NOT NULL DEFAULT 3,
+    "reason" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "handledById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "InstallmentRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "IdReissueRequest" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "reason" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "handledById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "IdReissueRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BookSuggestion" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "requesterName" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "author" TEXT,
+    "reason" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "BookSuggestion_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ClubProposal" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "requesterName" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "handledById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ClubProposal_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "TutorOffer" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "studentName" TEXT NOT NULL,
+    "subject" TEXT NOT NULL,
+    "level" TEXT,
+    "note" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "TutorOffer_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "HelpPost" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "authorUserId" TEXT NOT NULL,
+    "authorName" TEXT NOT NULL,
+    "subject" TEXT,
+    "title" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "solved" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "HelpPost_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "HelpAnswer" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "postId" TEXT NOT NULL,
+    "authorUserId" TEXT NOT NULL,
+    "authorName" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "isBest" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "HelpAnswer_postId_fkey" FOREIGN KEY ("postId") REFERENCES "HelpPost" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "ScienceProject" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "team" TEXT NOT NULL,
+    "category" TEXT,
+    "description" TEXT,
+    "score" INTEGER,
+    "award" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "ScienceProject_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "LeagueTeam" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "sport" TEXT NOT NULL DEFAULT 'فوتسال',
+    "className" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "LeagueTeam_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "LeagueMatch" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "homeTeam" TEXT NOT NULL,
+    "awayTeam" TEXT NOT NULL,
+    "homeScore" INTEGER,
+    "awayScore" INTEGER,
+    "date" TEXT NOT NULL,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "LeagueMatch_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "MealOrder" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "requesterId" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "item" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'ORDERED',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "MealOrder_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "SafetyReport" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "category" TEXT NOT NULL DEFAULT 'BULLYING',
+    "text" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'NEW',
+    "handledNote" TEXT,
+    "handledById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "SafetyReport_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "KindnessNote" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "authorUserId" TEXT,
+    "fromName" TEXT,
+    "toName" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "approved" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "KindnessNote_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "OfficeHour" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "teacherUserId" TEXT NOT NULL,
+    "teacherName" TEXT NOT NULL,
+    "weekday" TEXT NOT NULL,
+    "timeText" TEXT NOT NULL,
+    "room" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "OfficeHour_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "MedicationLog" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "medicine" TEXT NOT NULL,
+    "dose" TEXT,
+    "givenAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "givenById" TEXT,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "MedicationLog_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "DrillLog" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "durationMin" INTEGER,
+    "notes" TEXT,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "DrillLog_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "AssetLoan" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "assetName" TEXT NOT NULL,
+    "borrowerName" TEXT NOT NULL,
+    "borrowerUserId" TEXT,
+    "outAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "dueAt" TEXT,
+    "inAt" DATETIME,
+    "note" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "AssetLoan_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "PodcastEpisode" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "url" TEXT,
+    "hostName" TEXT,
+    "date" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "PodcastEpisode_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BikeRegistry" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL DEFAULT 'دوچرخه',
+    "color" TEXT,
+    "serial" TEXT,
+    "spot" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "BikeRegistry_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BotConnection" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "schoolId" TEXT NOT NULL,
+    "platform" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "apiBase" TEXT,
+    "botUsername" TEXT,
+    "webhookSecret" TEXT NOT NULL,
+    "events" TEXT NOT NULL DEFAULT 'ALL',
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdById" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "BotConnection_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "BotLink" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "connectionId" TEXT NOT NULL,
+    "userId" TEXT,
+    "chatId" TEXT,
+    "username" TEXT,
+    "linkCode" TEXT,
+    "codeExpiresAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL,
+    CONSTRAINT "BotLink_connectionId_fkey" FOREIGN KEY ("connectionId") REFERENCES "BotConnection" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "BotLink_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_nationalId_key" ON "User"("nationalId");
+
+-- CreateIndex
+CREATE INDEX "User_role_schoolId_idx" ON "User"("role", "schoolId");
+
+-- CreateIndex
+CREATE INDEX "User_schoolId_idx" ON "User"("schoolId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "School_code_key" ON "School"("code");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "School_managerId_key" ON "School"("managerId");
+
+-- CreateIndex
+CREATE INDEX "Class_schoolId_idx" ON "Class"("schoolId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Class_schoolId_name_academicYear_key" ON "Class"("schoolId", "name", "academicYear");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
+
+-- CreateIndex
+CREATE INDEX "Student_classId_idx" ON "Student"("classId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Student_schoolId_studentNumber_key" ON "Student"("schoolId", "studentNumber");
+
+-- CreateIndex
+CREATE INDEX "StudentParent_parentUserId_idx" ON "StudentParent"("parentUserId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "StudentParent_studentId_parentUserId_key" ON "StudentParent"("studentId", "parentUserId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Subject_schoolId_name_key" ON "Subject"("schoolId", "name");
+
+-- CreateIndex
+CREATE INDEX "TeachingAssignment_teacherId_idx" ON "TeachingAssignment"("teacherId");
+
+-- CreateIndex
+CREATE INDEX "TeachingAssignment_classId_idx" ON "TeachingAssignment"("classId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TeachingAssignment_teacherId_classId_subjectId_academicYear_key" ON "TeachingAssignment"("teacherId", "classId", "subjectId", "academicYear");
+
+-- CreateIndex
+CREATE INDEX "ScheduleSlot_teacherId_idx" ON "ScheduleSlot"("teacherId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ScheduleSlot_classId_dayOfWeek_period_key" ON "ScheduleSlot"("classId", "dayOfWeek", "period");
+
+-- CreateIndex
+CREATE INDEX "Attendance_classId_date_idx" ON "Attendance"("classId", "date");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Attendance_studentId_date_period_key" ON "Attendance"("studentId", "date", "period");
+
+-- CreateIndex
+CREATE INDEX "GradeRecord_studentId_term_idx" ON "GradeRecord"("studentId", "term");
+
+-- CreateIndex
+CREATE INDEX "GradeRecord_classId_subjectId_idx" ON "GradeRecord"("classId", "subjectId");
+
+-- CreateIndex
+CREATE INDEX "Assignment_classId_idx" ON "Assignment"("classId");
+
+-- CreateIndex
+CREATE INDEX "Assignment_dueDate_idx" ON "Assignment"("dueDate");
+
+-- CreateIndex
+CREATE INDEX "SchoolEvent_schoolId_startAt_idx" ON "SchoolEvent"("schoolId", "startAt");
+
+-- CreateIndex
+CREATE INDEX "Announcement_schoolId_createdAt_idx" ON "Announcement"("schoolId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "Announcement_scope_createdAt_idx" ON "Announcement"("scope", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "Message_recipientId_sentAt_idx" ON "Message"("recipientId", "sentAt");
+
+-- CreateIndex
+CREATE INDEX "Message_senderId_sentAt_idx" ON "Message"("senderId", "sentAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ShadSession_schoolId_key" ON "ShadSession"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "ShadOutbox_schoolId_createdAt_idx" ON "ShadOutbox"("schoolId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "ShadOutbox_status_idx" ON "ShadOutbox"("status");
+
+-- CreateIndex
+CREATE INDEX "AuditLog_createdAt_idx" ON "AuditLog"("createdAt");
+
+-- CreateIndex
+CREATE INDEX "AuditLog_schoolId_idx" ON "AuditLog"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "AuditLog_action_idx" ON "AuditLog"("action");
+
+-- CreateIndex
+CREATE INDEX "ProfileChangeRequest_status_createdAt_idx" ON "ProfileChangeRequest"("status", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "ProfileChangeRequest_userId_idx" ON "ProfileChangeRequest"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Ticket_code_key" ON "Ticket"("code");
+
+-- CreateIndex
+CREATE INDEX "Ticket_status_updatedAt_idx" ON "Ticket"("status", "updatedAt");
+
+-- CreateIndex
+CREATE INDEX "Ticket_userId_idx" ON "Ticket"("userId");
+
+-- CreateIndex
+CREATE INDEX "TicketMessage_ticketId_createdAt_idx" ON "TicketMessage"("ticketId", "createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "BlogPost_slug_key" ON "BlogPost"("slug");
+
+-- CreateIndex
+CREATE INDEX "BlogPost_status_publishedAt_idx" ON "BlogPost"("status", "publishedAt");
+
+-- CreateIndex
+CREATE INDEX "BlogComment_postId_approved_idx" ON "BlogComment"("postId", "approved");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SchoolSite_schoolId_key" ON "SchoolSite"("schoolId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SchoolSite_subdomain_key" ON "SchoolSite"("subdomain");
+
+-- CreateIndex
+CREATE INDEX "SchoolLead_schoolId_status_idx" ON "SchoolLead"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "StudentFee_schoolId_status_idx" ON "StudentFee"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "StudentFee_studentId_idx" ON "StudentFee"("studentId");
+
+-- CreateIndex
+CREATE INDEX "StudentFee_dueDate_idx" ON "StudentFee"("dueDate");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Backup_filename_key" ON "Backup"("filename");
+
+-- CreateIndex
+CREATE INDEX "Backup_createdAt_idx" ON "Backup"("createdAt");
+
+-- CreateIndex
+CREATE INDEX "Notification_userId_readAt_idx" ON "Notification"("userId", "readAt");
+
+-- CreateIndex
+CREATE INDEX "Notification_userId_createdAt_idx" ON "Notification"("userId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "BehaviorRecord_studentId_createdAt_idx" ON "BehaviorRecord"("studentId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "BehaviorRecord_schoolId_kind_idx" ON "BehaviorRecord"("schoolId", "kind");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Badge_schoolId_key_key" ON "Badge"("schoolId", "key");
+
+-- CreateIndex
+CREATE INDEX "StudentBadge_studentId_idx" ON "StudentBadge"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "StudentBadge_studentId_badgeId_key" ON "StudentBadge"("studentId", "badgeId");
+
+-- CreateIndex
+CREATE INDEX "Question_schoolId_subjectId_idx" ON "Question"("schoolId", "subjectId");
+
+-- CreateIndex
+CREATE INDEX "Question_difficulty_idx" ON "Question"("difficulty");
+
+-- CreateIndex
+CREATE INDEX "ResourceLink_schoolId_subjectId_idx" ON "ResourceLink"("schoolId", "subjectId");
+
+-- CreateIndex
+CREATE INDEX "Meeting_schoolId_slotStart_idx" ON "Meeting"("schoolId", "slotStart");
+
+-- CreateIndex
+CREATE INDEX "Meeting_staffId_status_idx" ON "Meeting"("staffId", "status");
+
+-- CreateIndex
+CREATE INDEX "ChangelogEntry_publishedAt_idx" ON "ChangelogEntry"("publishedAt");
+
+-- CreateIndex
+CREATE INDEX "LeaveRequest_schoolId_status_idx" ON "LeaveRequest"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "LeaveRequest_userId_idx" ON "LeaveRequest"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TelegramLink_userId_key" ON "TelegramLink"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TelegramLink_chatId_key" ON "TelegramLink"("chatId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TelegramLink_linkCode_key" ON "TelegramLink"("linkCode");
+
+-- CreateIndex
+CREATE INDEX "TelegramLink_chatId_idx" ON "TelegramLink"("chatId");
+
+-- CreateIndex
+CREATE INDEX "Task_schoolId_status_idx" ON "Task"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "Task_assigneeId_status_idx" ON "Task"("assigneeId", "status");
+
+-- CreateIndex
+CREATE INDEX "Task_classId_idx" ON "Task"("classId");
+
+-- CreateIndex
+CREATE INDEX "AutomationRule_schoolId_active_idx" ON "AutomationRule"("schoolId", "active");
+
+-- CreateIndex
+CREATE INDEX "AutomationLog_schoolId_createdAt_idx" ON "AutomationLog"("schoolId", "createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Room_schoolId_name_key" ON "Room"("schoolId", "name");
+
+-- CreateIndex
+CREATE INDEX "Booking_schoolId_startAt_idx" ON "Booking"("schoolId", "startAt");
+
+-- CreateIndex
+CREATE INDEX "Booking_roomId_startAt_idx" ON "Booking"("roomId", "startAt");
+
+-- CreateIndex
+CREATE INDEX "Booking_assetId_startAt_idx" ON "Booking"("assetId", "startAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Asset_schoolId_code_key" ON "Asset"("schoolId", "code");
+
+-- CreateIndex
+CREATE INDEX "MaintenanceTicket_schoolId_status_idx" ON "MaintenanceTicket"("schoolId", "status");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TagDef_schoolId_key_key" ON "TagDef"("schoolId", "key");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CustomFieldDef_schoolId_entity_key_key" ON "CustomFieldDef"("schoolId", "entity", "key");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "StudentDocument_studentId_kind_key" ON "StudentDocument"("studentId", "kind");
+
+-- CreateIndex
+CREATE INDEX "StudentGoal_studentId_status_idx" ON "StudentGoal"("studentId", "status");
+
+-- CreateIndex
+CREATE INDEX "Intervention_studentId_status_idx" ON "Intervention"("studentId", "status");
+
+-- CreateIndex
+CREATE INDEX "PortfolioItem_studentId_idx" ON "PortfolioItem"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "House_schoolId_name_key" ON "House"("schoolId", "name");
+
+-- CreateIndex
+CREATE INDEX "Poll_schoolId_active_idx" ON "Poll"("schoolId", "active");
+
+-- CreateIndex
+CREATE INDEX "PollOption_pollId_idx" ON "PollOption"("pollId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PollVote_pollId_userId_optionId_key" ON "PollVote"("pollId", "userId", "optionId");
+
+-- CreateIndex
+CREATE INDEX "Suggestion_schoolId_status_idx" ON "Suggestion"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "CertificateTemplate_schoolId_kind_idx" ON "CertificateTemplate"("schoolId", "kind");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Certificate_serial_key" ON "Certificate"("serial");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Certificate_verifyCode_key" ON "Certificate"("verifyCode");
+
+-- CreateIndex
+CREATE INDEX "Certificate_schoolId_issuedAt_idx" ON "Certificate"("schoolId", "issuedAt");
+
+-- CreateIndex
+CREATE INDEX "ImportJob_schoolId_createdAt_idx" ON "ImportJob"("schoolId", "createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SavedView_userId_page_name_key" ON "SavedView"("userId", "page", "name");
+
+-- CreateIndex
+CREATE INDEX "LoginEvent_userId_createdAt_idx" ON "LoginEvent"("userId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "LoginEvent_nationalId_createdAt_idx" ON "LoginEvent"("nationalId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "VisitorLog_schoolId_expectedDate_idx" ON "VisitorLog"("schoolId", "expectedDate");
+
+-- CreateIndex
+CREATE INDEX "LostFoundItem_schoolId_status_idx" ON "LostFoundItem"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "LostFoundItem_schoolId_kind_status_idx" ON "LostFoundItem"("schoolId", "kind", "status");
+
+-- CreateIndex
+CREATE INDEX "GradeHistory_gradeRecordId_createdAt_idx" ON "GradeHistory"("gradeRecordId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "GradeHistory_studentId_idx" ON "GradeHistory"("studentId");
+
+-- CreateIndex
+CREATE INDEX "ScheduledReport_active_nextRunAt_idx" ON "ScheduledReport"("active", "nextRunAt");
+
+-- CreateIndex
+CREATE INDEX "RiskScore_level_idx" ON "RiskScore"("level");
+
+-- CreateIndex
+CREATE INDEX "RiskScore_computedAt_idx" ON "RiskScore"("computedAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RiskScore_studentId_period_key" ON "RiskScore"("studentId", "period");
+
+-- CreateIndex
+CREATE INDEX "WellbeingCheckin_date_flagged_idx" ON "WellbeingCheckin"("date", "flagged");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "WellbeingCheckin_studentId_date_key" ON "WellbeingCheckin"("studentId", "date");
+
+-- CreateIndex
+CREATE INDEX "Book_schoolId_idx" ON "Book"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "BookLoan_schoolId_returnedAt_idx" ON "BookLoan"("schoolId", "returnedAt");
+
+-- CreateIndex
+CREATE INDEX "BookLoan_studentId_idx" ON "BookLoan"("studentId");
+
+-- CreateIndex
+CREATE INDEX "BookLoan_bookId_idx" ON "BookLoan"("bookId");
+
+-- CreateIndex
+CREATE INDEX "Quiz_schoolId_status_idx" ON "Quiz"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "QuizAttempt_studentId_idx" ON "QuizAttempt"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "QuizAttempt_quizId_studentId_key" ON "QuizAttempt"("quizId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "TransportRoute_schoolId_idx" ON "TransportRoute"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "TransportAssignment_schoolId_studentId_idx" ON "TransportAssignment"("schoolId", "studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TransportAssignment_routeId_studentId_key" ON "TransportAssignment"("routeId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "StaffAttendance_schoolId_date_idx" ON "StaffAttendance"("schoolId", "date");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "StaffAttendance_userId_date_key" ON "StaffAttendance"("userId", "date");
+
+-- CreateIndex
+CREATE INDEX "GatePass_schoolId_date_status_idx" ON "GatePass"("schoolId", "date", "status");
+
+-- CreateIndex
+CREATE INDEX "SchoolForm_schoolId_status_idx" ON "SchoolForm"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "FormSubmission_formId_idx" ON "FormSubmission"("formId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "FormSubmission_formId_studentId_key" ON "FormSubmission"("formId", "studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AlumniProfile_studentId_key" ON "AlumniProfile"("studentId");
+
+-- CreateIndex
+CREATE INDEX "AlumniProfile_schoolId_idx" ON "AlumniProfile"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "AssignmentSubmission_studentId_idx" ON "AssignmentSubmission"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AssignmentSubmission_assignmentId_studentId_key" ON "AssignmentSubmission"("assignmentId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "AnnouncementRead_userId_idx" ON "AnnouncementRead"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AnnouncementRead_announcementId_userId_key" ON "AnnouncementRead"("announcementId", "userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SeatingPlan_classId_key" ON "SeatingPlan"("classId");
+
+-- CreateIndex
+CREATE INDEX "SeatingPlan_schoolId_idx" ON "SeatingPlan"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "TransportBoarding_schoolId_date_idx" ON "TransportBoarding"("schoolId", "date");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TransportBoarding_assignmentId_date_key" ON "TransportBoarding"("assignmentId", "date");
+
+-- CreateIndex
+CREATE INDEX "ReportCommentTemplate_schoolId_idx" ON "ReportCommentTemplate"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "ReportComment_schoolId_studentId_idx" ON "ReportComment"("schoolId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "ExamSession_schoolId_startsAt_idx" ON "ExamSession"("schoolId", "startsAt");
+
+-- CreateIndex
+CREATE INDEX "ExamSeat_studentId_idx" ON "ExamSeat"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ExamSeat_sessionId_studentId_key" ON "ExamSeat"("sessionId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "ExamInvigilator_userId_idx" ON "ExamInvigilator"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ExamInvigilator_sessionId_userId_room_key" ON "ExamInvigilator"("sessionId", "userId", "room");
+
+-- CreateIndex
+CREATE INDEX "DescriptiveGrade_schoolId_studentId_idx" ON "DescriptiveGrade"("schoolId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "SalaryRecord_schoolId_yearMonth_idx" ON "SalaryRecord"("schoolId", "yearMonth");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SalaryRecord_userId_yearMonth_key" ON "SalaryRecord"("userId", "yearMonth");
+
+-- CreateIndex
+CREATE INDEX "DailyReport_schoolId_date_idx" ON "DailyReport"("schoolId", "date");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "DailyReport_studentId_date_key" ON "DailyReport"("studentId", "date");
+
+-- CreateIndex
+CREATE INDEX "PickupPerson_studentId_idx" ON "PickupPerson"("studentId");
+
+-- CreateIndex
+CREATE INDEX "LessonPlan_schoolId_teacherId_date_idx" ON "LessonPlan"("schoolId", "teacherId", "date");
+
+-- CreateIndex
+CREATE INDEX "LessonPlan_schoolId_classId_idx" ON "LessonPlan"("schoolId", "classId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "StudentHealth_studentId_key" ON "StudentHealth"("studentId");
+
+-- CreateIndex
+CREATE INDEX "ClinicVisit_schoolId_date_idx" ON "ClinicVisit"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "ClinicVisit_studentId_idx" ON "ClinicVisit"("studentId");
+
+-- CreateIndex
+CREATE INDEX "Club_schoolId_isActive_idx" ON "Club"("schoolId", "isActive");
+
+-- CreateIndex
+CREATE INDEX "ClubEnrollment_studentId_idx" ON "ClubEnrollment"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ClubEnrollment_clubId_studentId_key" ON "ClubEnrollment"("clubId", "studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "StudentWallet_studentId_key" ON "StudentWallet"("studentId");
+
+-- CreateIndex
+CREATE INDEX "WalletTx_walletId_createdAt_idx" ON "WalletTx"("walletId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "ShopProduct_schoolId_isActive_idx" ON "ShopProduct"("schoolId", "isActive");
+
+-- CreateIndex
+CREATE INDEX "ShopSale_schoolId_createdAt_idx" ON "ShopSale"("schoolId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "ShopSale_studentId_createdAt_idx" ON "ShopSale"("studentId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "ShopSaleItem_saleId_idx" ON "ShopSaleItem"("saleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "MealPlan_schoolId_weekday_key" ON "MealPlan"("schoolId", "weekday");
+
+-- CreateIndex
+CREATE INDEX "DormBuilding_schoolId_idx" ON "DormBuilding"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "DormRoom_buildingId_idx" ON "DormRoom"("buildingId");
+
+-- CreateIndex
+CREATE INDEX "DormAssignment_schoolId_idx" ON "DormAssignment"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "DormAssignment_studentId_idx" ON "DormAssignment"("studentId");
+
+-- CreateIndex
+CREATE INDEX "DormAssignment_roomId_idx" ON "DormAssignment"("roomId");
+
+-- CreateIndex
+CREATE INDEX "DormLeave_schoolId_idx" ON "DormLeave"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "DormLeave_studentId_idx" ON "DormLeave"("studentId");
+
+-- CreateIndex
+CREATE INDEX "TrackProgramme_schoolId_idx" ON "TrackProgramme"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "TrackEnrollment_studentId_idx" ON "TrackEnrollment"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TrackEnrollment_programmeId_studentId_key" ON "TrackEnrollment"("programmeId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "Thesis_schoolId_idx" ON "Thesis"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "Thesis_studentId_idx" ON "Thesis"("studentId");
+
+-- CreateIndex
+CREATE INDEX "Internship_schoolId_idx" ON "Internship"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "Internship_studentId_idx" ON "Internship"("studentId");
+
+-- CreateIndex
+CREATE INDEX "WorkshopSession_schoolId_idx" ON "WorkshopSession"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "WorkshopAttendance_studentId_idx" ON "WorkshopAttendance"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "WorkshopAttendance_sessionId_studentId_key" ON "WorkshopAttendance"("sessionId", "studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Plugin_code_key" ON "Plugin"("code");
+
+-- CreateIndex
+CREATE INDEX "PluginInstall_schoolId_idx" ON "PluginInstall"("schoolId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PluginInstall_pluginId_schoolId_key" ON "PluginInstall"("pluginId", "schoolId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PasskeyCredential_credentialId_key" ON "PasskeyCredential"("credentialId");
+
+-- CreateIndex
+CREATE INDEX "PasskeyCredential_userId_idx" ON "PasskeyCredential"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "GuidanceRecord_studentId_key" ON "GuidanceRecord"("studentId");
+
+-- CreateIndex
+CREATE INDEX "ClassObservation_schoolId_teacherId_idx" ON "ClassObservation"("schoolId", "teacherId");
+
+-- CreateIndex
+CREATE INDEX "ClassObservation_schoolId_date_idx" ON "ClassObservation"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "MeetingMinute_schoolId_date_idx" ON "MeetingMinute"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "AbsenceExcuse_schoolId_status_idx" ON "AbsenceExcuse"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "AbsenceExcuse_studentId_date_idx" ON "AbsenceExcuse"("studentId", "date");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AbsenceExcuse_studentId_date_parentUserId_key" ON "AbsenceExcuse"("studentId", "date", "parentUserId");
+
+-- CreateIndex
+CREATE INDEX "ParentSummon_schoolId_status_idx" ON "ParentSummon"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "ParentSummon_parentUserId_status_idx" ON "ParentSummon"("parentUserId", "status");
+
+-- CreateIndex
+CREATE INDEX "ParentSummon_studentId_idx" ON "ParentSummon"("studentId");
+
+-- CreateIndex
+CREATE INDEX "ExamSeatPlan_schoolId_createdAt_idx" ON "ExamSeatPlan"("schoolId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "ExamSeatAssignment_planId_sessionNo_idx" ON "ExamSeatAssignment"("planId", "sessionNo");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ExamSeatAssignment_planId_sessionNo_studentId_key" ON "ExamSeatAssignment"("planId", "sessionNo", "studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AttendanceSettings_schoolId_key" ON "AttendanceSettings"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "IntegrationKey_schoolId_idx" ON "IntegrationKey"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "StudyTask_studentId_date_idx" ON "StudyTask"("studentId", "date");
+
+-- CreateIndex
+CREATE INDEX "SmsLog_schoolId_createdAt_idx" ON "SmsLog"("schoolId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "VirtualSession_schoolId_startsAt_idx" ON "VirtualSession"("schoolId", "startsAt");
+
+-- CreateIndex
+CREATE INDEX "ConsentRequest_schoolId_createdAt_idx" ON "ConsentRequest"("schoolId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "ConsentResponse_parentUserId_idx" ON "ConsentResponse"("parentUserId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ConsentResponse_requestId_studentId_key" ON "ConsentResponse"("requestId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "HeldItem_schoolId_status_createdAt_idx" ON "HeldItem"("schoolId", "status", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "HeldItem_studentId_idx" ON "HeldItem"("studentId");
+
+-- CreateIndex
+CREATE INDEX "DocumentRequest_schoolId_status_createdAt_idx" ON "DocumentRequest"("schoolId", "status", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "DocumentRequest_requesterId_idx" ON "DocumentRequest"("requesterId");
+
+-- CreateIndex
+CREATE INDEX "DutyLog_schoolId_date_idx" ON "DutyLog"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "Locker_schoolId_status_idx" ON "Locker"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "UniformRecord_schoolId_studentId_idx" ON "UniformRecord"("schoolId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "AssemblyItem_schoolId_date_idx" ON "AssemblyItem"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "DutyAssignment_schoolId_date_idx" ON "DutyAssignment"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "Election_schoolId_status_idx" ON "Election"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "ElectionCandidate_electionId_idx" ON "ElectionCandidate"("electionId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ElectionVote_electionId_voterUserId_key" ON "ElectionVote"("electionId", "voterUserId");
+
+-- CreateIndex
+CREATE INDEX "Campaign_schoolId_isActive_idx" ON "Campaign"("schoolId", "isActive");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CampaignSignup_campaignId_userId_key" ON "CampaignSignup"("campaignId", "userId");
+
+-- CreateIndex
+CREATE INDEX "ClassRoleAssign_schoolId_classId_idx" ON "ClassRoleAssign"("schoolId", "classId");
+
+-- CreateIndex
+CREATE INDEX "VehiclePermit_schoolId_plate_idx" ON "VehiclePermit"("schoolId", "plate");
+
+-- CreateIndex
+CREATE INDEX "KeyCheckout_schoolId_inAt_idx" ON "KeyCheckout"("schoolId", "inAt");
+
+-- CreateIndex
+CREATE INDEX "CleaningDuty_schoolId_classId_date_idx" ON "CleaningDuty"("schoolId", "classId", "date");
+
+-- CreateIndex
+CREATE INDEX "MentorPair_schoolId_isActive_idx" ON "MentorPair"("schoolId", "isActive");
+
+-- CreateIndex
+CREATE INDEX "ReadingLog_schoolId_studentId_idx" ON "ReadingLog"("schoolId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "JournalEntry_schoolId_authorUserId_date_idx" ON "JournalEntry"("schoolId", "authorUserId", "date");
+
+-- CreateIndex
+CREATE INDEX "BookListing_schoolId_status_idx" ON "BookListing"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "SportRecord_schoolId_studentId_idx" ON "SportRecord"("schoolId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "VolunteerEntry_schoolId_userId_idx" ON "VolunteerEntry"("schoolId", "userId");
+
+-- CreateIndex
+CREATE INDEX "CallLog_schoolId_date_idx" ON "CallLog"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "GradeAppeal_schoolId_status_idx" ON "GradeAppeal"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "GradeAppeal_studentId_idx" ON "GradeAppeal"("studentId");
+
+-- CreateIndex
+CREATE INDEX "SupplyRequest_schoolId_status_idx" ON "SupplyRequest"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "PrintRequest_schoolId_status_idx" ON "PrintRequest"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "TransportRequest_schoolId_status_idx" ON "TransportRequest"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "MakeupClass_schoolId_newDate_idx" ON "MakeupClass"("schoolId", "newDate");
+
+-- CreateIndex
+CREATE INDEX "ClassVisit_schoolId_status_idx" ON "ClassVisit"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "InstallmentRequest_schoolId_status_idx" ON "InstallmentRequest"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "IdReissueRequest_schoolId_status_idx" ON "IdReissueRequest"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "BookSuggestion_schoolId_status_idx" ON "BookSuggestion"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "ClubProposal_schoolId_status_idx" ON "ClubProposal"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "TutorOffer_schoolId_subject_idx" ON "TutorOffer"("schoolId", "subject");
+
+-- CreateIndex
+CREATE INDEX "HelpPost_schoolId_createdAt_idx" ON "HelpPost"("schoolId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "HelpAnswer_postId_idx" ON "HelpAnswer"("postId");
+
+-- CreateIndex
+CREATE INDEX "ScienceProject_schoolId_idx" ON "ScienceProject"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "LeagueTeam_schoolId_idx" ON "LeagueTeam"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "LeagueMatch_schoolId_date_idx" ON "LeagueMatch"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "MealOrder_schoolId_date_idx" ON "MealOrder"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "MealOrder_studentId_idx" ON "MealOrder"("studentId");
+
+-- CreateIndex
+CREATE INDEX "SafetyReport_schoolId_status_idx" ON "SafetyReport"("schoolId", "status");
+
+-- CreateIndex
+CREATE INDEX "KindnessNote_schoolId_approved_idx" ON "KindnessNote"("schoolId", "approved");
+
+-- CreateIndex
+CREATE INDEX "OfficeHour_schoolId_idx" ON "OfficeHour"("schoolId");
+
+-- CreateIndex
+CREATE INDEX "MedicationLog_schoolId_studentId_idx" ON "MedicationLog"("schoolId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "DrillLog_schoolId_date_idx" ON "DrillLog"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "AssetLoan_schoolId_inAt_idx" ON "AssetLoan"("schoolId", "inAt");
+
+-- CreateIndex
+CREATE INDEX "PodcastEpisode_schoolId_date_idx" ON "PodcastEpisode"("schoolId", "date");
+
+-- CreateIndex
+CREATE INDEX "BikeRegistry_schoolId_studentId_idx" ON "BikeRegistry"("schoolId", "studentId");
+
+-- CreateIndex
+CREATE INDEX "BotConnection_schoolId_idx" ON "BotConnection"("schoolId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "BotLink_linkCode_key" ON "BotLink"("linkCode");
+
+-- CreateIndex
+CREATE INDEX "BotLink_userId_idx" ON "BotLink"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "BotLink_connectionId_chatId_key" ON "BotLink"("connectionId", "chatId");
