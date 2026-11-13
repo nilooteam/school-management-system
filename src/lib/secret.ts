@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import { getCloudflareContext } from "@opennextjs-cloudflare";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 // ============================================================
 // Bahar | Single source of truth for the application signing secret.
