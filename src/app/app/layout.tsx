@@ -5,6 +5,16 @@ import { verifyToken, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { parsePermissions } from "@/lib/roles";
 import { avatarApiFields } from "@/lib/avatar";
 import { AppShell } from "@/components/app-shell/app-shell";
+let _primarySchoolCache: { at: number; value: { id: string; name: string; shadEnabled: boolean; custodianEnabled: boolean } | null } | null = null;
+async function getPrimarySchool() {
+  if (_primarySchoolCache && Date.now() - _primarySchoolCache.at < 60_000) return _primarySchoolCache.value;
+  const value = await db.school.findFirst({
+    where: { isActive: true }, orderBy: { createdAt: "asc" },
+    select: { id: true, name: true, shadEnabled: true, custodianEnabled: true },
+  });
+  _primarySchoolCache = { at: Date.now(), value };
+  return value;
+}
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const store = await cookies();
@@ -26,10 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user || !user.isActive) redirect("/login");
   if (typeof payload.tv === "number" && user.tokenVersion !== payload.tv) redirect("/login");
 
-  const primarySchool = await db.school.findFirst({
-    where: { isActive: true }, orderBy: { createdAt: "asc" },
-    select: { id: true, name: true, shadEnabled: true, custodianEnabled: true },
-  });
+  const primarySchool = await getPrimarySchool();
   if (!primarySchool) redirect("/login");
   if (!["SUPER_ADMIN", "ADMIN"].includes(user.role) && user.schoolId !== primarySchool.id) redirect("/login");
   const school = primarySchool;
