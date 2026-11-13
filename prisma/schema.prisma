@@ -1555,47 +1555,14 @@ model ScheduledReport {
 // ============================================================
 // بسته‌های زبان کاستوم (Bahar Language Pack) — ترجمه رابط کاربری
 // ============================================================
-model LanguagePack {
-  id         String   @id @default(cuid())
-  code       String   @unique // کد کوتاه زبان مثل en، tr، ar، kurdish-sorani
-  name       String // نام زبان به فارسی (نمایش مدیریتی)
-  nativeName String // نام بومی زبان (English، کوردی سۆرانی…)
-  direction  String   @default("rtl") // rtl | ltr
-  status     String   @default("DRAFT") // DRAFT | ACTIVE | DISABLED
-  author     String? // سازنده بسته
-  version    String   @default("1.0.0")
-  notes      String? // توضیح سازنده
-  data       String // JSON — نقشه کلید→متن (حداکثر 400KB)
-  keyCount   Int      @default(0) // تعداد کلیدهای ترجمه‌شده
-  coverage   Int      @default(0) // درصد پوشش کاتالوگ
-  createdBy  String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 
-  @@index([status])
-}
 
 // ============================================================
 // بسته‌های کشور کاستوم (Bahar Country Pack) — پروفایل کشور
 // تقویم/کد ملی/شماره موبایل/مناطق/ارز/پایه‌ها/هفته کاری…
 // دیفالت: ایران (hardcoded در src/lib/country/iran.ts)
 // ============================================================
-model CountryPack {
-  id         String   @id @default(cuid())
-  code       String   @unique // کد کشور مثل IR، TR، AE
-  name       String // نام کشور به فارسی (نمایش مدیریتی)
-  nativeName String // نام بومی کشور (Iran، Türkiye…)
-  status     String   @default("DRAFT") // DRAFT | ACTIVE | DISABLED
-  author     String? // سازنده بسته
-  version    String   @default("1.0.0")
-  notes      String? // توضیح سازنده
-  data       String // JSON — پروفایل کامل کشور (حداکثر 600KB)
-  createdBy  String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 
-  @@index([status])
-}
 
 // ============================================================
 // موتور هشدار زودهنگام (Early-Warning) — امتیاز ریسک دانش‌آموز
