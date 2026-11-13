@@ -12,7 +12,6 @@ import { getSessionSecret } from "@/lib/secret";
 // سازگار با Google Authenticator / Aegis / Microsoft Authenticator
 // ============================================================
 
-const SESSION_SECRET = getSessionSecret();
 
 /* ---------- Base32 (RFC 4648) ---------- */
 const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -116,7 +115,7 @@ export function verifyTotp(secret: string, code: string, window = 1): boolean {
 /* ---------- رمزنگاری رمز TOTP برای ذخیره در DB ---------- */
 
 function aesKey(): Buffer {
-  return crypto.scryptSync(SESSION_SECRET, "bahar-2fa-secret", 32);
+  return crypto.scryptSync(getSessionSecret(), "bahar-2fa-secret", 32);
 }
 
 export function encryptTotpSecret(secret: string): string {
@@ -188,7 +187,7 @@ const PENDING_TTL_MS = 5 * 60 * 1000;
 export function signPendingToken(userId: string): string {
   const exp = Date.now() + PENDING_TTL_MS;
   const body = Buffer.from(JSON.stringify({ sub: userId, exp })).toString("base64url");
-  const sig = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("base64url");
+  const sig = crypto.createHmac("sha256", getSessionSecret()).update(body).digest("base64url");
   return `${body}.${sig}`;
 }
 
@@ -196,7 +195,7 @@ export function verifyPendingToken(token: string): string | null {
   try {
     const [body, sig] = token.split(".");
     if (!body || !sig) return null;
-    const expected = crypto.createHmac("sha256", SESSION_SECRET).update(body).digest("base64url");
+    const expected = crypto.createHmac("sha256", getSessionSecret()).update(body).digest("base64url");
     if (expected.length !== sig.length || !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig))) return null;
     const parsed = JSON.parse(Buffer.from(body, "base64url").toString()) as { sub?: string; exp?: number };
     if (!parsed.sub || typeof parsed.exp !== "number" || parsed.exp < Date.now()) return null;
