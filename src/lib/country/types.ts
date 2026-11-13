@@ -1,18 +1,18 @@
 // تعریف ثابت پروفایل محلی سامانه هنرستان بهار
 export const CALENDARS = ["persian"] as const;
-export type CalendarKind = (typeof CALENDARS)[number];
-export type NationalIdAlgorithm = "iran-mod11";
+export type CalendarKind = "persian" | "gregory" | "islamic-umalqura" | "islamic-civil" | "islamic-tbla" | "hebrew" | "ethiopic" | "coptic" | "indian" | "buddhist" | "chinese" | "dangi" | "japanese";
+export type NationalIdAlgorithm = "iran-mod11" | "luhn" | "none" | "digits";
 
 export type CountryProfile = {
   code: "IR";
   name: string;
   nativeName: string;
-  locale: "fa-IR";
-  direction: "rtl";
-  timezone: "Asia/Tehran";
-  calendar: "persian";
+  locale: string;
+  direction: "rtl" | "ltr";
+  timezone: string;
+  calendar: CalendarKind;
   digits: "native" | "latin";
-  nationalId: { label: string; algorithm: "iran-mod11"; pattern: string; placeholder: string; example: string; invalidMessage?: string };
+  nationalId: { label: string; algorithm: NationalIdAlgorithm; pattern: string; placeholder: string; example: string; invalidMessage?: string };
   phone: { pattern: string; placeholder: string; example: string };
   currency: { label: string; code: "IRR"; minAmount: number; maxAmount: number };
   week: { workDays: number[]; labels: string[] };
