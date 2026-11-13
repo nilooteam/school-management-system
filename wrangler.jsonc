@@ -12,7 +12,7 @@
     {
       "binding": "DB",
       "database_name": "bahar-db",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+      "database_id": "484c357b-a663-439c-943e-03cd3857695a"
     }
   ],
   "observability": { "enabled": true }
