@@ -25,9 +25,13 @@ export function getSessionSecret(): string {
   if (cached) return cached;
 
   const fromEnv = (process.env.SESSION_SECRET ?? "").trim();
-  if (fromEnv.length >= 16) {
+  if (fromEnv.length >= 32) {
     cached = fromEnv;
     return cached;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET must be configured as a production secret (at least 32 characters).");
   }
 
   const candidates = [
