@@ -14,7 +14,11 @@ const CAPTCHA_AFTER_FAILS = 2;
 const CAPTCHA_AFTER_IP_FAILS = 3;
 
 // هش الکی برای برابری زمان پاسخ وقتی کاربر وجود ندارد (ضد شناسایی کاربر با سنجش زمان)
-const DUMMY_HASH = hashPassword("bahar-timing-equalizer");
+let _dummyHash: string | null = null;
+function dummyHash(): string {
+  if (!_dummyHash) _dummyHash = hashPassword("bahar-timing-equalizer");
+  return _dummyHash;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -60,7 +64,7 @@ export async function POST(req: NextRequest) {
 
     if (!user || !user.isActive) {
       // سنجش زمانی یکسان با مسیر رمز نادرست — بدون افشای وجود/عدم وجود کاربر
-      verifyPassword(password, DUMMY_HASH);
+      verifyPassword(password, dummyHash());
       failIncr(`loginfail:${ip}`);
       await db.loginEvent.create({ data: { nationalId, ip, userAgent, status: "FAILED", note: "چنین کاربری نیست" } }).catch(() => {});
       return apiErr(401, "نام کاربری یا رمز عبور نادرست است.", "INVALID_CREDENTIALS", {
