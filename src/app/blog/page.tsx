@@ -4,7 +4,6 @@ import { Sprout, BookOpen, Search, Clock, Eye, MessageSquare } from "lucide-reac
 import { db } from "@/lib/db";
 import { formatDateFa, faNumber } from "@/lib/persian";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { SiteLangSelect } from "@/components/shared/site-lang-select";
 import { cookies } from "next/headers";
 import { SITE_CATALOG } from "@/lib/langs";
 import { siteStringsFor } from "@/lib/langs/shipped";
@@ -96,7 +95,6 @@ export default async function BlogIndexPage({ searchParams }: Props) {
           </Link>
           <span className="text-xs text-steel">{tx("site.blog.label", "بلاگ")}</span>
           <div className="ms-auto flex items-center gap-1.5">
-            <SiteLangSelect current={siteLang} />
             <ThemeToggle />
             <Link href="/login" className="b-btn b-btn-spring b-btn-sm">{tx("site.blog.login", "ورود")}</Link>
           </div>
