@@ -1,6 +1,6 @@
 "use client";
 
-// Compatibility placeholder for the single-language edition.
-export function SiteLangSelect(_props: { compact?: boolean; className?: string }) {
+// The single-school edition is Persian-only; keep the legacy props accepted.
+export function SiteLangSelect(_props: { current?: string; compact?: boolean; className?: string }) {
   return null;
 }
