@@ -13,7 +13,8 @@
     "db:reset": "prisma migrate reset",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "db:d1:generate": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script --output migrations/0001_initial.sql"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
