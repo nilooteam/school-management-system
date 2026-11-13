@@ -4,7 +4,6 @@ generator client {
   // compiling it from src/ made Turbopack builds run out of memory
   // (exit 137) and broke the wasm module path in webpack/OpenNext.
   provider   = "prisma-client-js"
-  output     = "../node_modules/.prisma/client"
   engineType = "client"
   previewFeatures = ["driverAdapters"]
 }
