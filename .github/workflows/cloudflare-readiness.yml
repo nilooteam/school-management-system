@@ -46,7 +46,8 @@ jobs:
           git add migrations/0001_initial.sql
           if ! git diff --cached --quiet; then
             git commit -m "Generate initial Cloudflare D1 schema migration"
-            git push
+            git pull --rebase origin refactor/single-iranian-vocational-school
+            git push origin HEAD:refactor/single-iranian-vocational-school
           fi
 
       - name: Build Next.js application
