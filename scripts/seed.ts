@@ -162,9 +162,9 @@ async function main() {
   // ── کلاس‌ها ──
   console.log("班级 کلاس‌ها…");
   const classDefs = [
-    { name: "دهم ریاضی ۱", grade: "دهم", field: "ریاضی", room: "۱۰۱", teacher: 0 },
-    { name: "دهم تجربی ۱", grade: "دهم", field: "تجربی", room: "۱۰۲", teacher: 1 },
-    { name: "یازدهم ریاضی ۱", grade: "یازدهم", field: "ریاضی", room: "۲۰۱", teacher: 2 },
+    { name: "دهم فنی‌وحرفه‌ای ۱", grade: "دهم", field: "فنی‌وحرفه‌ای", room: "۱۰۱", teacher: 0 },
+    { name: "دهم کاردانش ۱", grade: "دهم", field: "کاردانش", room: "۱۰۲", teacher: 1 },
+    { name: "دوازدهم فنی‌وحرفه‌ای ۱", grade: "دوازدهم", field: "فنی‌وحرفه‌ای", room: "۲۰۱", teacher: 2 },
   ];
   const classes: Array<{ id: string; name: string }> = [];
   for (const c of classDefs) {

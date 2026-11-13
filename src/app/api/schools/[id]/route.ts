@@ -6,7 +6,7 @@ import { enDigits } from "@/lib/persian";
 
 type Ctx = { params: Promise<{ id: string }> };
 
-/** PATCH /api/schools/[id] — ویرایش کامل مدرسه (ادمین مجاز یا مدیر خود مدرسه برای متن‌ها/لوگو) */
+/** PATCH /api/schools/[id] — ویرایش مشخصات همان هنرستان توسط مدیر هنرستان یا مدیر سامانه */
 export async function PATCH(req: NextRequest, ctx: Ctx) {
   try {
     const me = await requireUser(req);

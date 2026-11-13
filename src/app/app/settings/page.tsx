@@ -62,7 +62,6 @@ export default function SettingsPage() {
   const { t } = useLang();
   const { data, loading, error, refetch } = useApi<SettingsResponse>("/api/settings");
   const [tab, setTab] = useState<"general" | "backup" | "design">("general");
-  // لینک هدر: /app/settings?tab=languages باید مستقیم تب زبان را باز کند
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("tab");
     if (q === "general" || q === "backup" || q === "design") setTab(q);

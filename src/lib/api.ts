@@ -18,7 +18,6 @@ export type SessionUser = {
   lastName: string;
   schoolId: string | null;
   /** راند ۱۹: مدرسهٔ فعال سوپرادمین/ادمین (پنل مدرسه) — پس از ادغام در schoolId */
-  actingSchoolId?: string | null;
   mustChangePassword: boolean;
   isActive: boolean;
   shadNumber: string | null;
@@ -73,14 +72,6 @@ export async function getSessionUser(req: NextRequest): Promise<SessionUser | nu
     impersonatedBy: typeof payload.imp === "string" ? payload.imp : null,
   };
 
-  /* راند ۱۹ — ادغام مدرسهٔ فعال در schoolId:
-     سوپرادمین/ادمینِ بدون مدرسه وقتی وارد «پنل مدرسه» شده‌اند (کوکی
-     bahar_acting_school از مسیر /api/schools/[id]/enter ست می‌شود)،
-     schoolId مؤثر همان مدرسهٔ فعال می‌شود تا همهٔ مسیرهایی که از
-     requireSchoolId/me.schoolId استفاده می‌کنند بی‌دردسر کار کنند.
-     امنیت: کوکی فقط برای نقش سرویسِ دارای مجوز enter_school_panel
-     معتبر است، هرگز schoolId کاربران مدرسه‌ای را دور نمی‌زند و
-     وجود/فعال‌بودن مدرسه در هر درخواست سمت سرور اعتبارسنجی می‌شود. */
   // قفل دامنه نصب: هیچ نشست کاربری نمی‌تواند به مدرسه‌ای غیر از هنرستان اصلی تعلق داشته باشد.
   const primarySchool = await db.school.findFirst({
     where: { isActive: true },
@@ -136,11 +127,7 @@ export function requireSchoolId(user: SessionUser): string {
   return user.schoolId;
 }
 
-/**
- * مدرسه فعال سوپرادمین/ادمین (کوکی bahar_acting_school) — با اعتبارسنجی سمت سرور.
- * کوکی از سمت کلاینت قابل جعل است؛ فقط برای نقش سرویسِ دارای مجوز enter_school_panel معتبر است
- * و هرگز نباید schoolId کاربران مدرسه‌ای (مدیر/معاون/معلم) را دور بزند.
- */
+/** شناسه هنرستان یگانه این نصب را از نشست معتبر کاربر برمی‌گرداند. */
 export function actingSchoolIdFor(_req: NextRequest, me: SessionUser): string | null {
   return me.schoolId;
 }
