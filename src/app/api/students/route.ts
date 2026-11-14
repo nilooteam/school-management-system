@@ -148,7 +148,9 @@ export async function POST(req: NextRequest) {
         if (!parentUser.shadNumber && pShad) patch.shadNumber = pShad;
         if (!parentUser.phone && p.phone) patch.phone = enDigits(String(p.phone));
         if (p.jobTitle && !parentUser.jobTitle) patch.jobTitle = String(p.jobTitle);
-        await db.user.update({ where: { id: parentUser.id }, data: patch });
+        if (Object.keys(patch).length > 0) {   
+          await db.user.update({ where: { id: parentUser.id }, data: patch }); 
+        }
         parentsResult.push({
           id: parentUser.id, nationalId: pNational,
           firstName: parentUser.firstName, lastName: parentUser.lastName,
