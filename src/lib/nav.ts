@@ -50,7 +50,7 @@ export type NavItem = {
 export const NAV: NavItem[] = [
   { href: "/app", label: "داشبورد", tKey: "shell.dashboard", short: "خانه", icon: LayoutDashboard, roles: ["*"], tint: 0, group: "personal" },
   { href: "/app/users", label: "کاربران", tKey: "nav.users", short: "کاربران", icon: Users, roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"], tint: 2, group: "admin" },
-  { href: "/app/students", label: "دانش‌آموزان", tKey: "nav.students", short: "دانش‌آموز", icon: GraduationCap, roles: ["MANAGER", "DEPUTY"], permission: "manage_students", tint: 3, group: "students" },
+  { href: "/app/students", label: "دانش‌آموزان", tKey: "nav.students", short: "دانش‌آموز", icon: GraduationCap, roles: ["MANAGER", "DEPUTY", "SUPER_ADMIN"], permission: "manage_students", tint: 3, group: "students" },
   { href: "/app/classes", label: "کلاس‌ها", tKey: "nav.classes", short: "کلاس‌ها", icon: BookOpen, roles: ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN"], tint: 0, group: "education" },
   { href: "/app/subjects", label: "درس‌ها", tKey: "nav.subjects", short: "درس‌ها", icon: LibraryBig, roles: ["MANAGER", "DEPUTY"], permission: "manage_subjects", tint: 1, group: "education" },
   { href: "/app/schedule", label: "برنامه هفتگی", tKey: "nav.schedule", short: "برنامه", icon: CalendarDays, roles: ["MANAGER", "DEPUTY", "TEACHER", "STUDENT", "PARENT"], tint: 2, group: "education" },
