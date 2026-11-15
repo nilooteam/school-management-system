@@ -209,7 +209,6 @@ model School {
   elections Election[]
   campaigns Campaign[]
   classRoleAssigns ClassRoleAssign[]
-  vehiclePermits VehiclePermit[]
   keyCheckouts KeyCheckout[]
   cleaningDuties CleaningDuty[]
   mentorPairs MentorPair[]
@@ -2831,20 +2830,6 @@ model ClassRoleAssign {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([schoolId, classId])
-}
-model VehiclePermit {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  ownerUserId String?
-  ownerName String
-  plate String
-  kind String @default("PARENT")
-  isActive Boolean @default(true)
-  note String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([schoolId, plate])
 }
 model KeyCheckout {
   id String @id @default(cuid())
