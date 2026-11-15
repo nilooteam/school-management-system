@@ -10,7 +10,7 @@ import {
   Bus, FileText, Video, Armchair, MessageSquareText, Landmark,
   CalendarSync, MessageSquare, UserPlus, Network, Trophy, UtensilsCrossed,
   Compass, MonitorPlay, Flame, Album, Terminal, Accessibility, FlaskConical, Puzzle,
-  Eye, NotebookText, Bot, FileSignature, Package, FileBadge, BookMarked, PackageSearch, Cake, ShieldCheck, Lock, Shirt, Sunrise, Megaphone, UserCheck, Car, KeyRound, SprayCan, Target, BookCopy, Medal, HandHeart, PhoneCall, Scale, PackagePlus, Printer, CalendarPlus, Library, ArrowLeftRight, Heart, Clock, Pill, Siren, Podcast, Bike,
+  Eye, NotebookText, Bot, FileSignature, Package, FileBadge, BookMarked, PackageSearch, Cake, ShieldCheck, Lock, Shirt, Sunrise, Megaphone, UserCheck, KeyRound, SprayCan, Target, BookCopy, Medal, HandHeart, PhoneCall, Scale, PackagePlus, Printer, CalendarPlus, Library, ArrowLeftRight, Heart, Clock, Pill, Siren, Podcast, Bike,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -99,7 +99,6 @@ export const NAV: NavItem[] = [
   { href: "/app/elections", label: "انتخابات دانش‌آموزی", tKey: "nav.elections", short: "انتخابات", icon: Vote, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/campaigns", label: "پویش‌ها", tKey: "nav.campaigns", short: "پویش", icon: Megaphone, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/class-roles", label: "مسئولیت‌های کلاسی", tKey: "nav.classRoles", short: "مسئولیت", icon: UserCheck, roles: ["MANAGER", "DEPUTY", "TEACHER", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
-  { href: "/app/parking", label: "مجوز خودرو", tKey: "nav.parking", short: "خودرو", icon: Car, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/keys-log", label: "دفتر کلیدها", tKey: "nav.keysLog", short: "کلیدها", icon: KeyRound, roles: ["MANAGER", "DEPUTY", "TEACHER", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "admin" },
   { href: "/app/cleaning", label: "نوبت نظافت", tKey: "nav.cleaning", short: "نظافت", icon: SprayCan, roles: ["MANAGER", "DEPUTY", "TEACHER", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/lost-found", label: "گمشده و پیداشده", tKey: "nav.lostFound", short: "گمشده‌ها", icon: PackageSearch, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
