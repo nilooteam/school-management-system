@@ -2559,20 +2559,6 @@ CREATE TABLE IF NOT EXISTS "ClassRoleAssign" (
     CONSTRAINT "ClassRoleAssign_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- CreateTable
-CREATE TABLE IF NOT EXISTS "VehiclePermit" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "ownerUserId" TEXT,
-    "ownerName" TEXT NOT NULL,
-    "plate" TEXT NOT NULL,
-    "kind" TEXT NOT NULL DEFAULT 'PARENT',
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "note" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "VehiclePermit_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
--- CreateTable
 CREATE TABLE IF NOT EXISTS "KeyCheckout" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "schoolId" TEXT NOT NULL,
@@ -3043,8 +3029,6 @@ CREATE INDEX IF NOT EXISTS "Campaign_schoolId_isActive_idx" ON "Campaign"("schoo
 CREATE UNIQUE INDEX IF NOT EXISTS "CampaignSignup_campaignId_userId_key" ON "CampaignSignup"("campaignId", "userId");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "ClassRoleAssign_schoolId_classId_idx" ON "ClassRoleAssign"("schoolId", "classId");
--- CreateIndex
-CREATE INDEX IF NOT EXISTS "VehiclePermit_schoolId_plate_idx" ON "VehiclePermit"("schoolId", "plate");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "KeyCheckout_schoolId_inAt_idx" ON "KeyCheckout"("schoolId", "inAt");
 -- CreateIndex
