@@ -46,8 +46,8 @@ not invent new values.
 
 | Token | Role |
 | --- | --- |
-| --spring, --spring-deep, --spring-soft, --spring-tint | Primary green scale |
-| --blossom, --blossom-tint, --blossom-foreground | Accent pink scale |
+| --spring, --spring-deep, --spring-soft, --spring-tint | Primary blue scale |
+| --blossom, --blossom-tint, --blossom-foreground | Secondary sky-blue scale |
 | --ink-deep, --ink, --steel, --stone | Text scale |
 | --hairline, --hairline-soft, --cloud | Borders and quiet surfaces |
 | --success, --success-foreground | Success fill and its text |
