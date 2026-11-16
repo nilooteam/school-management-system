@@ -89,16 +89,15 @@ export async function GET(req: NextRequest) {
       if (kind === "student") {
         const st = await db.student.findFirst({ where: { id, schoolId }, include: { user: { select: { firstName: true, lastName: true } } } });
         if (!st) return apiErr(404, "دانش‌آموز یافت نشد.", "NOT_FOUND");
-        const [attendance, grades, fees, wallet, badges] = await Promise.all([
+        const [attendance, grades, fees, badges] = await Promise.all([
           db.attendance.count({ where: { studentId: id } }),
           db.gradeRecord.count({ where: { studentId: id } }),
           db.studentFee.count({ where: { studentId: id } }),
-          db.studentWallet.findUnique({ where: { studentId: id } }),
           db.studentBadge.count({ where: { studentId: id } }),
         ]);
         return apiOk({ tool, node: { kind, id, name: `${st.user.firstName} ${st.user.lastName}` }, edges: [
           { to: "attendance", count: attendance }, { to: "grades", count: grades }, { to: "fees", count: fees },
-          { to: "wallet", count: wallet ? 1 : 0 }, { to: "badges", count: badges },
+          { to: "badges", count: badges },
         ] });
       }
       return apiErr(400, "kind باید class یا student باشد.", "BAD_INPUT");

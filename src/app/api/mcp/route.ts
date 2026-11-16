@@ -62,8 +62,6 @@ const TOOLS: ToolDef[] = [
   { name: "mcp_list_classes", description: "List classes of the caller's school.", inputSchema: { type: "object", properties: {} } },
   { name: "mcp_get_attendance", description: "Attendance records for one student, optionally on one Jalali date (YYYY-MM-DD as stored).", inputSchema: { type: "object", properties: { studentId: { type: "string" }, date: { type: "string" } }, required: ["studentId"] } },
   { name: "mcp_list_grades", description: "Grade records for one student, optionally filtered by term (1 or 2).", inputSchema: { type: "object", properties: { studentId: { type: "string" }, term: { type: "number" } }, required: ["studentId"] } },
-  { name: "mcp_get_wallet", description: "Student wallet balance and recent transactions.", inputSchema: { type: "object", properties: { studentId: { type: "string" } }, required: ["studentId"] } },
-  { name: "mcp_list_shop_products", description: "Active buffet shop products of the caller's school.", inputSchema: { type: "object", properties: {} } },
   { name: "mcp_list_announcements", description: "Recent school announcements for the caller's school.", inputSchema: { type: "object", properties: {} } },
   { name: "mcp_list_tasks", description: "Tasks of the caller's school, optionally filtered by status.", inputSchema: { type: "object", properties: { status: { type: "string" } } } },
   { name: "mcp_create_announcement", description: "Create a school announcement. Staff roles only.", inputSchema: { type: "object", properties: { title: { type: "string" }, body: { type: "string" }, classId: { type: "string" } }, required: ["title", "body"] } },
@@ -145,16 +143,6 @@ async function callTool(user: SessionUser, name: string, args: Record<string, un
         where: { studentId, ...(typeof args.term === "number" ? { term: args.term } : {}) },
         orderBy: { createdAt: "desc" }, take: 100,
       });
-    }
-    case "mcp_get_wallet": {
-      const studentId = String(args.studentId ?? "");
-      await checkStudentAccess(user, schoolId, studentId);
-      const wallet = await db.studentWallet.findUnique({ where: { studentId } });
-      const txs = wallet ? await db.walletTx.findMany({ where: { walletId: wallet.id }, orderBy: { createdAt: "desc" }, take: 20 }) : [];
-      return { balance: wallet?.balance ?? 0, dailyLimit: wallet?.dailyLimit ?? null, txs };
-    }
-    case "mcp_list_shop_products": {
-      return db.shopProduct.findMany({ where: { schoolId, isActive: true }, orderBy: { name: "asc" }, take: 100 });
     }
     case "mcp_list_announcements": {
       const rows = await db.announcement.findMany({ where: { schoolId }, orderBy: { createdAt: "desc" }, take: 20 });
