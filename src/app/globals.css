@@ -246,22 +246,22 @@ html[lang="en"] .t-h3, html[lang="tr"] .t-h3, html[lang="az"] .t-h3, html[lang="
 :root {
   --radius: 0.5rem;
 
-  /* Bahar blue palette — light mode */
+  /* Bahar palette — light mode: white and blue only */
   --spring: #2563eb;
   --spring-deep: #1d4ed8;
   --spring-soft: #60a5fa;
   --spring-tint: #eff6ff;
   --blossom: #0ea5e9;
   --blossom-tint: #e0f2fe;
-  --ink-deep: #0f172a;
-  --ink: #172554;
-  --steel: #475569;
-  --stone: #94a3b8;
-  --hairline: #cbd5e1;
-  --hairline-soft: #e2e8f0;
-  --cloud: #f1f5f9;
+  --ink-deep: #1e40af;
+  --ink: #1e3a8a;
+  --steel: #1d4ed8;
+  --stone: #60a5fa;
+  --hairline: #bfdbfe;
+  --hairline-soft: #dbeafe;
+  --cloud: #eff6ff;
 
-  /* Semantic status colors remain distinct from the brand palette */
+  /* Semantic status colors */
   --success: #16834a;
   --success-foreground: #ffffff;
   --warning: #f2a918;
@@ -270,70 +270,71 @@ html[lang="en"] .t-h3, html[lang="tr"] .t-h3, html[lang="az"] .t-h3, html[lang="
   --info: #0284c7;
   --info-foreground: #ffffff;
   --blossom-foreground: #082f49;
-  --overlay: #0f172a;
-  --invert: #0f172a;
+  --overlay: #1e3a8a;
+  --invert: #2563eb;
   --invert-foreground: #ffffff;
   --autofill-bg: #eff6ff;
-  /* نقشه ایران (SVG) */
-  --map-land: #e2e8f0;
+  /* Iran map */
+  --map-land: #dbeafe;
   --map-hover: #bfdbfe;
   --map-stroke: #ffffff;
-  --map-label: #475569;
-  --map-label-strong: #1d4ed8;
+  --map-label: #1d4ed8;
+  --map-label-strong: #1e40af;
   --map-label-selected: #ffffff;
 
-  /* shadcn mapping */
+  /* shadcn mapping — white surfaces, blue interaction states */
   --background: #ffffff;
-  --foreground: #0f172a;
+  --foreground: #1e3a8a;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #1e3a8a;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
+  --popover-foreground: #1e3a8a;
   --primary: #2563eb;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #475569;
-  --accent: #eff6ff;
+  --secondary: #eff6ff;
+  --secondary-foreground: #1e40af;
+  --muted: #eff6ff;
+  --muted-foreground: #1d4ed8;
+  --accent: #dbeafe;
   --accent-foreground: #1d4ed8;
   --destructive: #e41e3f;
   --destructive-foreground: #ffffff;
-  --border: #e2e8f0;
-  --input: #cbd5e1;
+  --border: #bfdbfe;
+  --input: #93c5fd;
   --ring: #2563eb;
   --chart-1: #2563eb;
   --chart-2: #0ea5e9;
   --chart-3: #60a5fa;
   --chart-4: #f2a918;
-  --chart-5: #64748b;
+  --chart-5: #1d4ed8;
   --sidebar: #ffffff;
-  --sidebar-foreground: #172554;
+  --sidebar-foreground: #1e3a8a;
   --sidebar-primary: #2563eb;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #eff6ff;
   --sidebar-accent-foreground: #1d4ed8;
-  --sidebar-border: #e2e8f0;
+  --sidebar-border: #bfdbfe;
   --sidebar-ring: #2563eb;
 }
 
 .dark {
+  /* Bahar palette — dark mode: black and blue only */
   --spring: #60a5fa;
   --spring-deep: #93c5fd;
   --spring-soft: #bfdbfe;
-  --spring-tint: #172b4d;
+  --spring-tint: #0b1f3a;
   --blossom: #38bdf8;
   --blossom-tint: #082f49;
   --blossom-foreground: #e0f2fe;
-  --ink-deep: #f8fafc;
-  --ink: #e2e8f0;
-  --steel: #a8b7cc;
-  --stone: #718096;
-  --hairline: #334155;
-  --hairline-soft: #1e293b;
-  --cloud: #111c30;
+  --ink-deep: #eff6ff;
+  --ink: #dbeafe;
+  --steel: #bfdbfe;
+  --stone: #93c5fd;
+  --hairline: #1e40af;
+  --hairline-soft: #172554;
+  --cloud: #0a0a0a;
 
-  /* Semantic status colors remain distinct from the brand palette */
+  /* Semantic status colors */
   --success: #4ade80;
   --success-foreground: #052e16;
   --warning: #f5b73d;
@@ -341,50 +342,50 @@ html[lang="en"] .t-h3, html[lang="tr"] .t-h3, html[lang="az"] .t-h3, html[lang="
   --warning-deep: #f7c04a;
   --info: #7dd3fc;
   --info-foreground: #082f49;
-  --overlay: #020617;
-  --invert: #f8fafc;
-  --invert-foreground: #0f172a;
-  --autofill-bg: #172554;
-  /* نقشه ایران */
-  --map-land: #1e293b;
-  --map-hover: #1e3a5f;
-  --map-stroke: #020617;
-  --map-label: #a8b7cc;
+  --overlay: #000000;
+  --invert: #eff6ff;
+  --invert-foreground: #000000;
+  --autofill-bg: #0b1f3a;
+  /* Iran map */
+  --map-land: #0a0a0a;
+  --map-hover: #0b1f3a;
+  --map-stroke: #000000;
+  --map-label: #bfdbfe;
   --map-label-strong: #93c5fd;
-  --map-label-selected: #0f172a;
+  --map-label-selected: #000000;
 
-  /* سلسله‌مراتب سطح در دارک: background ← sidebar ← card ← popover */
-  --background: #050b16;
-  --foreground: #f8fafc;
-  --card: #0b1424;
-  --card-foreground: #f8fafc;
-  --popover: #111d33;
-  --popover-foreground: #f8fafc;
+  /* Dark surfaces are black; blue is reserved for interaction and emphasis */
+  --background: #000000;
+  --foreground: #eff6ff;
+  --card: #050505;
+  --card-foreground: #eff6ff;
+  --popover: #0a0a0a;
+  --popover-foreground: #eff6ff;
   --primary: #3b82f6;
-  --primary-foreground: #061329;
-  --secondary: #111c30;
-  --secondary-foreground: #e2e8f0;
-  --muted: #111c30;
-  --muted-foreground: #a8b7cc;
-  --accent: #172b4d;
+  --primary-foreground: #ffffff;
+  --secondary: #0a0a0a;
+  --secondary-foreground: #dbeafe;
+  --muted: #0a0a0a;
+  --muted-foreground: #bfdbfe;
+  --accent: #0b1f3a;
   --accent-foreground: #bfdbfe;
   --destructive: #f0284a;
   --destructive-foreground: #ffffff;
-  --border: #26364f;
-  --input: #3b4d68;
+  --border: #1e3a8a;
+  --input: #1e40af;
   --ring: #60a5fa;
   --chart-1: #60a5fa;
   --chart-2: #38bdf8;
   --chart-3: #93c5fd;
   --chart-4: #f5b73d;
-  --chart-5: #a8b7cc;
-  --sidebar: #080f1d;
-  --sidebar-foreground: #e2e8f0;
+  --chart-5: #bfdbfe;
+  --sidebar: #000000;
+  --sidebar-foreground: #dbeafe;
   --sidebar-primary: #60a5fa;
-  --sidebar-primary-foreground: #061329;
-  --sidebar-accent: #172b4d;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #0b1f3a;
   --sidebar-accent-foreground: #bfdbfe;
-  --sidebar-border: #1e293b;
+  --sidebar-border: #172554;
   --sidebar-ring: #60a5fa;
 }
 
@@ -530,7 +531,7 @@ html[lang="en"] .t-h3, html[lang="tr"] .t-h3, html[lang="az"] .t-h3, html[lang="
   overflow: hidden;
 }
 .dark .b-btn-spring {
-  color: #051610;
+  color: #ffffff;
 }
 .b-btn-spring:not(:disabled):hover {
   background: var(--spring-soft);
@@ -583,9 +584,9 @@ html[lang="en"] .t-h3, html[lang="tr"] .t-h3, html[lang="az"] .t-h3, html[lang="
   background: var(--spring-tint);
 }
 .b-pill-tab-active {
-  background: var(--invert);
-  color: var(--invert-foreground);
-  border-color: transparent;
+  background: var(--spring);
+  color: #ffffff;
+  border-color: var(--spring);
 }
 
 /* Cards */
@@ -719,6 +720,12 @@ textarea.b-input {
 }
 .b-option-selected {
   border: 2px solid var(--spring);
+  background: var(--spring-tint);
+  color: var(--spring-deep);
+}
+.b-option:not(.b-option-selected):hover {
+  border-color: var(--spring);
+  background: var(--spring-tint);
 }
 
 /* Hairline helpers */
