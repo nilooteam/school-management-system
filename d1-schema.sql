@@ -2894,18 +2894,6 @@ CREATE TABLE IF NOT EXISTS "SafetyReport" (
     CONSTRAINT "SafetyReport_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- CreateTable
-CREATE TABLE IF NOT EXISTS "KindnessNote" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "authorUserId" TEXT,
-    "fromName" TEXT,
-    "toName" TEXT NOT NULL,
-    "text" TEXT NOT NULL,
-    "approved" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "KindnessNote_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
--- CreateTable
 CREATE TABLE IF NOT EXISTS "OfficeHour" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "schoolId" TEXT NOT NULL,
@@ -2945,19 +2933,6 @@ CREATE TABLE IF NOT EXISTS "PodcastEpisode" (
     "date" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "PodcastEpisode_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
--- CreateTable
-CREATE TABLE IF NOT EXISTS "BikeRegistry" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "kind" TEXT NOT NULL DEFAULT 'دوچرخه',
-    "color" TEXT,
-    "serial" TEXT,
-    "spot" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "BikeRegistry_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- RedefineTables
 PRAGMA defer_foreign_keys=ON;
@@ -3039,8 +3014,6 @@ CREATE INDEX IF NOT EXISTS "LeagueMatch_schoolId_date_idx" ON "LeagueMatch"("sch
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "SafetyReport_schoolId_status_idx" ON "SafetyReport"("schoolId", "status");
 -- CreateIndex
-CREATE INDEX IF NOT EXISTS "KindnessNote_schoolId_approved_idx" ON "KindnessNote"("schoolId", "approved");
--- CreateIndex
 CREATE INDEX IF NOT EXISTS "OfficeHour_schoolId_idx" ON "OfficeHour"("schoolId");
 -- CreateIndex
 -- CreateIndex
@@ -3048,8 +3021,6 @@ CREATE INDEX IF NOT EXISTS "OfficeHour_schoolId_idx" ON "OfficeHour"("schoolId")
 CREATE INDEX IF NOT EXISTS "AssetLoan_schoolId_inAt_idx" ON "AssetLoan"("schoolId", "inAt");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "PodcastEpisode_schoolId_date_idx" ON "PodcastEpisode"("schoolId", "date");
--- CreateIndex
-CREATE INDEX IF NOT EXISTS "BikeRegistry_schoolId_studentId_idx" ON "BikeRegistry"("schoolId", "studentId");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "ExamSeatAssignment_planId_sessionNo_idx" ON "ExamSeatAssignment"("planId", "sessionNo");
 -- CreateIndex
