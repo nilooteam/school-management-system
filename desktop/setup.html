@@ -18,12 +18,30 @@
 <input id="server" type="url" placeholder="https://your-school-domain.example" autocomplete="url" required>
 <button id="save" type="submit">اتصال به سامانه</button>
 <div class="hint">نشانی باید با https شروع شود. برای محیط آزمایشی، localhost نیز پذیرفته می‌شود.</div>
-<div class="error" id="error" role="alert"></div>
+<div class="error" id="error" role="alert" aria-live="polite"></div>
 </form>
 </main>
 <script>
-const form=document.getElementById("setup"), input=document.getElementById("server"), button=document.getElementById("save"), error=document.getElementById("error");
-form.addEventListener("submit",async(event)=>{event.preventDefault();button.disabled=true;error.textContent="";const result=await window.baharDesktop.saveServerUrl(input.value);if(!result.ok){error.textContent=result.error;button.disabled=false;}});
+const form=document.getElementById("setup");
+const input=document.getElementById("server");
+const button=document.getElementById("save");
+const error=document.getElementById("error");
+
+form.addEventListener("submit",async(event)=>{
+  event.preventDefault();
+  button.disabled=true;
+  error.textContent="";
+  try{
+    const result=await window.baharDesktop.saveServerUrl(input.value);
+    if(!result.ok){
+      error.textContent=result.error || "اتصال انجام نشد. دوباره تلاش کنید.";
+      button.disabled=false;
+    }
+  }catch{
+    error.textContent="ارتباط با برنامه برقرار نشد. برنامه را ببندید و دوباره باز کنید.";
+    button.disabled=false;
+  }
+});
 </script>
 </body>
 </html>
