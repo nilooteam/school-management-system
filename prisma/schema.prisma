@@ -2160,16 +2160,6 @@ model ShopSaleItem {
   @@index([saleId])
 }
 
-model MealPlan {
-  id        String @id @default(cuid())
-  schoolId  String
-  weekday   Int // ۱=شنبه … ۷=جمعه
-  breakfast String @default("")
-  lunch     String @default("")
-  snack     String @default("")
-
-  @@unique([schoolId, weekday])
-}
 
 // خوابگاه شبانه‌روزی: ساختمان، اتاق با ظرفیت، اسکان و مرخصی.
 // اسکان دانش‌آموز به اتاق با شمارش اسکان‌های فعال همان اتاق کنترل
