@@ -1899,14 +1899,6 @@ CREATE TABLE IF NOT EXISTS "ClubEnrollment" (
     CONSTRAINT "ClubEnrollment_clubId_fkey" FOREIGN KEY ("clubId") REFERENCES "Club" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "ClubEnrollment_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-CREATE TABLE IF NOT EXISTS "MealPlan" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "weekday" INTEGER NOT NULL,
-    "breakfast" TEXT NOT NULL DEFAULT '',
-    "lunch" TEXT NOT NULL DEFAULT '',
-    "snack" TEXT NOT NULL DEFAULT ''
-);
 CREATE TABLE IF NOT EXISTS "StudentWallet" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "schoolId" TEXT NOT NULL,
@@ -2127,7 +2119,6 @@ CREATE INDEX IF NOT EXISTS "ClubEnrollment_studentId_idx" ON "ClubEnrollment"("s
 CREATE UNIQUE INDEX IF NOT EXISTS "ClubEnrollment_clubId_studentId_key" ON "ClubEnrollment"("clubId", "studentId");
 CREATE UNIQUE INDEX IF NOT EXISTS "StudentWallet_studentId_key" ON "StudentWallet"("studentId");
 CREATE INDEX IF NOT EXISTS "WalletTx_walletId_createdAt_idx" ON "WalletTx"("walletId", "createdAt");
-CREATE UNIQUE INDEX IF NOT EXISTS "MealPlan_schoolId_weekday_key" ON "MealPlan"("schoolId", "weekday");
 
 CREATE TABLE IF NOT EXISTS "GuidanceRecord" (
     "id" TEXT NOT NULL PRIMARY KEY,
