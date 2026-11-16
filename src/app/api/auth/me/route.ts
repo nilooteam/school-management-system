@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     // مدرسه فعال برای ادمین‌ها (ورود به پنل مدرسه) — با اعتبارسنجی نقش، نه اعتماد به کوکی خام
     const actingSchoolId = actingSchoolIdFor(req, me);
     const actingSchool = actingSchoolId
-      ? await db.school.findUnique({ where: { id: actingSchoolId }, select: { id: true, name: true, code: true, shadEnabled: true, custodianEnabled: true } })
+      ? await db.school.findUnique({ where: { id: actingSchoolId }, select: { id: true, name: true, code: true, shadEnabled: true } })
       : null;
 
     const user = await db.user.findUnique({

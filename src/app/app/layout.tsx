@@ -5,12 +5,12 @@ import { verifyToken, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { parsePermissions } from "@/lib/roles";
 import { avatarApiFields } from "@/lib/avatar";
 import { AppShell } from "@/components/app-shell/app-shell";
-let _primarySchoolCache: { at: number; value: { id: string; name: string; shadEnabled: boolean; custodianEnabled: boolean } | null } | null = null;
+let _primarySchoolCache: { at: number; value: { id: string; name: string; shadEnabled: boolean } | null } | null = null;
 async function getPrimarySchool() {
   if (_primarySchoolCache && Date.now() - _primarySchoolCache.at < 60_000) return _primarySchoolCache.value;
   const value = await db.school.findFirst({
     where: { isActive: true }, orderBy: { createdAt: "asc" },
-    select: { id: true, name: true, shadEnabled: true, custodianEnabled: true },
+    select: { id: true, name: true, shadEnabled: true },
   });
   _primarySchoolCache = { at: Date.now(), value };
   return value;
@@ -30,7 +30,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       mustChangePassword: true, isActive: true, shadNumber: true, tokenVersion: true,
       langCode: true,
       profileImageType: true, photoUrl: true, avatarConfig: true,
-      school: { select: { id: true, name: true, code: true, shadEnabled: true, custodianEnabled: true } },
+      school: { select: { id: true, name: true, code: true, shadEnabled: true } },
     },
   });
   if (!user || !user.isActive) redirect("/login");
@@ -41,7 +41,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!["SUPER_ADMIN", "ADMIN"].includes(user.role) && user.schoolId !== primarySchool.id) redirect("/login");
   const school = primarySchool;
   const schoolModules = school
-    ? { shadEnabled: school.shadEnabled, custodianEnabled: school.custodianEnabled }
+    ? { shadEnabled: school.shadEnabled }
     : null;
 
   return (

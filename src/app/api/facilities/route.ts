@@ -46,7 +46,6 @@ export async function GET(req: NextRequest) {
       const assets = await db.asset.findMany({
         where: { schoolId },
         orderBy: { name: "asc" },
-        include: { custodian: { select: { firstName: true, lastName: true } } },
       });
       return apiOk({ kind, assets, assetCats: ASSET_CATS });
     }
@@ -180,10 +179,6 @@ export async function POST(req: NextRequest) {
       if (!["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"].includes(me.role)) return apiErr(403, "دسترسی ندارید.", "FORBIDDEN");
       if (!body.name || !body.code) return apiErr(400, "نام و کد دارایی لازم است.", "BAD_REQUEST");
       if (body.purchaseDate && !toDate(body.purchaseDate)) return apiErr(400, "تاریخ خرید نامعتبر است.", "BAD_DATE");
-      if (body.custodianId) {
-        const cOk = await db.user.findFirst({ where: { id: String(body.custodianId), schoolId, isActive: true }, select: { id: true } });
-        if (!cOk) return apiErr(400, "متصدی انتخاب‌شده در این مدرسه فعال نیست.", "BAD_CUSTODIAN");
-      }
       const asset = await db.asset.create({
         data: {
           schoolId,
@@ -191,7 +186,6 @@ export async function POST(req: NextRequest) {
           code: String(body.code),
           category: ASSET_CATS[String(body.category)] ? String(body.category) : "OTHER",
           location: (body.location as string) ?? null,
-          custodianId: (body.custodianId as string) || null,
           purchaseDate: body.purchaseDate ? toDate(body.purchaseDate) : null,
           value: body.value ? Number(body.value) : null,
           note: (body.note as string) ?? null,
@@ -358,7 +352,6 @@ export async function PATCH(req: NextRequest) {
       const data: Record<string, unknown> = {};
       if (["OK", "BROKEN", "REPAIRING", "RETIRED"].includes(String(body.status))) data.status = String(body.status);
       if (body.location !== undefined) data.location = String(body.location);
-      if (body.custodianId !== undefined) data.custodianId = (body.custodianId as string) || null;
       const updated = await db.asset.update({ where: { id }, data });
       await audit({ user: me, action: "ویرایش دارایی", entityType: "Asset", entityId: id, schoolId, meta: { status: body.status } });
       return apiOk({ asset: updated });

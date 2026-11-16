@@ -52,18 +52,16 @@ export async function GET(req: NextRequest) {
     }
 
     if (tool === "quality") {
-      const [noClass, noTeacherClass, outOfRange, emptyRooms, dupNational] = await Promise.all([
+      const [noClass, noTeacherClass, outOfRange, dupNational] = await Promise.all([
         db.student.findMany({ where: { schoolId, classId: null, status: "ACTIVE" }, include: { user: { select: { firstName: true, lastName: true } } }, take: 5 }),
         db.class.findMany({ where: { schoolId, homeroomTeacherId: null, isActive: true }, take: 5 }),
         db.gradeRecord.findMany({ where: { class: { schoolId }, OR: [{ score: { lt: 0 } }, { score: { gt: 20 } }] }, take: 5 }),
-        db.dormRoom.findMany({ where: { building: { schoolId }, capacity: { lte: 0 } }, take: 5 }),
         db.user.groupBy({ by: ["nationalId"], where: { schoolId }, _count: { _all: true }, having: { nationalId: { _count: { gt: 1 } } }, orderBy: { _count: { nationalId: "desc" } }, take: 5 }),
       ]);
       const checks = [
         { key: "students_without_class", label: "دانش‌آموز فعال بدون کلاس", count: noClass.length, sample: noClass.map((s) => `${s.user.firstName} ${s.user.lastName}`) },
         { key: "classes_without_homeroom", label: "کلاس فعال بدون معلم راهنما", count: noTeacherClass.length, sample: noTeacherClass.map((c) => c.name) },
         { key: "grades_out_of_range", label: "نمره خارج از بازهٔ ۰ تا ۲۰", count: outOfRange.length, sample: outOfRange.map((g) => g.id) },
-        { key: "rooms_zero_capacity", label: "اتاق خوابگاه با ظرفیت صفر", count: emptyRooms.length, sample: emptyRooms.map((r) => r.name) },
         { key: "duplicate_national_ids", label: "کد ملی تکراری در مدرسه", count: dupNational.length, sample: dupNational.map((d) => d.nationalId) },
       ];
       return apiOk({ tool, checks, note: "نمونه‌ها حداکثر ۵ مورد اول هر بررسی‌اند؛ شمارش کامل نیست." });
@@ -91,41 +89,31 @@ export async function GET(req: NextRequest) {
       if (kind === "student") {
         const st = await db.student.findFirst({ where: { id, schoolId }, include: { user: { select: { firstName: true, lastName: true } } } });
         if (!st) return apiErr(404, "دانش‌آموز یافت نشد.", "NOT_FOUND");
-        const [attendance, grades, fees, wallet, dorm, badges] = await Promise.all([
+        const [attendance, grades, fees, wallet, badges] = await Promise.all([
           db.attendance.count({ where: { studentId: id } }),
           db.gradeRecord.count({ where: { studentId: id } }),
           db.studentFee.count({ where: { studentId: id } }),
           db.studentWallet.findUnique({ where: { studentId: id } }),
-          db.dormAssignment.count({ where: { studentId: id, status: "ACTIVE" } }),
           db.studentBadge.count({ where: { studentId: id } }),
         ]);
         return apiOk({ tool, node: { kind, id, name: `${st.user.firstName} ${st.user.lastName}` }, edges: [
           { to: "attendance", count: attendance }, { to: "grades", count: grades }, { to: "fees", count: fees },
-          { to: "wallet", count: wallet ? 1 : 0 }, { to: "dormAssignments", count: dorm }, { to: "badges", count: badges },
+          { to: "wallet", count: wallet ? 1 : 0 }, { to: "badges", count: badges },
         ] });
       }
       return apiErr(400, "kind باید class یا student باشد.", "BAD_INPUT");
     }
 
     if (tool === "forecast") {
-      const [classes, rooms] = await Promise.all([
-        db.class.findMany({ where: { schoolId, isActive: true }, select: { id: true, name: true, capacity: true } }),
-        db.dormRoom.findMany({ where: { building: { schoolId }, isActive: true }, select: { id: true, name: true, capacity: true } }),
-      ]);
+      const classes = await db.class.findMany({ where: { schoolId, isActive: true }, select: { id: true, name: true, capacity: true } });
       const classCounts = await db.student.groupBy({ by: ["classId"], where: { classId: { in: classes.map((c) => c.id) }, status: "ACTIVE" }, _count: { _all: true } });
       const countMap = new Map<string, number>(classCounts.flatMap((c) => (c.classId ? [[c.classId, c._count._all] as [string, number]] : [])));
-      const roomCounts = await db.dormAssignment.groupBy({ by: ["roomId"], where: { roomId: { in: rooms.map((r) => r.id) }, status: "ACTIVE" }, _count: { _all: true } });
-      const roomMap = new Map<string, number>(roomCounts.map((c) => [c.roomId, c._count._all]));
       const scenarios = [5, 10, 20];
       return apiOk({
         tool,
         classes: classes.map((c) => {
           const now = countMap.get(c.id) ?? 0;
           return { name: c.name, now, capacity: c.capacity, overCapacity: now > c.capacity, scenarios: scenarios.map((p) => ({ growth: p, projected: Math.round(now * (1 + p / 100)) })) };
-        }),
-        dormRooms: rooms.map((r) => {
-          const now = roomMap.get(r.id) ?? 0;
-          return { name: r.name, now, capacity: r.capacity, overCapacity: now > r.capacity, scenarios: scenarios.map((p) => ({ growth: p, projected: Math.round(now * (1 + p / 100)) })) };
         }),
         note: "سناریوهای رشد ۵٪/۱۰٪/۲۰٪ حسابی‌اند، نه پیش‌بینی مدل.",
       });

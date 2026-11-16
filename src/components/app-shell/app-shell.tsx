@@ -41,7 +41,7 @@ export type ShellUser = {
   photoUrl: string | null;
   avatar: AvatarParams | null;
   /** راند ۱۸: ماژول‌های مدرسهٔ مؤثر — شاد/سرایدار قابل خاموش‌کردن برای هر مدرسه */
-  schoolModules: { shadEnabled: boolean; custodianEnabled: boolean } | null;
+  schoolModules: { shadEnabled: boolean } | null;
 };
 
 /* ─── بافت کاربر پوسته — لانچر موبایلِ داشبورد هم به نقش/دسترسی/نشان‌ها دسترسی دارد ─── */
@@ -110,7 +110,6 @@ function AppShellInner({ user, children }: { user: ShellUser; children: React.Re
      بستهٔ کشور فعال ماژولش را روشن کرده باشد (ایران) و هم مدرسهٔ مؤثر */
   const shadVisible = country.modules.shad !== false && (user.schoolModules?.shadEnabled !== false);
   /* راند ۱۸: نقش سرایدار در این مدرسه غیرفعال شده است؟ */
-  const custodianDisabled = user.role === "CUSTODIAN" && user.schoolModules?.custodianEnabled === false;
 
   // بارگذاری وضعیت جمع‌شده سایدبار
   useEffect(() => {
@@ -520,12 +519,6 @@ function AppShellInner({ user, children }: { user: ShellUser; children: React.Re
       </header>
 
       {/* بنر تغییر رمز */}
-      {custodianDisabled && (
-        <div className="b-promo !bg-warning/10 !text-warning-deep no-print">
-          <DoorOpen className="w-4 h-4 shrink-0" />
-          <span className="truncate">{t("shell.banner.custodianDisabled")}</span>
-        </div>
-      )}
       {user.mustChangePassword && (
         <div className="b-promo b-promo-spring no-print">
           <KeyRound className="w-4 h-4 shrink-0" />
