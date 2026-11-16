@@ -824,7 +824,6 @@
    "returnDate"
   ],
   "roles": [
-   "CUSTODIAN",
    "ADMIN",
    "TEACHER"
   ],
@@ -868,8 +867,7 @@
    "condition"
   ],
   "roles": [
-   "ADMIN",
-   "CUSTODIAN"
+   "ADMIN"
   ],
   "slug": "d4p-admin-asset-register",
   "statuses": [

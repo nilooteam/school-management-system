@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
       return apiOk({ requests: out, classes });
     }
 
-    if (me.role === "PARENT" || me.role === "CUSTODIAN") {
+    if (me.role === "PARENT") {
       const links = await db.studentParent.findMany({
         where: { parentUserId: me.id },
         include: { student: { select: { id: true, schoolId: true, classId: true, user: { select: { firstName: true, lastName: true } }, class: { select: { name: true } } } } },

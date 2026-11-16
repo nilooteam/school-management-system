@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const date = req.nextUrl.searchParams.get("date") || todayJalali();
     const rows = await db.dutyAssignment.findMany({ where: { schoolId, date }, orderBy: { createdAt: "asc" } });
     const teachers = await db.user.findMany({
-      where: { schoolId, isActive: true, role: { in: ["TEACHER", "DEPUTY", "MANAGER", "CUSTODIAN"] } },
+      where: { schoolId, isActive: true, role: { in: ["TEACHER", "DEPUTY", "MANAGER"] } },
       select: { id: true, firstName: true, lastName: true, role: true },
       orderBy: { lastName: "asc" },
     });

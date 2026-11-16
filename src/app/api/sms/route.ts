@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     // حل گیرندگان از روی نقش/کلاس
     let userIds: string[] = [];
     if (audience === "TEACHERS") {
-      userIds = (await db.user.findMany({ where: { schoolId, role: { in: ["TEACHER", "MANAGER", "DEPUTY", "CUSTODIAN"] }, isActive: true }, select: { id: true } })).map((u) => u.id);
+      userIds = (await db.user.findMany({ where: { schoolId, role: { in: ["TEACHER", "MANAGER", "DEPUTY"] }, isActive: true }, select: { id: true } })).map((u) => u.id);
     } else if (audience === "STUDENTS" || audience === "CLASS") {
       const students = await db.student.findMany({
         where: { schoolId, status: "ACTIVE", ...(audience === "CLASS" ? { classId: String(body.classId ?? "") } : {}) },

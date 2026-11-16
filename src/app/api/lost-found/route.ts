@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { requireUser, apiOk, apiErr, handleApiError, readJson, audit, requireSchoolId, demoWriteBlock } from "@/lib/api";
 import { notifyUser } from "@/lib/notify";
 
-const STAFF = ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"] as const;
+const STAFF = ["MANAGER", "DEPUTY", "TEACHER", "ADMIN", "SUPER_ADMIN"] as const;
 
 function norm(s: string) {
   return s.replace(/[\s‌]+/g, " ").trim().toLowerCase();

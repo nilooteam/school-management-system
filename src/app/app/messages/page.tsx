@@ -15,7 +15,7 @@ import { relativeTimeFa, formatTimeFa, formatDateFa, faNumber, enDigits } from "
 import { ROLE_ORDER } from "@/lib/roles";
 import { useLang } from "@/lib/i18n";
 
-const ROLE_TKEY: Record<string, string> = { SUPER_ADMIN: "enum.role.SUPER_ADMIN", ADMIN: "enum.role.ADMIN", MANAGER: "enum.role.MANAGER", DEPUTY: "enum.role.DEPUTY", TEACHER: "enum.role.TEACHER", CUSTODIAN: "enum.role.CUSTODIAN", STUDENT: "enum.role.STUDENT", PARENT: "enum.role.PARENT" };
+const ROLE_TKEY: Record<string, string> = { SUPER_ADMIN: "enum.role.SUPER_ADMIN", ADMIN: "enum.role.ADMIN", MANAGER: "enum.role.MANAGER", DEPUTY: "enum.role.DEPUTY", TEACHER: "enum.role.TEACHER", STUDENT: "enum.role.STUDENT", PARENT: "enum.role.PARENT" };
 
 type AvatarFields = {
   profileImageType?: "upload" | "avatar" | null;
@@ -91,7 +91,7 @@ export default function MessagesPage() {
       const items = filtered.filter((c) => c.role === role);
       if (items.length > 0) groups.push({ key: role, label: ROLE_TKEY[role] ? t(ROLE_TKEY[role]) : role, items });
     }
-    // نقش‌های خارج از فهرست (مثل سرایدار جدید) هم دیده شوند
+    // نقش‌های خارج از فهرست هم دیده شوند
     for (const c of filtered) {
       if (!ROLE_ORDER.includes(c.role) && !groups.some((g) => g.key === c.role)) {
         const items = filtered.filter((x) => x.role === c.role);

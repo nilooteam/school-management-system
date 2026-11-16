@@ -155,7 +155,6 @@ export function RoleBadge({ role }: { role: string }) {
     MANAGER: "b-badge-spring",
     DEPUTY: "b-badge-blossom",
     TEACHER: "b-badge-neutral",
-    CUSTODIAN: "b-badge-neutral",
     STUDENT: "b-badge-neutral",
     PARENT: "b-badge-neutral",
   };
@@ -165,7 +164,6 @@ export function RoleBadge({ role }: { role: string }) {
     MANAGER: t("role.badge.manager"),
     DEPUTY: t("role.badge.deputy"),
     TEACHER: t("role.badge.teacher"),
-    CUSTODIAN: t("role.badge.custodian"),
     STUDENT: t("role.badge.student"),
     PARENT: t("role.badge.parent"),
   };

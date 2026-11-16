@@ -9,7 +9,7 @@ import { todayKey } from "@/lib/persian";
    ============================================================ */
 
 const STATUSES = ["PRESENT", "ABSENT", "LATE", "LEAVE", "MISSION"] as const;
-const STAFF_ROLES = ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN"];
+const STAFF_ROLES = ["MANAGER", "DEPUTY", "TEACHER"];
 
 export async function GET(req: NextRequest) {
   try {

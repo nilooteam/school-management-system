@@ -1,7 +1,7 @@
 /**
  * Bahar — Round 18 E2E tests
  * Covers: search rewrite, badges (SA-only define), polls acting-school, automation
- * acting-school, school-site publish/subdomain, custodian role + toggles, shad
+ * acting-school, school-site publish/subdomain, shad
  * per-school toggle + credential alternative, excel export/import, country &
  * language builders, OTP login flow, login captcha escalation.
  */
@@ -164,37 +164,6 @@ async function main() {
   // بازگشت به وضعیت قبل
   await api("/api/school-site", { method: "PUT", body: JSON.stringify({ subdomain: originalSub, published: false }) });
 
-  /* ═══ 8) سرایدار — ساخت + كلید روشن/خاموش ═══ */
-  const custNid = validNid(Date.now());
-  r = await api("/api/users", {
-    method: "POST",
-    body: JSON.stringify({
-      role: "CUSTODIAN",
-      nationalId: custNid,
-      firstName: "سرایدار",
-      lastName: "آزمایشی",
-      password: undefined,
-    }),
-  });
-  check("custodian created", r.status === 200 && r.body?.user?.role === "CUSTODIAN", `status=${r.status} ${r.body?.error?.message ?? ""}`);
-  const custUserId = r.body?.user?.id;
-  const custPassword = r.body?.password;
-
-  // خاموش‌کردن ماژول سرایدار → ساخت باید 403 بدهد
-  await api(`/api/schools/${school.id}`, { method: "PATCH", body: JSON.stringify({ custodianEnabled: false }) });
-  const custNid2 = validNid(Date.now() - 1);
-  r = await api("/api/users", {
-    method: "POST",
-    body: JSON.stringify({ role: "CUSTODIAN", nationalId: custNid2, firstName: "سما", lastName: "تست" }),
-  });
-  check("custodian blocked when disabled", r.status === 403 && r.body?.error?.code === "CUSTODIAN_DISABLED", `status=${r.status}`);
-  await api(`/api/schools/${school.id}`, { method: "PATCH", body: JSON.stringify({ custodianEnabled: true }) });
-
-  // ورود سرایدار (باید mustChangePassword بدهد ولی نشست می‌گیرد)
-  if (custUserId && custPassword) {
-    const cl = await login(custNid, custPassword);
-    check("custodian can login", cl.status === 200, `status=${cl.status}`);
-  }
 
   /* ═══ 9) شاد — کلید مدرسه + اعتبارنامه جایگزین ═══ */
   await api(`/api/schools/${school.id}`, { method: "PATCH", body: JSON.stringify({ shadEnabled: false }) });

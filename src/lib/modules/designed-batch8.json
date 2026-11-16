@@ -315,7 +315,6 @@
    "actionTaken"
   ],
   "roles": [
-   "CUSTODIAN",
    "NURSE",
    "MANAGER"
   ],
@@ -687,8 +686,7 @@
   ],
   "roles": [
    "TEACHER",
-   "ADMIN",
-   "CUSTODIAN"
+   "ADMIN"
   ],
   "slug": "d8p-admin-hall-booking",
   "statuses": [
@@ -1093,7 +1091,6 @@
   ],
   "roles": [
    "TEACHER",
-   "CUSTODIAN",
    "MANAGER"
   ],
   "slug": "d8p-health-lab-safety-inspection",

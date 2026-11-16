@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { requireUser, apiOk, apiErr, handleApiError, readJson, requireSchoolId, demoWriteBlock } from "@/lib/api";
 import { notifyUser } from "@/lib/notify";
 
-const STAFF = ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"] as const;
+const STAFF = ["MANAGER", "DEPUTY", "TEACHER", "ADMIN", "SUPER_ADMIN"] as const;
 const OFFICE = ["MANAGER", "DEPUTY", "ADMIN", "SUPER_ADMIN"] as const;
 
 /** GET /api/print-requests — سفارش‌های چاپ من + صف چاپخانهٔ دفتر */

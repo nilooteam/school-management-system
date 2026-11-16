@@ -9,7 +9,7 @@ import { requireUser, apiOk, apiErr, handleApiError, readJson, actingSchoolIdFor
    همان لحظه اعلان می‌گیرد.
    ============================================================ */
 
-const STAFF = ["TEACHER", "MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN", "CUSTODIAN"];
+const STAFF = ["TEACHER", "MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"];
 
 async function resolveStudent(req: NextRequest, me: { id: string; role: string; schoolId?: string | null }, studentId: string) {
   if (me.role === "STUDENT") {

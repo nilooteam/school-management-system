@@ -9,7 +9,7 @@ import { requireUser, apiOk, apiErr, handleApiError, readJson, actingSchoolIdFor
    ریز همهٔ تراکنش‌ها را می‌بیند. پول نقد از بوفه حذف می‌شود.
    ============================================================ */
 
-const STAFF = ["MANAGER", "DEPUTY", "CUSTODIAN", "SUPER_ADMIN", "ADMIN"];
+const STAFF = ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"];
 
 async function myStudentIds(me: { id: string; role: string }): Promise<string[]> {
   if (me.role === "STUDENT") {

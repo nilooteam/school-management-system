@@ -101,7 +101,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       const list = (body.invigilators ?? []).slice(0, 40);
       const validUsers = new Set(
         (await db.user.findMany({
-          where: { id: { in: list.map((x) => x.userId) }, schoolId: session.schoolId, role: { in: ["TEACHER", "MANAGER", "DEPUTY", "CUSTODIAN"] } },
+          where: { id: { in: list.map((x) => x.userId) }, schoolId: session.schoolId, role: { in: ["TEACHER", "MANAGER", "DEPUTY"] } },
           select: { id: true },
         })).map((u) => u.id),
       );

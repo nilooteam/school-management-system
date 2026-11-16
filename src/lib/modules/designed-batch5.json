@@ -438,7 +438,7 @@
  {
   "category": "سلامت و ایمنی",
   "categoryCode": "health",
-  "description": "پرستار و سرایدار هر ماه بهداشت کلاس‌ها را بازرسی می‌کنند؛ موارد یافت‌شده مانند سطل پر یا تهویه خراب ثبت می‌شود و پس از رفع، بازرسی دوباره انجام می‌شود تا کلاس تأییدیه بهداشت بگیرد.",
+  "description": "پرستار هر ماه بهداشت کلاس‌ها را بازرسی می‌کند؛ موارد یافت‌شده مانند سطل پر یا تهویه خراب ثبت می‌شود و پس از رفع، بازرسی دوباره انجام می‌شود تا کلاس تأییدیه بهداشت بگیرد.",
   "fields": [
    "classroom",
    "inspectionDate",
@@ -448,7 +448,6 @@
   ],
   "roles": [
    "NURSE",
-   "CUSTODIAN",
    "MANAGER"
   ],
   "slug": "d5p-health-hygiene-inspection",
@@ -497,7 +496,6 @@
   ],
   "roles": [
    "ADMIN",
-   "CUSTODIAN",
    "PARENT"
   ],
   "slug": "d5p-trans-parent-car-queue",
@@ -716,8 +714,7 @@
   ],
   "roles": [
    "STUDENT",
-   "TEACHER",
-   "CUSTODIAN"
+   "TEACHER"
   ],
   "slug": "d5p-extra-recycling-drive",
   "statuses": [

@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       if (me.role === "STUDENT") {
         const profile = await db.student.findFirst({ where: { userId: me.id }, select: { id: true } });
         studentFilter = profile ? [profile.id] : [];
-      } else if (me.role === "PARENT" || me.role === "CUSTODIAN") {
+      } else if (me.role === "PARENT") {
         const links = await db.studentParent.findMany({ where: { parentUserId: me.id }, select: { studentId: true } });
         studentFilter = links.map((l) => l.studentId);
       } else {

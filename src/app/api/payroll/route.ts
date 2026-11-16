@@ -8,7 +8,7 @@ import { requireUser, apiOk, apiErr, handleApiError, readJson, audit, actingScho
    جدول مدیریتی ماه با جمع کل
    ============================================================ */
 
-const STAFF_ROLES = ["TEACHER", "MANAGER", "DEPUTY", "CUSTODIAN"];
+const STAFF_ROLES = ["TEACHER", "MANAGER", "DEPUTY"];
 
 export async function GET(req: NextRequest) {
   try {

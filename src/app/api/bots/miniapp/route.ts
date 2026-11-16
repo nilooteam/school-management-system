@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       };
     };
 
-    if (user.role === "PARENT" || user.role === "CUSTODIAN") {
+    if (user.role === "PARENT") {
       const links = await db.studentParent.findMany({
         where: { parentUserId: user.id },
         include: {

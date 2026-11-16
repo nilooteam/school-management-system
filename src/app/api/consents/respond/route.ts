@@ -5,7 +5,7 @@ import { requireUser, apiOk, apiErr, handleApiError, readJson, demoWriteBlock } 
 /** POST /api/consents/respond — پاسخ ولی (تأیید/رد) برای یک دانش‌آموز */
 export async function POST(req: NextRequest) {
   try {
-    const me = await requireUser(req, ["PARENT", "CUSTODIAN"]);
+    const me = await requireUser(req, ["PARENT"]);
     const blocked = await demoWriteBlock(me);
     if (blocked) return blocked;
     const body = await readJson<{ requestId?: string; studentId?: string; status?: string; note?: string }>(req);

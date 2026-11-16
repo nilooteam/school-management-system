@@ -21,7 +21,7 @@ const STATUS_OPTIONS = [
   { value: "MISSION", tkey: "enum.staffAttendanceStatus.MISSION" },
 ];
 const STATUS_TKEY: Record<string, string> = Object.fromEntries(STATUS_OPTIONS.map((o) => [o.value, o.tkey]));
-const ROLE_TKEY: Record<string, string> = { MANAGER: "common.manager", DEPUTY: "common.deputy", TEACHER: "common.teacher", CUSTODIAN: "role.custodian" };
+const ROLE_TKEY: Record<string, string> = { MANAGER: "common.manager", DEPUTY: "common.deputy", TEACHER: "common.teacher" };
 
 export default function StaffAttendancePage() {
   const { t } = useLang();

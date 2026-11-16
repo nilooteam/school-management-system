@@ -121,8 +121,7 @@
     ],
     "roles": [
       "MANAGER",
-      "STUDENT",
-      "CUSTODIAN"
+      "STUDENT"
     ],
     "slug": "d9p-att-gate-pass",
     "statuses": [

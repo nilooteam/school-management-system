@@ -5,10 +5,10 @@ import { todayKey } from "@/lib/persian";
 
 /* ============================================================
    بهار | مجوز خروج دانش‌آموز — درخواست ولی/دفتر، تأیید مدیریت،
-   ثبت خروج نهایی توسط سرایدار/دفتر
+   ثبت خروج نهایی توسط دفتر
    ============================================================ */
 
-const STAFF = ["MANAGER", "DEPUTY", "CUSTODIAN", "SUPER_ADMIN", "ADMIN"];
+const STAFF = ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"];
 
 export async function GET(req: NextRequest) {
   try {
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const me = await requireUser(req, ["MANAGER", "DEPUTY", "CUSTODIAN", "SUPER_ADMIN", "ADMIN"]);
+    const me = await requireUser(req, ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"]);
     const blocked = await demoWriteBlock(me);
     if (blocked) return blocked;
     const schoolId = me.schoolId ?? actingSchoolIdFor(req, me) ?? null;

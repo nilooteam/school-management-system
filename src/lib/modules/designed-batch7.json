@@ -347,7 +347,6 @@
   ],
   "roles": [
    "NURSE",
-   "CUSTODIAN",
    "MANAGER"
   ],
   "slug": "d7p-health-water-safety",
@@ -392,8 +391,7 @@
    "restocked"
   ],
   "roles": [
-   "NURSE",
-   "CUSTODIAN"
+   "NURSE"
   ],
   "slug": "d7p-health-first-aid-kit",
   "statuses": [
@@ -545,8 +543,7 @@
    "fixedStatus"
   ],
   "roles": [
-   "STUDENT",
-   "CUSTODIAN"
+   "STUDENT"
   ],
   "slug": "d7p-extra-safety-patrol",
   "statuses": [
@@ -829,8 +826,7 @@
   ],
   "roles": [
    "STUDENT",
-   "TEACHER",
-   "CUSTODIAN"
+   "TEACHER"
   ],
   "slug": "d7p-events-planting-day",
   "statuses": [
@@ -1068,7 +1064,6 @@
   ],
   "roles": [
    "DRIVER",
-   "CUSTODIAN",
    "MANAGER"
   ],
   "slug": "d7p-trans-vehicle-cleaning",

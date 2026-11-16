@@ -96,11 +96,10 @@ export async function POST(req: NextRequest) {
       if (!poll || poll.schoolId !== schoolId) return apiErr(404, "نظرسنجی یافت نشد.", "NOT_FOUND");
       if (!poll.active) return apiErr(400, "این نظرسنجی بسته شده است.", "CLOSED");
       if (poll.closesAt && poll.closesAt < new Date()) return apiErr(400, "زمان نظرسنجی تمام شده است.", "CLOSED");
-      // مخاطب — سرایدار هم کارکنان است (راند ۱۸)
       const roleMap: Record<string, string[]> = {
-        ALL: ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN", "STUDENT", "PARENT", "SUPER_ADMIN", "ADMIN"],
+        ALL: ["MANAGER", "DEPUTY", "TEACHER", "STUDENT", "PARENT", "SUPER_ADMIN", "ADMIN"],
         STUDENTS: ["STUDENT"], PARENTS: ["PARENT"], TEACHERS: ["TEACHER"],
-        STAFF: ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN"],
+        STAFF: ["MANAGER", "DEPUTY", "TEACHER"],
       };
       if (!roleMap[poll.audience]?.includes(me.role)) return apiErr(403, "این نظرسنجی برای نقش شما نیست.", "FORBIDDEN");
       const existing = await db.pollVote.findFirst({ where: { pollId, userId: me.id } });

@@ -69,7 +69,6 @@ const STAFF_ROLES: Record<string, string> = {
   MANAGER: "MANAGER", مدیر: "MANAGER",
   DEPUTY: "DEPUTY", معاون: "DEPUTY",
   TEACHER: "TEACHER", معلم: "TEACHER", دبیر: "TEACHER",
-  CUSTODIAN: "CUSTODIAN", سرایدار: "CUSTODIAN", خدمتگزار: "CUSTODIAN",
 };
 
 function autoMap(headers: string[], explicit: Record<string, string> | undefined, staff = false): Record<string, string> {
@@ -94,7 +93,7 @@ function validateStaff(rows: Row[], mapping: Record<string, string>): Validation
     else if (!/^\d{10}$/.test(nationalId)) errors.push("کد ملی ۱۰ رقم نیست");
     else if (!isValidNationalId(nationalId)) errors.push("کد ملی نامعتبر (رقم کنترل)");
     const roleRaw = get("role").trim();
-    if (!roleRaw) errors.push("نقش خالی است (مدیر/معاون/معلم/سرایدار)");
+    if (!roleRaw) errors.push("نقش خالی است (مدیر/معاون/معلم)");
     else if (!STAFF_ROLES[roleRaw] && !STAFF_ROLES[roleRaw.toUpperCase()]) errors.push(`نقش نامعتبر: ${roleRaw}`);
     const phone = get("phone");
     if (phone && !/^09\d{9}$/.test(phone)) warnings.push("شماره موبایل نامعتبر");

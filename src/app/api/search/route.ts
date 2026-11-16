@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     if (!isService && !scope) return apiOk({ results: [] });
 
     // سرویس (سوپرادمین/ادمین) حتی بیرون از پنل مدرسه هم دانش‌آموز/کلاس/درس کل سامانه را جستجو می‌کند
-    const isStaff = me.role === "MANAGER" || me.role === "DEPUTY" || me.role === "CUSTODIAN" || isService;
+    const isStaff = me.role === "MANAGER" || me.role === "DEPUTY" || isService;
     const canSeeStudents = isStaff || me.role === "TEACHER";
     const results: Result[] = [];
 

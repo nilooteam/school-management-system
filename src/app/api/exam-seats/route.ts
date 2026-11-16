@@ -5,7 +5,7 @@ import { buildAssignments, totalCapacity, type SeatRoom, type SeatStrategy, type
 
 const STAFF = ["MANAGER", "DEPUTY", "TEACHER", "ADMIN", "SUPER_ADMIN"];
 /** مراقب اتاق فقط از میان کادر همان مدرسه (همان الگوی مراقبان آزمون) */
-const INVIGILATOR_ROLES = ["TEACHER", "MANAGER", "DEPUTY", "CUSTODIAN"];
+const INVIGILATOR_ROLES = ["TEACHER", "MANAGER", "DEPUTY"];
 
 async function schoolInvigilators(schoolId: string) {
   return db.user.findMany({

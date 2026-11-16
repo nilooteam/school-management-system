@@ -40,7 +40,7 @@ export type ShellUser = {
   profileImageType: "upload" | "avatar" | null;
   photoUrl: string | null;
   avatar: AvatarParams | null;
-  /** راند ۱۸: ماژول‌های مدرسهٔ مؤثر — شاد/سرایدار قابل خاموش‌کردن برای هر مدرسه */
+  /** راند ۱۸: ماژول‌های مدرسهٔ مؤثر — شاد قابل خاموش‌کردن برای هر مدرسه */
   schoolModules: { shadEnabled: boolean } | null;
 };
 
@@ -109,7 +109,6 @@ function AppShellInner({ user, children }: { user: ShellUser; children: React.Re
   /* راند ۱۸: شاد کاملاً اختیاری — فقط وقتی دیده می‌شود که هم
      بستهٔ کشور فعال ماژولش را روشن کرده باشد (ایران) و هم مدرسهٔ مؤثر */
   const shadVisible = country.modules.shad !== false && (user.schoolModules?.shadEnabled !== false);
-  /* راند ۱۸: نقش سرایدار در این مدرسه غیرفعال شده است؟ */
 
   // بارگذاری وضعیت جمع‌شده سایدبار
   useEffect(() => {

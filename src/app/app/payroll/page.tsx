@@ -13,7 +13,7 @@ type Row = { user: { id: string; firstName: string; lastName: string; role: stri
 type Data = { rows?: Row[]; totals?: { base: number; allowances: number; deductions: number; net: number }; mine?: SalaryRow[] };
 type Me = { user: { role: string } };
 
-const ROLE_TKEY: Record<string, string> = { MANAGER: "common.manager", DEPUTY: "common.deputy", TEACHER: "common.teacher", CUSTODIAN: "enum.roleFa.CUSTODIAN" };
+const ROLE_TKEY: Record<string, string> = { MANAGER: "common.manager", DEPUTY: "common.deputy", TEACHER: "common.teacher" };
 const thisMonth = () => {
   // ماه جاری شمسی به‌صورت تقریبی از روی تاریخ میلادی سرور کاربر — مقدار پیش‌فرض قابل ویرایش است
   return "1405-08";

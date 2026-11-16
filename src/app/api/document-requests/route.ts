@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       if (me.role === "STUDENT") {
         const profile = await db.student.findFirst({ where: { userId: me.id }, select: { id: true, user: { select: { firstName: true, lastName: true } } } });
         if (profile) myStudents = [{ id: profile.id, name: `${profile.user.firstName} ${profile.user.lastName}` }];
-      } else if (me.role === "PARENT" || me.role === "CUSTODIAN") {
+      } else if (me.role === "PARENT") {
         const links = await db.studentParent.findMany({
           where: { parentUserId: me.id },
           include: { student: { select: { id: true, user: { select: { firstName: true, lastName: true } } } } },
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const me = await requireUser(req, ["STUDENT", "PARENT", "CUSTODIAN"]);
+    const me = await requireUser(req, ["STUDENT", "PARENT"]);
     const blocked = await demoWriteBlock(me);
     if (blocked) return blocked;
     const schoolId = requireSchoolId(me);

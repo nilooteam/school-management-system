@@ -9,7 +9,7 @@ import { requireUser, apiOk, apiErr, handleApiError, readJson, audit, demoWriteB
                                deleteBook | loan | return
    ============================================================ */
 
-const STAFF = ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN", "SUPER_ADMIN", "ADMIN"];
+const STAFF = ["MANAGER", "DEPUTY", "TEACHER", "SUPER_ADMIN", "ADMIN"];
 
 export async function GET(req: NextRequest) {
   try {

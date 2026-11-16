@@ -40,7 +40,6 @@ const ROLE_TKEY: Record<string, string> = {
   MANAGER: "role.manager",
   DEPUTY: "role.deputy",
   TEACHER: "role.teacher",
-  CUSTODIAN: "role.custodian",
   STUDENT: "role.student",
   PARENT: "role.parent",
 };

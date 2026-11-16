@@ -26,7 +26,7 @@ export default function WalletPage() {
   const role = me?.user.role ?? "";
   const isAudience = role === "STUDENT" || role === "PARENT";
   const isParent = role === "PARENT";
-  const isStaff = ["MANAGER", "DEPUTY", "CUSTODIAN", "SUPER_ADMIN", "ADMIN"].includes(role);
+  const isStaff = ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"].includes(role);
   const [classId, setClassId] = useState("");
   const [studentId, setStudentId] = useState("");
   const { data: classesData } = useApi<{ classes: ClassRow[] }>(!isAudience ? "/api/classes" : null);

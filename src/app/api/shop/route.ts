@@ -14,7 +14,7 @@ import type { SessionUser } from "@/lib/api";
      موجود کیف پول انجام می‌شود تا دو مسیر برگشت ساخته نشود.
    ============================================================ */
 
-const STAFF = ["MANAGER", "DEPUTY", "CUSTODIAN", "SUPER_ADMIN", "ADMIN"];
+const STAFF = ["MANAGER", "DEPUTY", "SUPER_ADMIN", "ADMIN"];
 
 async function schoolIdFor(me: SessionUser, req: NextRequest) {
   if (me.role === "SUPER_ADMIN" || me.role === "ADMIN") return actingSchoolIdFor(req, me) ?? me.schoolId ?? null;

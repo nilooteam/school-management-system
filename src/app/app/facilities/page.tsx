@@ -13,7 +13,7 @@ import { useLang } from "@/lib/i18n";
 
 type Room = { id: string; name: string; kind: string; capacity: number; floor: number | null; active: boolean };
 type Booking = { id: string; roomId: string | null; assetId: string | null; room: { name: string } | null; by: { firstName: string; lastName: string }; purpose: string; startAt: string; endAt: string; status: string };
-type Asset = { id: string; name: string; code: string; category: string; location: string | null; status: string; custodian: { firstName: string; lastName: string } | null };
+type Asset = { id: string; name: string; code: string; category: string; location: string | null; status: string };
 type MaintTicket = { id: string; title: string; description: string | null; priority: string; status: string; slaHours: number; createdAt: string; resolvedAt: string | null; asset: { name: string; code: string } | null; location: string | null; reportedBy: { firstName: string; lastName: string } };
 type Visitor = { id: string; name: string; nationalId: string | null; phone: string | null; purpose: string; hostName: string | null; expected: boolean; expectedDate: string | null; status: string; checkInAt: string | null; checkOutAt: string | null };
 type LostItem = { id: string; title: string; description: string | null; location: string | null; foundAt: string; status: string; claimedByName: string | null };
