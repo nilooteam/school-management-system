@@ -198,7 +198,6 @@ model School {
   consentRequests      ConsentRequest[]
   heldItems            HeldItem[]
   documentRequests     DocumentRequest[]
-  dutyLogs             DutyLog[]
   lockers Locker[]
   uniformRecords UniformRecord[]
   assemblyItems AssemblyItem[]
@@ -2155,72 +2154,9 @@ model ShopSaleItem {
 // خوابگاه شبانه‌روزی: ساختمان، اتاق با ظرفیت، اسکان و مرخصی.
 // اسکان دانش‌آموز به اتاق با شمارش اسکان‌های فعال همان اتاق کنترل
 // می‌شود؛ مرخصی خوابگاهی از مرخصی کارکنان (LeaveRequest) جداست.
-model DormBuilding {
-  id           String   @id @default(cuid())
-  schoolId     String
-  name         String
-  address      String   @default("")
-  supervisorId String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
 
-  rooms DormRoom[]
 
-  @@index([schoolId])
-}
 
-model DormRoom {
-  id         String   @id @default(cuid())
-  buildingId String
-  building   DormBuilding @relation(fields: [buildingId], references: [id], onDelete: Cascade)
-  name       String
-  floor      Int      @default(0)
-  capacity   Int
-  notes      String   @default("")
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  assignments DormAssignment[]
-
-  @@index([buildingId])
-}
-
-model DormAssignment {
-  id          String   @id @default(cuid())
-  schoolId    String
-  studentId   String
-  roomId      String
-  room        DormRoom @relation(fields: [roomId], references: [id])
-  bedLabel    String   @default("")
-  status      String   @default("ACTIVE") // ACTIVE | ENDED
-  startDate   DateTime @default(now())
-  endDate     DateTime?
-  createdById String?
-  createdAt   DateTime @default(now())
-
-  @@index([schoolId])
-  @@index([studentId])
-  @@index([roomId])
-}
-
-model DormLeave {
-  id          String   @id @default(cuid())
-  schoolId    String
-  studentId   String
-  fromDate    DateTime
-  toDate      DateTime
-  reason      String?
-  status      String   @default("PENDING") // PENDING | APPROVED | REJECTED
-  decidedById String?
-  decisionNote String?
-  createdById String?
-  createdAt   DateTime @default(now())
-
-  @@index([schoolId])
-  @@index([studentId])
-}
 
 // مسیرهای تخصصی: آموزش عالی (رشته/پایان‌نامه) و فنی‌حرفه‌ای
 // (کارگاه/کارورزی) — به کلاس، دانش‌آموز و برنامهٔ درسی وصل‌اند،
@@ -2670,19 +2606,6 @@ model DocumentRequest {
 
 /// دفتر کشیک روزانه — معلم/معاون کشیک، وقایع و نکته‌های روز را ثبت می‌کند تا
 /// مدیر و کشیک روز بعد در جریان باشند؛ جدا از پروندهٔ انضباطی هر دانش‌آموز.
-model DutyLog {
-  id         String   @id @default(cuid())
-  schoolId   String
-  school     School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  authorId   String
-  date       String // تاریخ شمسی روز کشیک
-  category   String   @default("NOTE") // NOTE | INCIDENT | HANDOVER
-  text       String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([schoolId, date])
-}
 
 // ───────── ماراتن ماژول‌ها (دسته‌های A/B/C) ─────────
 model Locker {

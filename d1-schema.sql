@@ -2021,61 +2021,6 @@ CREATE TABLE IF NOT EXISTS "PluginInstall" (
 CREATE UNIQUE INDEX IF NOT EXISTS "Plugin_code_key" ON "Plugin"("code");
 CREATE UNIQUE INDEX IF NOT EXISTS "PluginInstall_pluginId_schoolId_key" ON "PluginInstall"("pluginId", "schoolId");
 CREATE INDEX IF NOT EXISTS "PluginInstall_schoolId_idx" ON "PluginInstall"("schoolId");
-CREATE TABLE IF NOT EXISTS "DormBuilding" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "address" TEXT NOT NULL DEFAULT '',
-    "supervisorId" TEXT,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
-);
-CREATE TABLE IF NOT EXISTS "DormRoom" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "buildingId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "floor" INTEGER NOT NULL DEFAULT 0,
-    "capacity" INTEGER NOT NULL,
-    "notes" TEXT NOT NULL DEFAULT '',
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "DormRoom_buildingId_fkey" FOREIGN KEY ("buildingId") REFERENCES "DormBuilding" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
-CREATE TABLE IF NOT EXISTS "DormAssignment" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "roomId" TEXT NOT NULL,
-    "bedLabel" TEXT NOT NULL DEFAULT '',
-    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
-    "startDate" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "endDate" DATETIME,
-    "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "DormAssignment_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "DormRoom" ("id") ON UPDATE CASCADE
-);
-CREATE TABLE IF NOT EXISTS "DormLeave" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "fromDate" DATETIME NOT NULL,
-    "toDate" DATETIME NOT NULL,
-    "reason" TEXT,
-    "status" TEXT NOT NULL DEFAULT 'PENDING',
-    "decidedById" TEXT,
-    "decisionNote" TEXT,
-    "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE INDEX IF NOT EXISTS "DormBuilding_schoolId_idx" ON "DormBuilding"("schoolId");
-CREATE INDEX IF NOT EXISTS "DormRoom_buildingId_idx" ON "DormRoom"("buildingId");
-CREATE INDEX IF NOT EXISTS "DormAssignment_schoolId_idx" ON "DormAssignment"("schoolId");
-CREATE INDEX IF NOT EXISTS "DormAssignment_studentId_idx" ON "DormAssignment"("studentId");
-CREATE INDEX IF NOT EXISTS "DormAssignment_roomId_idx" ON "DormAssignment"("roomId");
-CREATE INDEX IF NOT EXISTS "DormLeave_schoolId_idx" ON "DormLeave"("schoolId");
-CREATE INDEX IF NOT EXISTS "DormLeave_studentId_idx" ON "DormLeave"("studentId");
 CREATE TABLE IF NOT EXISTS "ShopProduct" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "schoolId" TEXT NOT NULL,
@@ -2402,18 +2347,6 @@ CREATE TABLE IF NOT EXISTS "DocumentRequest" (
 );
 CREATE INDEX IF NOT EXISTS "DocumentRequest_schoolId_status_createdAt_idx" ON "DocumentRequest"("schoolId", "status", "createdAt");
 CREATE INDEX IF NOT EXISTS "DocumentRequest_requesterId_idx" ON "DocumentRequest"("requesterId");
-CREATE TABLE IF NOT EXISTS "DutyLog" (
-  "id" TEXT NOT NULL PRIMARY KEY,
-  "schoolId" TEXT NOT NULL,
-  "authorId" TEXT NOT NULL,
-  "date" TEXT NOT NULL,
-  "category" TEXT NOT NULL DEFAULT 'NOTE',
-  "text" TEXT NOT NULL,
-  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updatedAt" DATETIME NOT NULL,
-  CONSTRAINT "DutyLog_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
-CREATE INDEX IF NOT EXISTS "DutyLog_schoolId_date_idx" ON "DutyLog"("schoolId", "date");
 ALTER TABLE "LostFoundItem" ADD COLUMN "kind" TEXT NOT NULL DEFAULT 'FOUND';
 ALTER TABLE "LostFoundItem" ADD COLUMN "reporterUserId" TEXT;
 ALTER TABLE "LostFoundItem" ADD COLUMN "reporterName" TEXT;
