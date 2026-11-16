@@ -1527,35 +1527,6 @@ CREATE INDEX "QuizAttempt_studentId_idx" ON "QuizAttempt"("studentId");
 -- File storage on Workers without R2: files live as BLOBs in D1.
 -- (storage.ts also creates this table lazily if it is missing.)
 -- Batch 2 modules: transport, staff attendance, gate passes, forms, alumni, virtual sessions
-CREATE TABLE IF NOT EXISTS "TransportRoute" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "driverName" TEXT,
-    "driverPhone" TEXT,
-    "vehiclePlate" TEXT,
-    "vehicleDesc" TEXT,
-    "capacity" INTEGER NOT NULL DEFAULT 20,
-    "stops" TEXT NOT NULL DEFAULT '[]',
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "TransportRoute_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
-CREATE INDEX "TransportRoute_schoolId_idx" ON "TransportRoute"("schoolId");
-CREATE TABLE IF NOT EXISTS "TransportAssignment" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "routeId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "stopName" TEXT,
-    "monthlyFee" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "TransportAssignment_routeId_fkey" FOREIGN KEY ("routeId") REFERENCES "TransportRoute" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "TransportAssignment_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
-CREATE INDEX "TransportAssignment_schoolId_studentId_idx" ON "TransportAssignment"("schoolId", "studentId");
-CREATE UNIQUE INDEX "TransportAssignment_routeId_studentId_key" ON "TransportAssignment"("routeId", "studentId");
 CREATE TABLE IF NOT EXISTS "StaffAttendance" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "schoolId" TEXT NOT NULL,
@@ -1696,41 +1667,6 @@ CREATE TABLE IF NOT EXISTS "SeatingPlan" (
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "SeatingPlan_classId_fkey" FOREIGN KEY ("classId") REFERENCES "Class" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 )
-CREATE TABLE IF NOT EXISTS "TransportBoarding" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "assignmentId" TEXT NOT NULL,
-    "date" TEXT NOT NULL,
-    "boardedAt" DATETIME,
-    "alightedAt" DATETIME,
-    "markedById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "TransportBoarding_assignmentId_fkey" FOREIGN KEY ("assignmentId") REFERENCES "TransportAssignment" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-)
-CREATE INDEX IF NOT EXISTS "AssignmentSubmission_studentId_idx" ON "AssignmentSubmission"("studentId")
-CREATE UNIQUE INDEX IF NOT EXISTS "AssignmentSubmission_assignmentId_studentId_key" ON "AssignmentSubmission"("assignmentId", "studentId")
-CREATE INDEX IF NOT EXISTS "AnnouncementRead_userId_idx" ON "AnnouncementRead"("userId")
-CREATE UNIQUE INDEX IF NOT EXISTS "AnnouncementRead_announcementId_userId_key" ON "AnnouncementRead"("announcementId", "userId")
-CREATE UNIQUE INDEX IF NOT EXISTS "SeatingPlan_classId_key" ON "SeatingPlan"("classId")
-CREATE INDEX IF NOT EXISTS "SeatingPlan_schoolId_idx" ON "SeatingPlan"("schoolId")
-CREATE INDEX IF NOT EXISTS "TransportBoarding_schoolId_date_idx" ON "TransportBoarding"("schoolId", "date")
-CREATE UNIQUE INDEX IF NOT EXISTS "TransportBoarding_assignmentId_date_key" ON "TransportBoarding"("assignmentId", "date")
-CREATE INDEX IF NOT EXISTS "ReportCommentTemplate_schoolId_idx" ON "ReportCommentTemplate"("schoolId")
-CREATE INDEX IF NOT EXISTS "ReportComment_schoolId_studentId_idx" ON "ReportComment"("schoolId", "studentId")
-
-CREATE TABLE IF NOT EXISTS "DescriptiveGrade" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "subjectId" TEXT,
-    "competency" TEXT NOT NULL,
-    "level" TEXT NOT NULL,
-    "term" INTEGER NOT NULL DEFAULT 1,
-    "note" TEXT,
-    "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "DescriptiveGrade_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
 CREATE TABLE IF NOT EXISTS "ExamInvigilator" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "sessionId" TEXT NOT NULL,
@@ -2370,18 +2306,6 @@ CREATE TABLE IF NOT EXISTS "Locker" (
     CONSTRAINT "Locker_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- CreateTable
-CREATE TABLE IF NOT EXISTS "UniformRecord" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "item" TEXT NOT NULL,
-    "size" TEXT,
-    "status" TEXT NOT NULL DEFAULT 'MEASURED',
-    "note" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "UniformRecord_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
 -- CreateTable
 CREATE TABLE IF NOT EXISTS "AssemblyItem" (
     "id" TEXT NOT NULL PRIMARY KEY,
@@ -2507,18 +2431,6 @@ CREATE TABLE IF NOT EXISTS "CleaningDuty" (
     CONSTRAINT "CleaningDuty_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- CreateTable
-CREATE TABLE IF NOT EXISTS "MentorPair" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "mentorStudentId" TEXT NOT NULL,
-    "menteeStudentId" TEXT NOT NULL,
-    "focus" TEXT,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "MentorPair_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
 -- CreateTable
 CREATE TABLE IF NOT EXISTS "ReadingLog" (
     "id" TEXT NOT NULL PRIMARY KEY,
@@ -2648,19 +2560,6 @@ CREATE TABLE IF NOT EXISTS "PrintRequest" (
     CONSTRAINT "PrintRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- CreateTable
-CREATE TABLE IF NOT EXISTS "TransportRequest" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "requesterId" TEXT NOT NULL,
-    "kind" TEXT NOT NULL DEFAULT 'CHANGE_STOP',
-    "details" TEXT NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'PENDING',
-    "handledById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "TransportRequest_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
 -- CreateTable
 CREATE TABLE IF NOT EXISTS "MakeupClass" (
     "id" TEXT NOT NULL PRIMARY KEY,
@@ -2872,7 +2771,6 @@ PRAGMA defer_foreign_keys=OFF;
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "Locker_schoolId_status_idx" ON "Locker"("schoolId", "status");
 -- CreateIndex
-CREATE INDEX IF NOT EXISTS "UniformRecord_schoolId_studentId_idx" ON "UniformRecord"("schoolId", "studentId");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "AssemblyItem_schoolId_date_idx" ON "AssemblyItem"("schoolId", "date");
 -- CreateIndex
@@ -2894,7 +2792,6 @@ CREATE INDEX IF NOT EXISTS "KeyCheckout_schoolId_inAt_idx" ON "KeyCheckout"("sch
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "CleaningDuty_schoolId_classId_date_idx" ON "CleaningDuty"("schoolId", "classId", "date");
 -- CreateIndex
-CREATE INDEX IF NOT EXISTS "MentorPair_schoolId_isActive_idx" ON "MentorPair"("schoolId", "isActive");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "ReadingLog_schoolId_studentId_idx" ON "ReadingLog"("schoolId", "studentId");
 -- CreateIndex
@@ -2916,7 +2813,6 @@ CREATE INDEX IF NOT EXISTS "SupplyRequest_schoolId_status_idx" ON "SupplyRequest
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "PrintRequest_schoolId_status_idx" ON "PrintRequest"("schoolId", "status");
 -- CreateIndex
-CREATE INDEX IF NOT EXISTS "TransportRequest_schoolId_status_idx" ON "TransportRequest"("schoolId", "status");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "MakeupClass_schoolId_newDate_idx" ON "MakeupClass"("schoolId", "newDate");
 -- CreateIndex

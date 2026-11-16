@@ -184,7 +184,6 @@ model School {
   lostFoundItems       LostFoundItem[]
   books                Book[]
   quizzes              Quiz[]
-  transportRoutes      TransportRoute[]
   schoolForms          SchoolForm[]
   scheduledReports     ScheduledReport[]
   observations         ClassObservation[]
@@ -199,7 +198,6 @@ model School {
   heldItems            HeldItem[]
   documentRequests     DocumentRequest[]
   lockers Locker[]
-  uniformRecords UniformRecord[]
   assemblyItems AssemblyItem[]
   dutyAssignments DutyAssignment[]
   elections Election[]
@@ -207,7 +205,6 @@ model School {
   classRoleAssigns ClassRoleAssign[]
   keyCheckouts KeyCheckout[]
   cleaningDuties CleaningDuty[]
-  mentorPairs MentorPair[]
   readingLogs ReadingLog[]
   journalEntries JournalEntry[]
   bookListings BookListing[]
@@ -217,7 +214,6 @@ model School {
   gradeAppeals GradeAppeal[]
   supplyRequests SupplyRequest[]
   printRequests PrintRequest[]
-  transportRequests TransportRequest[]
   makeupClasses MakeupClass[]
   classVisits ClassVisit[]
   installmentRequests InstallmentRequest[]
@@ -312,7 +308,6 @@ model Student {
   wellbeingCheckins WellbeingCheckin[]
   bookLoans         BookLoan[]
   quizAttempts      QuizAttempt[]
-  transportAssignments TransportAssignment[]
   gatePasses        GatePass[]
   formSubmissions   FormSubmission[]
   alumniProfile     AlumniProfile?
@@ -1671,42 +1666,7 @@ model QuizAttempt {
   @@index([studentId])
 }
 
-model TransportRoute {
-  id           String   @id @default(cuid())
-  schoolId     String
-  school       School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  name         String // مسیر ۱ — شهرک غرب
-  driverName   String?
-  driverPhone  String?
-  vehiclePlate String?
-  vehicleDesc  String? // مینی‌بوس سفید
-  capacity     Int      @default(20)
-  stops        String   @default("[]") // JSON: نام ایستگاه‌ها به ترتیب
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
 
-  assignments TransportAssignment[]
-
-  @@index([schoolId])
-}
-
-model TransportAssignment {
-  id         String         @id @default(cuid())
-  schoolId   String
-  routeId    String
-  route      TransportRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
-  studentId  String
-  student    Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  stopName   String?
-  monthlyFee Int            @default(0) // تومان
-  createdAt  DateTime       @default(now())
-
-  boardings  TransportBoarding[]
-
-  @@unique([routeId, studentId])
-  @@index([schoolId, studentId])
-}
 
 model StaffAttendance {
   id        String   @id @default(cuid())
@@ -1835,20 +1795,6 @@ model SeatingPlan {
   @@index([schoolId])
 }
 
-model TransportBoarding {
-  id           String             @id @default(cuid())
-  schoolId     String
-  assignmentId String
-  assignment   TransportAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  date         String // تاریخ شمسی
-  boardedAt    DateTime?
-  alightedAt   DateTime?
-  markedById   String?
-  createdAt    DateTime           @default(now())
-
-  @@unique([assignmentId, date])
-  @@index([schoolId, date])
-}
 
 model ReportCommentTemplate {
   id          String   @id @default(cuid())
@@ -2621,19 +2567,6 @@ model Locker {
   updatedAt DateTime @updatedAt
   @@index([schoolId, status])
 }
-model UniformRecord {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  studentId String
-  item String
-  size String?
-  status String @default("MEASURED")
-  note String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([schoolId, studentId])
-}
 model AssemblyItem {
   id String @id @default(cuid())
   schoolId String
@@ -2761,19 +2694,6 @@ model CleaningDuty {
   updatedAt DateTime @updatedAt
   @@index([schoolId, classId, date])
 }
-model MentorPair {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  mentorStudentId String
-  menteeStudentId String
-  focus String?
-  isActive Boolean @default(true)
-  createdById String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([schoolId, isActive])
-}
 model ReadingLog {
   id String @id @default(cuid())
   schoolId String
@@ -2899,20 +2819,6 @@ model PrintRequest {
   color Boolean @default(false)
   status String @default("PENDING")
   note String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([schoolId, status])
-}
-model TransportRequest {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  studentId String
-  requesterId String
-  kind String @default("CHANGE_STOP")
-  details String
-  status String @default("PENDING")
-  handledById String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([schoolId, status])
