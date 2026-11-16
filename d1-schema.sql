@@ -2880,18 +2880,6 @@ CREATE TABLE IF NOT EXISTS "LeagueMatch" (
     CONSTRAINT "LeagueMatch_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- CreateTable
-CREATE TABLE IF NOT EXISTS "MealOrder" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "requesterId" TEXT NOT NULL,
-    "date" TEXT NOT NULL,
-    "item" TEXT NOT NULL,
-    "status" TEXT NOT NULL DEFAULT 'ORDERED',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "MealOrder_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
 -- CreateTable
 CREATE TABLE IF NOT EXISTS "SafetyReport" (
     "id" TEXT NOT NULL PRIMARY KEY,
@@ -2931,17 +2919,6 @@ CREATE TABLE IF NOT EXISTS "OfficeHour" (
     CONSTRAINT "OfficeHour_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- CreateTable
-CREATE TABLE IF NOT EXISTS "DrillLog" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "kind" TEXT NOT NULL,
-    "date" TEXT NOT NULL,
-    "durationMin" INTEGER,
-    "notes" TEXT,
-    "createdById" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "DrillLog_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
 -- CreateTable
 CREATE TABLE IF NOT EXISTS "AssetLoan" (
     "id" TEXT NOT NULL PRIMARY KEY,
@@ -3058,9 +3035,7 @@ CREATE INDEX IF NOT EXISTS "LeagueTeam_schoolId_idx" ON "LeagueTeam"("schoolId")
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "LeagueMatch_schoolId_date_idx" ON "LeagueMatch"("schoolId", "date");
 -- CreateIndex
-CREATE INDEX IF NOT EXISTS "MealOrder_schoolId_date_idx" ON "MealOrder"("schoolId", "date");
 -- CreateIndex
-CREATE INDEX IF NOT EXISTS "MealOrder_studentId_idx" ON "MealOrder"("studentId");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "SafetyReport_schoolId_status_idx" ON "SafetyReport"("schoolId", "status");
 -- CreateIndex
@@ -3069,7 +3044,6 @@ CREATE INDEX IF NOT EXISTS "KindnessNote_schoolId_approved_idx" ON "KindnessNote
 CREATE INDEX IF NOT EXISTS "OfficeHour_schoolId_idx" ON "OfficeHour"("schoolId");
 -- CreateIndex
 -- CreateIndex
-CREATE INDEX IF NOT EXISTS "DrillLog_schoolId_date_idx" ON "DrillLog"("schoolId", "date");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "AssetLoan_schoolId_inAt_idx" ON "AssetLoan"("schoolId", "inAt");
 -- CreateIndex
