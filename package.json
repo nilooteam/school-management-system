@@ -135,5 +135,6 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     }
-  }
+  },
+  "main": "desktop/main.cjs"
 }
