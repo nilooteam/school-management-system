@@ -1,0 +1,36 @@
+name: Build Bahar Windows App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - refactor/single-iranian-vocational-school
+    paths:
+      - "desktop/**"
+      - "package.json"
+      - ".github/workflows/build-windows-app.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: دریافت کد
+        uses: actions/checkout@v4
+      - name: نصب Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: نصب وابستگی‌ها
+        run: bun install
+      - name: ساخت نصب‌کننده ویندوز
+        run: bun run desktop:dist
+      - name: بارگذاری فایل نصب
+        uses: actions/upload-artifact@v4
+        with:
+          name: bahar-windows-installer
+          path: release/*.exe
+          if-no-files-found: error
+          retention-days: 14
