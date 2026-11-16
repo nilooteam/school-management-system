@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Cake, CalendarDays, Megaphone, Trophy, UtensilsCrossed, Maximize } from "lucide-react";
+import { Cake, CalendarDays, Megaphone, Trophy, Maximize } from "lucide-react";
 import { useApi } from "@/lib/client";
 import { LoadingBlock, ErrorBox } from "@/components/shared/bits";
 import { formatDateFa, formatTimeFa, faNumber } from "@/lib/persian";
@@ -12,7 +12,6 @@ type Tv = {
   announcements: { id: string; title: string; body: string; pinned: boolean }[];
   events: { id: string; title: string; startAt: string; kind: string }[];
   birthdays: { name: string; role: string }[];
-  meal: { breakfast: string; lunch: string; snack: string } | null;
   topHouse: { name: string; color: string; points: number } | null;
 };
 
@@ -89,16 +88,6 @@ export default function TvPage() {
               {data.birthdays.map((b, i) => (
                 <span key={i} className="text-lg md:text-xl">🎂 {b.name} <span className="text-steel text-sm">({(b.role === "TEACHER" ? t("tv.role.teacher") : t("role.student"))})</span></span>
               ))}
-            </div>
-            <div className="flex flex-col gap-3">
-              <h2 className="flex items-center gap-2 text-xl md:text-2xl font-extrabold"><UtensilsCrossed className="w-6 h-6 text-spring" /> {t("tv.mealToday")}</h2>
-              {data.meal ? (
-                <div className="text-base md:text-lg flex flex-col gap-2">
-                  <span>{t("tv.meal.breakfast")} {data.meal.breakfast || "—"}</span>
-                  <span>{t("tv.meal.lunch")} {data.meal.lunch || "—"}</span>
-                  <span>{t("tv.meal.snack")} {data.meal.snack || "—"}</span>
-                </div>
-              ) : <p className="text-steel text-base">{t("tv.noMeal")}</p>}
             </div>
           </div>
         )}
