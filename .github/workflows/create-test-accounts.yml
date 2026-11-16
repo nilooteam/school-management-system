@@ -1,0 +1,52 @@
+# ساخت حساب‌های تست ۷ نقش سامانه بهار (فقط مواردِ ناموجود) — Idempotent
+# رمزهای متنِ ساده هرگز وارد CI نمی‌شوند: فقط هشِ scrypt (salt:hash) به‌عنوان
+# ورودی داده می‌شود و رمزها بیرون از CI تولید و تحویل داده می‌شوند.
+# حسابِ موجود بدون هیچ تغییری رد می‌شود؛ نقش CUSTODIAN ساخته نمی‌شود.
+name: Create test accounts (7 roles)
+on:
+  workflow_dispatch:
+    inputs:
+      admin_hash:
+        description: "scrypt hash (salt:hash) for ADMIN 1000000028"
+        required: true
+        type: string
+      teacher_hash:
+        description: "scrypt hash (salt:hash) for TEACHER 3000000011"
+        required: true
+        type: string
+      student_hash:
+        description: "scrypt hash (salt:hash) for STUDENT 5000000013"
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Inspect current state (read-only)
+        run: |
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT nationalId, role, firstName, lastName, isActive, mustChangePassword, schoolId FROM [User] WHERE nationalId IN ('1000000011','1000000028','2000000010','2000000029','3000000011','5000000013','6000000014') ORDER BY nationalId;"
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT id, name, code, isActive, managerId FROM [School];"
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT id, schoolId, name, grade, academicYear, homeroomTeacherId FROM [Class];"
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT id, userId, classId, schoolId, studentNumber FROM [Student];"
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT studentId, parentUserId, relation, isPrimary FROM [StudentParent];"
+      - name: Create missing test accounts (idempotent)
+        env:
+          ADMIN_HASH: ${{ inputs.admin_hash }}
+          TEACHER_HASH: ${{ inputs.teacher_hash }}
+          STUDENT_HASH: ${{ inputs.student_hash }}
+        run: bun scripts/create-test-accounts-ci.ts
+      - name: Verify final state
+        run: |
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT nationalId, role, firstName, lastName, isActive, mustChangePassword, schoolId FROM [User] WHERE nationalId IN ('1000000011','1000000028','2000000010','2000000029','3000000011','5000000013','6000000014') ORDER BY nationalId;"
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT id, userId, classId, schoolId, studentNumber FROM [Student];"
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT studentId, parentUserId, relation, isPrimary FROM [StudentParent];"
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT id, name, grade, academicYear, homeroomTeacherId FROM [Class];"
