@@ -6,11 +6,11 @@
 /* ============================================================
    بهار | Bahar School Management — Design Language v4
    Meta design system (pills, 32px cards, hairlines, dual CTA)
-   re-themed with the proprietary Bahar spring palette,
+   re-themed with the Bahar blue palette,
    Material 3 motion principles (capsules, spring physics,
    origin-aware transitions) and Arad Dots2 display type.
-   - Spring Green  #00825E  (custom primary)
-   - Blossom Pink  #E5548B  (seasonal accent, used sparingly)
+   - Clear Blue    #2563EB  (primary)
+   - Sky Blue      #0EA5E9  (secondary accent)
    ============================================================ */
 
 /* --- Arad Dots2 (display/headings — Persian, fused dots, Farsi digits) --- */
@@ -246,148 +246,146 @@ html[lang="en"] .t-h3, html[lang="tr"] .t-h3, html[lang="az"] .t-h3, html[lang="
 :root {
   --radius: 0.5rem;
 
-  /* Bahar spring palette (custom) */
-  --spring: #00825e;
-  --spring-deep: #006749;
-  --spring-soft: #00b37d;
-  --spring-tint: #e2f3ec;
-  --blossom: #e5548b;
-  --blossom-tint: #fdeef4;
-  --ink-deep: #0b1416;
-  --ink: #1c2523;
-  --steel: #5d6f66;
-  --stone: #8a9b92;
-  --hairline: #cdd5d1;
-  --hairline-soft: #e2eae6;
-  --cloud: #f2f6f3;
+  /* Bahar blue palette — light mode */
+  --spring: #2563eb;
+  --spring-deep: #1d4ed8;
+  --spring-soft: #60a5fa;
+  --spring-tint: #eff6ff;
+  --blossom: #0ea5e9;
+  --blossom-tint: #e0f2fe;
+  --ink-deep: #0f172a;
+  --ink: #172554;
+  --steel: #475569;
+  --stone: #94a3b8;
+  --hairline: #cbd5e1;
+  --hairline-soft: #e2e8f0;
+  --cloud: #f1f5f9;
 
-  /* Status tokens — «رنگ» برای fill/dot و «foreground» متن روی fill */
-  --success: #1b8148;
+  /* Semantic status colors remain distinct from the brand palette */
+  --success: #16834a;
   --success-foreground: #ffffff;
   --warning: #f2a918;
-  --warning-foreground: #0b1416;
-  --warning-deep: #8a4c0b; /* متن کهربایی خوانا روی پس‌زمینه روشن */
-  --info: #1972c4;
+  --warning-foreground: #0f172a;
+  --warning-deep: #8a4c0b;
+  --info: #0284c7;
   --info-foreground: #ffffff;
-  --blossom-foreground: #ffffff;
-  /* سیستم */
-  --overlay: #0b1416;      /* اسکریم دیالوگ/جستجو — در دارک تقریباً سیاه */
-  --invert: #0b1416;       /* چیپ معکوسِ امضای بهار (کپسول‌ها، دکمه ink) */
+  --blossom-foreground: #082f49;
+  --overlay: #0f172a;
+  --invert: #0f172a;
   --invert-foreground: #ffffff;
-  --autofill-bg: #eef4f0;  /* پس‌زمینه autofill مرورگر */
+  --autofill-bg: #eff6ff;
   /* نقشه ایران (SVG) */
-  --map-land: #e3e8e5;
-  --map-hover: #c9ded3;
+  --map-land: #e2e8f0;
+  --map-hover: #bfdbfe;
   --map-stroke: #ffffff;
-  --map-label: #5b6b66;
-  --map-label-strong: #005a42;
+  --map-label: #475569;
+  --map-label-strong: #1d4ed8;
   --map-label-selected: #ffffff;
 
   /* shadcn mapping */
   --background: #ffffff;
-  --foreground: #0b1416;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --card-foreground: #0b1416;
+  --card-foreground: #0f172a;
   --popover: #ffffff;
-  --popover-foreground: #0b1416;
-  --primary: #00825e;
+  --popover-foreground: #0f172a;
+  --primary: #2563eb;
   --primary-foreground: #ffffff;
-  --secondary: #f2f6f3;
-  --secondary-foreground: #0b1416;
-  --muted: #f2f6f3;
-  --muted-foreground: #5d6f66;
-  --accent: #e2f3ec;
-  --accent-foreground: #00553e;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  --accent: #eff6ff;
+  --accent-foreground: #1d4ed8;
   --destructive: #e41e3f;
   --destructive-foreground: #ffffff;
-  --border: #e2eae6;
-  --input: #cdd5d1;
-  --ring: #00b37d;
-  --chart-1: #00825e;
-  --chart-2: #00b37d;
-  --chart-3: #e5548b;
+  --border: #e2e8f0;
+  --input: #cbd5e1;
+  --ring: #2563eb;
+  --chart-1: #2563eb;
+  --chart-2: #0ea5e9;
+  --chart-3: #60a5fa;
   --chart-4: #f2a918;
-  --chart-5: #5d6f66;
+  --chart-5: #64748b;
   --sidebar: #ffffff;
-  --sidebar-foreground: #1c2523;
-  --sidebar-primary: #00825e;
+  --sidebar-foreground: #172554;
+  --sidebar-primary: #2563eb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e2f3ec;
-  --sidebar-accent-foreground: #00553e;
-  --sidebar-border: #e2eae6;
-  --sidebar-ring: #00b37d;
+  --sidebar-accent: #eff6ff;
+  --sidebar-accent-foreground: #1d4ed8;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #2563eb;
 }
 
 .dark {
-  --spring: #00b37d;
-  --spring-deep: #35d69c;
-  --spring-soft: #2ecf9a;
-  --spring-tint: #10312a;
-  --blossom: #f06fa4;
-  --blossom-tint: #331420;
-  --blossom-foreground: #380f22;
-  --ink-deep: #e8f0ec;
-  --ink: #d7e3dd;
-  --steel: #9aada3;
-  --stone: #7d8f85;
-  --hairline: #33403a;
-  --hairline-soft: #232e29;
-  --cloud: #141b18;
+  --spring: #60a5fa;
+  --spring-deep: #93c5fd;
+  --spring-soft: #bfdbfe;
+  --spring-tint: #172b4d;
+  --blossom: #38bdf8;
+  --blossom-tint: #082f49;
+  --blossom-foreground: #e0f2fe;
+  --ink-deep: #f8fafc;
+  --ink: #e2e8f0;
+  --steel: #a8b7cc;
+  --stone: #718096;
+  --hairline: #334155;
+  --hairline-soft: #1e293b;
+  --cloud: #111c30;
 
-  /* Status tokens — در دارک روشن‌تر تا به‌عنوان متن هم خوانا باشند */
-  --success: #3fbf77;
-  --success-foreground: #04150c;
+  /* Semantic status colors remain distinct from the brand palette */
+  --success: #4ade80;
+  --success-foreground: #052e16;
   --warning: #f5b73d;
   --warning-foreground: #221803;
-  --warning-deep: #f7c04a; /* متن کهربایی خوانا روی پس‌زمینه تیره */
-  --info: #58a8ec;
-  --info-foreground: #0a1b2e;
-  /* سیستم */
-  --overlay: #030605;
-  --invert: #e8f0ec;
-  --invert-foreground: #0b1416;
-  --autofill-bg: #1a2420;
+  --warning-deep: #f7c04a;
+  --info: #7dd3fc;
+  --info-foreground: #082f49;
+  --overlay: #020617;
+  --invert: #f8fafc;
+  --invert-foreground: #0f172a;
+  --autofill-bg: #172554;
   /* نقشه ایران */
-  --map-land: #1c2823;
-  --map-hover: #2c4239;
-  --map-stroke: #0c1210;
-  --map-label: #8fa39a;
-  --map-label-strong: #7fe3bd;
-  --map-label-selected: #051610;
+  --map-land: #1e293b;
+  --map-hover: #1e3a5f;
+  --map-stroke: #020617;
+  --map-label: #a8b7cc;
+  --map-label-strong: #93c5fd;
+  --map-label-selected: #0f172a;
 
   /* سلسله‌مراتب سطح در دارک: background ← sidebar ← card ← popover */
-  --background: #0c1210;
-  --foreground: #e8f0ec;
-  --card: #131b18;
-  --card-foreground: #e8f0ec;
-  --popover: #19231f;
-  --popover-foreground: #e8f0ec;
-  --primary: #00b37d;
-  --primary-foreground: #051610;
-  --secondary: #1a2420;
-  --secondary-foreground: #e8f0ec;
-  --muted: #1a2420;
-  --muted-foreground: #9aada3;
-  --accent: #1d382e;
-  --accent-foreground: #7fe3bd;
+  --background: #050b16;
+  --foreground: #f8fafc;
+  --card: #0b1424;
+  --card-foreground: #f8fafc;
+  --popover: #111d33;
+  --popover-foreground: #f8fafc;
+  --primary: #3b82f6;
+  --primary-foreground: #061329;
+  --secondary: #111c30;
+  --secondary-foreground: #e2e8f0;
+  --muted: #111c30;
+  --muted-foreground: #a8b7cc;
+  --accent: #172b4d;
+  --accent-foreground: #bfdbfe;
   --destructive: #f0284a;
   --destructive-foreground: #ffffff;
-  --border: #26312b;
-  --input: #36443d;
-  --ring: #00b37d;
-  --chart-1: #00b37d;
-  --chart-2: #2ecf9a;
-  --chart-3: #f06fa4;
-  --chart-4: #f2a918;
-  --chart-5: #93a69c;
-  --sidebar: #0f1613;
-  --sidebar-foreground: #d7e3dd;
-  --sidebar-primary: #00b37d;
-  --sidebar-primary-foreground: #051610;
-  --sidebar-accent: #1d382e;
-  --sidebar-accent-foreground: #8ee8c4;
-  --sidebar-border: #232e29;
-  --sidebar-ring: #00b37d;
+  --border: #26364f;
+  --input: #3b4d68;
+  --ring: #60a5fa;
+  --chart-1: #60a5fa;
+  --chart-2: #38bdf8;
+  --chart-3: #93c5fd;
+  --chart-4: #f5b73d;
+  --chart-5: #a8b7cc;
+  --sidebar: #080f1d;
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-primary: #60a5fa;
+  --sidebar-primary-foreground: #061329;
+  --sidebar-accent: #172b4d;
+  --sidebar-accent-foreground: #bfdbfe;
+  --sidebar-border: #1e293b;
+  --sidebar-ring: #60a5fa;
 }
 
 @layer base {
@@ -775,7 +773,7 @@ html[data-scrolling] *::-webkit-scrollbar-thumb:hover,
 }
 html.dark[data-scrolling] *::-webkit-scrollbar-thumb,
 html.dark *:hover::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--spring) 45%, #0c1210);
+  background: color-mix(in srgb, var(--spring) 45%, #050b16);
 }
 html.dark[data-scrolling] *::-webkit-scrollbar-thumb:hover,
 html.dark *:hover::-webkit-scrollbar-thumb:hover {
@@ -824,7 +822,7 @@ html[data-scrolling] .b-scroll::-webkit-scrollbar-thumb:hover,
 .b-hero-grad {
   background:
     radial-gradient(60% 50% at 85% 10%, color-mix(in srgb, var(--spring-soft) 22%, transparent), transparent 70%),
-    radial-gradient(45% 45% at 10% 85%, color-mix(in srgb, var(--blossom) 16%, transparent), transparent 70%),
+    radial-gradient(45% 45% at 10% 85%, color-mix(in srgb, var(--blossom) 8%, transparent), transparent 70%),
     radial-gradient(35% 35% at 60% 60%, color-mix(in srgb, var(--spring) 10%, transparent), transparent 75%);
 }
 
@@ -891,7 +889,7 @@ html.bahar-slowmo .animate-spin {
   img { max-width: 100%; }
   .b-print-head {
     display: flex !important; align-items: flex-end; justify-content: space-between; gap: 12px;
-    border-bottom: 2px solid #00825E; padding-bottom: 8px; margin-bottom: 16px;
+    border-bottom: 2px solid var(--spring); padding-bottom: 8px; margin-bottom: 16px;
   }
   .b-print-head .ph-school { font-size: 16px; font-weight: 800; }
   .b-print-head .ph-title { font-size: 12px; color: #555; margin-top: 2px; }
@@ -1039,7 +1037,7 @@ html[dir="rtl"] .flip-rtl { transform: scaleX(-1); }
   border: 1px solid transparent;
   background:
     linear-gradient(var(--card), var(--card)) padding-box,
-    linear-gradient(120deg, color-mix(in srgb, var(--spring) 55%, transparent), color-mix(in srgb, var(--blossom) 55%, transparent)) border-box;
+    linear-gradient(120deg, color-mix(in srgb, var(--spring) 55%, transparent), color-mix(in srgb, var(--blossom) 40%, transparent)) border-box;
 }
 /* شناورِ نرم برای شکل‌های تزئینی صفحات خطا و هدرها */
 @keyframes bahar-float {
