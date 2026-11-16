@@ -15,7 +15,9 @@
     "deploy": "bun run db:d1:apply && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "db:d1:generate": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script --output migrations/0001_initial.sql",
-    "db:d1:apply": "wrangler d1 migrations apply bahar-db --remote"
+    "db:d1:apply": "wrangler d1 migrations apply bahar-db --remote",
+    "desktop": "electron desktop/main.cjs",
+    "desktop:dist": "electron-builder --win nsis"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -99,8 +101,39 @@
     "tw-animate-css": "^1.3.5",
     "typescript": "^5",
     "@opennextjs/cloudflare": "^1.20.13",
-    "wrangler": "^4.152.0"
+    "wrangler": "^4.152.0",
+    "electron": "^40.0.0",
+    "electron-builder": "^26.0.12"
   },
   "description": "Bahar — a comprehensive school management system (single-school, Persian-first).",
-  "license": "MIT"
+  "license": "MIT",
+  "build": {
+    "appId": "ir.nilooteam.bahar",
+    "productName": "Bahar",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "desktop/**/*",
+      "!desktop/**/*.md"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "Bahar-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
 }
