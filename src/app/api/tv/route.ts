@@ -22,14 +22,14 @@ export async function GET(req: NextRequest) {
       }
     }
     const school = schoolId ? await db.school.findUnique({ where: { id: schoolId }, select: { name: true } }) : null;
-    if (!schoolId) return apiOk({ schoolName: "", announcements: [], events: [], birthdays: [], meal: null, topHouse: null, today: todayKey() });
+    if (!schoolId) return apiOk({ schoolName: "", announcements: [], events: [], birthdays: [], topHouse: null, today: todayKey() });
 
     const now = new Date();
     const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const dayEnd = new Date(dayStart.getTime() + 2 * 86400000);
     const { m: jm, d: jd } = jalaliParts(now);
 
-    const [announcements, events, mealRows, birthdayUsers, houses, students, behaviors, badgeRows] = await Promise.all([
+    const [announcements, events, birthdayUsers, houses, students, behaviors, badgeRows] = await Promise.all([
       db.announcement.findMany({
         where: { schoolId, scope: "SCHOOL" },
         select: { id: true, title: true, body: true, pinned: true, createdAt: true },
@@ -40,7 +40,6 @@ export async function GET(req: NextRequest) {
         select: { id: true, title: true, startAt: true, kind: true },
         orderBy: { startAt: "asc" }, take: 10,
       }),
-      db.mealPlan.findMany({ where: { schoolId, weekday: jalaliDayOfWeek(now) }, take: 1 }),
       db.user.findMany({
         where: { schoolId, isActive: true, role: { in: ["STUDENT", "TEACHER"] }, birthDate: { not: null } },
         select: { firstName: true, lastName: true, role: true, birthDate: true },
@@ -73,7 +72,6 @@ export async function GET(req: NextRequest) {
       announcements,
       events,
       birthdays,
-      meal: mealRows[0] ?? null,
       topHouse,
     });
   } catch (e) {
