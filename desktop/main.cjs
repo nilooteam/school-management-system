@@ -5,7 +5,7 @@ const { fileURLToPath } = require("node:url");
 
 const configPath = () => path.join(app.getPath("userData"), "config.json");
 const setupPath = path.join(__dirname, "setup.html");
-let mainWindow;
+let mainWindow = null;
 let activeOrigin = null;
 
 function normalizeServerUrl(value) {
@@ -15,6 +15,7 @@ function normalizeServerUrl(value) {
   } catch {
     throw new Error("نشانی واردشده معتبر نیست.");
   }
+
   const isLocal = ["localhost", "127.0.0.1"].includes(parsed.hostname);
   if (parsed.protocol !== "https:" && !(isLocal && parsed.protocol === "http:")) {
     throw new Error("برای امنیت، نشانی سامانه باید با https شروع شود.");
@@ -31,6 +32,24 @@ async function readServerUrl() {
     return normalizeServerUrl(config.serverUrl);
   } catch {
     return null;
+  }
+}
+
+function isSetupSender(event) {
+  try {
+    const senderUrl = new URL(event.senderFrame.url);
+    return senderUrl.protocol === "file:" &&
+      path.resolve(fileURLToPath(senderUrl)) === path.resolve(setupPath);
+  } catch {
+    return false;
+  }
+}
+
+function isAppSender(event) {
+  try {
+    return Boolean(activeOrigin) && new URL(event.senderFrame.url).origin === activeOrigin;
+  } catch {
+    return false;
   }
 }
 
@@ -53,8 +72,8 @@ async function loadBahar() {
   }
 
   try {
-    activeOrigin = serverUrl;
     await mainWindow.loadURL(serverUrl);
+    activeOrigin = serverUrl;
     return true;
   } catch {
     await showSetup("اتصال به سامانه برقرار نشد. اینترنت و نشانی سامانه را بررسی کنید.");
@@ -99,6 +118,11 @@ function createWindow() {
   });
 
   mainWindow.once("ready-to-show", () => mainWindow.show());
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+    activeOrigin = null;
+  });
+
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     try {
       const target = new URL(url);
@@ -106,47 +130,76 @@ function createWindow() {
     } catch {}
     return { action: "deny" };
   });
+
   mainWindow.webContents.on("will-navigate", guardNavigation);
   mainWindow.webContents.on("will-redirect", guardNavigation);
   void loadBahar();
 }
 
-ipcMain.handle("bahar:save-server-url", async (_event, value) => {
-  try {
-    const serverUrl = normalizeServerUrl(value);
-    await fs.mkdir(app.getPath("userData"), { recursive: true });
-    await fs.writeFile(configPath(), JSON.stringify({ serverUrl }, null, 2), { mode: 0o600 });
-    const connected = await loadBahar();
-    if (!connected) {
-      return { ok: false, error: "نشانی ذخیره شد، اما اتصال برقرار نشد. نشانی و اینترنت را بررسی کنید." };
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+if (!gotSingleInstanceLock) {
+  app.quit();
+} else {
+  app.on("second-instance", () => {
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      createWindow();
+      return;
     }
-    return { ok: true };
-  } catch (error) {
-    return {
-      ok: false,
-      error: error instanceof Error ? error.message : "ذخیره نشانی انجام نشد."
-    };
-  }
-});
-
-ipcMain.handle("bahar:open-external", async (_event, value) => {
-  try {
-    const url = new URL(String(value));
-    if (url.protocol !== "https:") return false;
-    await shell.openExternal(url.toString());
-    return true;
-  } catch {
-    return false;
-  }
-});
-
-app.whenReady().then(() => {
-  createWindow();
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
   });
-});
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
-});
+  ipcMain.handle("bahar:save-server-url", async (event, value) => {
+    if (!isSetupSender(event)) {
+      return { ok: false, error: "درخواست از صفحه مجاز ارسال نشده است." };
+    }
+
+    try {
+      const serverUrl = normalizeServerUrl(value);
+      await fs.mkdir(app.getPath("userData"), { recursive: true });
+      await fs.writeFile(
+        configPath(),
+        JSON.stringify({ serverUrl }, null, 2),
+        { mode: 0o600 }
+      );
+
+      const connected = await loadBahar();
+      if (!connected) {
+        return {
+          ok: false,
+          error: "نشانی ذخیره شد، اما اتصال برقرار نشد. نشانی و اینترنت را بررسی کنید."
+        };
+      }
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error instanceof Error ? error.message : "ذخیره نشانی انجام نشد."
+      };
+    }
+  });
+
+  ipcMain.handle("bahar:open-external", async (event, value) => {
+    if (!isAppSender(event)) return false;
+
+    try {
+      const url = new URL(String(value));
+      if (url.protocol !== "https:") return false;
+      await shell.openExternal(url.toString());
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
+  app.whenReady().then(() => {
+    createWindow();
+    app.on("activate", () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+  });
+
+  app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") app.quit();
+  });
+}
