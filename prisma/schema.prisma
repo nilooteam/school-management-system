@@ -237,7 +237,6 @@ model School {
   safetyReports SafetyReport[]
   kindnessNotes KindnessNote[]
   officeHours OfficeHour[]
-  medicationLogs MedicationLog[]
   drillLogs DrillLog[]
   assetLoans AssetLoan[]
   podcastEpisodes PodcastEpisode[]
