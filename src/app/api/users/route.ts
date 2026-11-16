@@ -14,7 +14,7 @@ import { deliverCredentials } from "@/lib/shad";
 import { enDigits } from "@/lib/persian";
 import { avatarApiFields } from "@/lib/avatar";
 
-const VALID_ROLES = ["ADMIN", "MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN", "STUDENT", "PARENT"];
+const VALID_ROLES = ["ADMIN", "MANAGER", "DEPUTY", "TEACHER", "STUDENT", "PARENT"];
 const EDITABLE_TEXT_FIELDS = [
   "firstName", "lastName", "fatherName", "birthPlace", "education",
   "fieldOfStudy", "jobTitle", "address", "email", "staffCode",
@@ -133,9 +133,8 @@ export async function POST(req: NextRequest) {
         return apiErr(403, "دسترسی ساخت کاربر ندارید.", "FORBIDDEN");
       }
     } else if (isManager) {
-      // راند ۱۸: سرایدار هم توسط مدیر ساخته می‌شود
-      if (!["DEPUTY", "TEACHER", "PARENT", "CUSTODIAN"].includes(role)) {
-        return apiErr(403, "مدیر مدرسه فقط معاون، معلم، ولی و سرایدار می‌تواند بسازد.", "FORBIDDEN");
+      if (!["DEPUTY", "TEACHER", "PARENT"].includes(role)) {
+        return apiErr(403, "مدیر مدرسه فقط معاون، معلم و ولی می‌تواند بسازد.", "FORBIDDEN");
       }
     } else {
       // ── سایر نقش‌ها (معاون/معلم دارای مجوز) — فقط معلم/ولی قابل ساخت است ──
@@ -193,21 +192,13 @@ export async function POST(req: NextRequest) {
       schoolId = me.schoolId;
     }
     // FIX (راند ۱۶): مدرسه مقصد باید واقعاً وجود داشته باشد — قبلاً FK 500 می‌داد
-    // راند ۱۸: ماژول‌های مدرسه هم خوانده می‌شود (شاد/سرایدار قابل خاموش‌کردن)
-    let schoolRow: { id: string; name: string; shadEnabled: boolean; custodianEnabled: boolean } | null = null;
+    let schoolRow: { id: string; name: string; shadEnabled: boolean } | null = null;
     if (schoolId) {
       schoolRow = await db.school.findUnique({
         where: { id: schoolId },
-        select: { id: true, name: true, shadEnabled: true, custodianEnabled: true },
+        select: { id: true, name: true, shadEnabled: true },
       });
       if (!schoolRow) return apiErr(404, "مدرسه مقصد یافت نشد.", "SCHOOL_NOT_FOUND");
-    }
-    // راند ۱۸: سرایدار باید به مدرسه‌ای وصل باشد و ماژولش روشن باشد
-    if (role === "CUSTODIAN") {
-      if (!schoolId) return apiErr(400, "سرایدار باید به یک مدرسه متصل باشد.", "NO_SCHOOL");
-      if (schoolRow && !schoolRow.custodianEnabled) {
-        return apiErr(403, "نقش سرایدار در این مدرسه غیرفعال است؛ اول از تنظیمات مدرسه فعالش کنید.", "CUSTODIAN_DISABLED");
-      }
     }
 
     // مجوزهای نقش

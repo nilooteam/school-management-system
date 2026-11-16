@@ -5,7 +5,6 @@ export const ROLES = {
   MANAGER: "MANAGER",
   DEPUTY: "DEPUTY",
   TEACHER: "TEACHER",
-  CUSTODIAN: "CUSTODIAN",
   STUDENT: "STUDENT",
   PARENT: "PARENT",
 } as const;
@@ -18,7 +17,6 @@ export const ROLE_LABELS: Record<string, string> = {
   MANAGER: "مدیر مدرسه",
   DEPUTY: "معاون",
   TEACHER: "معلم",
-  CUSTODIAN: "سرایدار",
   STUDENT: "دانش‌آموز",
   PARENT: "ولی",
 };
@@ -29,7 +27,6 @@ export const ROLE_ORDER: string[] = [
   "MANAGER",
   "DEPUTY",
   "TEACHER",
-  "CUSTODIAN",
   "STUDENT",
   "PARENT",
 ];
@@ -144,7 +141,7 @@ export const DEFAULT_ADMIN_PERMISSIONS: string[] = [
 /** نقش‌های مدیریتی سامانه برای همین نصب تک‌هنرستانی */
 export const SERVICE_ROLES: string[] = ["SUPER_ADMIN", "ADMIN"];
 /** نقش‌های پرسنلی مدرسه */
-export const STAFF_ROLES: string[] = ["MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN"];
+export const STAFF_ROLES: string[] = ["MANAGER", "DEPUTY", "TEACHER"];
 
 export function parsePermissions(json: string | null | undefined): string[] {
   if (!json) return [];

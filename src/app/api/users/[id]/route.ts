@@ -182,22 +182,13 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     let managedSchoolId: string | null = null;
     if (body.role !== undefined && String(body.role) !== user.role) {
       const newRole = String(body.role);
-      const VALID = ["ADMIN", "MANAGER", "DEPUTY", "TEACHER", "CUSTODIAN", "STUDENT", "PARENT"];
+      const VALID = ["ADMIN", "MANAGER", "DEPUTY", "TEACHER", "STUDENT", "PARENT"];
       if (!VALID.includes(newRole)) return apiErr(400, "نقش نامعتبر است.", "BAD_ROLE");
       if (newRole === "ADMIN" && me.role !== "SUPER_ADMIN") {
         return apiErr(403, "فقط مدیر کل سامانه می‌تواند کاربر را به ادمین سرویس ارتقا دهد.", "FORBIDDEN");
       }
       if (newRole === "STUDENT" && !user.studentProfile) {
         return apiErr(400, "برای تبدیل به دانش‌آموز، پرونده دانش‌آموزی لازم است؛ از بخش «دانش‌آموزان» عمل کنید.", "NEED_STUDENT_PROFILE");
-      }
-      // راند ۱۸: سرایدار — ماژول باید در مدرسه مقصد روشن باشد
-      if (newRole === "CUSTODIAN") {
-        const targetSchoolId = (data.schoolId as string | undefined) ?? user.schoolId;
-        if (!targetSchoolId) return apiErr(400, "سرایدار باید به یک مدرسه متصل باشد.", "NO_SCHOOL");
-        const targetSchool = await db.school.findUnique({ where: { id: targetSchoolId }, select: { custodianEnabled: true } });
-        if (targetSchool && !targetSchool.custodianEnabled) {
-          return apiErr(403, "نقش سرایدار در این مدرسه غیرفعال است.", "CUSTODIAN_DISABLED");
-        }
       }
       // مدیر → سلب مدیریت مدرسه (خواندن بیرون، نوشتن در batch پایین)
       if (user.role === "MANAGER") {
@@ -392,7 +383,6 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
       ops.push(db.resourceLink.updateMany({ where: { addedById: user.id }, data: { addedById: null } }));
       ops.push(db.behaviorRecord.updateMany({ where: { recordedById: user.id }, data: { recordedById: null } }));
       ops.push(db.studentBadge.updateMany({ where: { awardedById: user.id }, data: { awardedById: null } }));
-      ops.push(db.asset.updateMany({ where: { custodianId: user.id }, data: { custodianId: null } }));
       ops.push(db.gradeHistory.updateMany({ where: { changedById: user.id }, data: { changedById: null } }));
       ops.push(db.backup.updateMany({ where: { createdById: user.id }, data: { createdById: null } }));
       ops.push(db.user.delete({ where: { id: user.id } }));

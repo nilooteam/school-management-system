@@ -20,7 +20,6 @@ const ROLE_TKEY: Record<string, string> = {
   MANAGER: "role.manager",
   DEPUTY: "role.deputy",
   TEACHER: "role.teacher",
-  CUSTODIAN: "role.custodian",
   STUDENT: "role.student",
   PARENT: "role.parent",
 };
@@ -69,8 +68,8 @@ type Me = {
     role: string;
     permissions: string[];
     schoolName: string | null;
-    school: { name: string; id: string; shadEnabled?: boolean; custodianEnabled?: boolean } | null;
-    actingSchool: { id: string; name: string; shadEnabled?: boolean; custodianEnabled?: boolean } | null;
+    school: { name: string; id: string; shadEnabled?: boolean } | null;
+    actingSchool: { id: string; name: string; shadEnabled?: boolean } | null;
   };
 };
 
@@ -108,10 +107,8 @@ export default function UsersPage() {
   const isService = me?.user.role === "SUPER_ADMIN" || me?.user.role === "ADMIN";
   const isSuper = me?.user.role === "SUPER_ADMIN";
 
-  /* راند ۱۸: ماژول‌های اختیاری مدرسهٔ مؤثر — شاد و سرایدار */
   const effSchool = me?.user.actingSchool ?? me?.user.school ?? null;
   const shadVisible = effSchool ? (effSchool as { shadEnabled?: boolean }).shadEnabled !== false : true;
-  const custodianAvailable = effSchool ? (effSchool as { custodianEnabled?: boolean }).custodianEnabled !== false : true;
 
   /** کپی سریع متن با بازخورد */
   async function copyText(text: string, label: string) {
@@ -482,7 +479,6 @@ export default function UsersPage() {
                             { value: "MANAGER", label: t("role.manager") },
                             { value: "DEPUTY", label: t("role.deputy") },
                             { value: "TEACHER", label: t("role.teacher") },
-                            { value: "CUSTODIAN", label: t("role.custodian") },
                             { value: "PARENT", label: t("role.parent") },
                           ]
                         : isService
@@ -490,14 +486,12 @@ export default function UsersPage() {
                             { value: "MANAGER", label: t("role.manager") },
                             { value: "DEPUTY", label: t("role.deputy") },
                             { value: "TEACHER", label: t("role.teacher") },
-                            { value: "CUSTODIAN", label: t("role.custodian") },
                             { value: "PARENT", label: t("role.parent") },
                           ]
                         : me?.user.role === "MANAGER"
                         ? [
                             { value: "DEPUTY", label: t("role.deputy") },
                             { value: "TEACHER", label: t("role.teacher") },
-                            { value: "CUSTODIAN", label: t("role.custodian") },
                             { value: "PARENT", label: t("role.parent") },
                           ]
                         : [
@@ -506,10 +500,7 @@ export default function UsersPage() {
                           ]
                     }
                   />
-                  {form.role === "CUSTODIAN" && !custodianAvailable && (
-                    <span className="text-xs text-warning-deep">{t("users.custodianDisabledNote")}</span>
-                  )}
-                </label>
+</label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-bold flex items-center gap-1.5">
                     <IdCard className="w-3.5 h-3.5" /> {t("students.field.nationalIdUser")}
@@ -697,7 +688,6 @@ export default function UsersPage() {
                         { value: "MANAGER", label: t("role.manager") },
                         { value: "DEPUTY", label: t("role.deputy") },
                         { value: "TEACHER", label: t("role.teacher") },
-                        { value: "CUSTODIAN", label: t("role.custodian") },
                         { value: "STUDENT", label: t("common.student") },
                         { value: "PARENT", label: t("role.parent") },
                       ]}

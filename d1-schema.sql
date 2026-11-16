@@ -67,7 +67,6 @@ CREATE TABLE "School" (
     "managerId" TEXT,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "shadEnabled" BOOLEAN NOT NULL DEFAULT true,
-    "custodianEnabled" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
     CONSTRAINT "School_managerId_fkey" FOREIGN KEY ("managerId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
@@ -727,14 +726,12 @@ CREATE TABLE "Asset" (
     "category" TEXT NOT NULL DEFAULT 'OTHER',
     "location" TEXT,
     "status" TEXT NOT NULL DEFAULT 'OK',
-    "custodianId" TEXT,
     "purchaseDate" DATETIME,
     "value" INTEGER,
     "note" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Asset_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "Asset_custodianId_fkey" FOREIGN KEY ("custodianId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT "Asset_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateTable

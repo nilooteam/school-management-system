@@ -54,9 +54,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
     if (body.about !== undefined) data.about = String(body.about) || null;
     if (body.logoUrl !== undefined) data.logoUrl = String(body.logoUrl) || null;
 
-    // راند ۱۸: ماژول‌های اختیاری مدرسه — شاد + نقش سرایدار (مدیر مدرسه/ادمین سرویس)
     if (body.shadEnabled !== undefined) data.shadEnabled = Boolean(body.shadEnabled);
-    if (body.custodianEnabled !== undefined) data.custodianEnabled = Boolean(body.custodianEnabled);
 
     if (Object.keys(data).length === 0) return apiOk({ ok: true });
 

@@ -104,7 +104,6 @@ model User {
   tasksAssigned         Task[]                 @relation("TaskAssignee")
   tasksCreated          Task[]                 @relation("TaskCreator")
   bookingsMade          Booking[]              @relation("BookingBy")
-  assetsCustodian       Asset[]                @relation("AssetCustodian")
   maintenanceReported   MaintenanceTicket[]    @relation("MaintenanceReporter")
   interventionsStarted  Intervention[]         @relation("InterventionStarter")
   pollsCreated          Poll[]                 @relation("PollCreator")
@@ -148,8 +147,6 @@ model School {
   weekStart       String    @default("SATURDAY") // SATURDAY | SUNDAY | MONDAY
   // راند ۱۸: شاد کاملاً اختیاری است — هر مدرسه می‌تواند خاموشش کند (ایران هم)
   shadEnabled     Boolean   @default(true)
-  // راند ۱۸: نقش سرایدار (CUSTODIAN) قابل خاموش/روشن برای هر مدرسه
-  custodianEnabled Boolean  @default(true)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -1118,8 +1115,6 @@ model Asset {
   category     String    @default("OTHER") // PROJECTOR | LAPTOP | COMPUTER | SOUND | LAB | FURNITURE | OTHER
   location     String?
   status       String    @default("OK") // OK | BROKEN | REPAIRING | RETIRED
-  custodianId  String?
-  custodian    User?     @relation("AssetCustodian", fields: [custodianId], references: [id])
   purchaseDate DateTime?
   value        Int?
   note         String?
