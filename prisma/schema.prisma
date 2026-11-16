@@ -234,11 +234,9 @@ model School {
   leagueTeams LeagueTeam[]
   leagueMatches LeagueMatch[]
   safetyReports SafetyReport[]
-  kindnessNotes KindnessNote[]
   officeHours OfficeHour[]
   assetLoans AssetLoan[]
   podcastEpisodes PodcastEpisode[]
-  bikeRegistries BikeRegistry[]
 }
 
 model Class {
@@ -3176,18 +3174,6 @@ model SafetyReport {
   updatedAt DateTime @updatedAt
   @@index([schoolId, status])
 }
-model KindnessNote {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  authorUserId String?
-  fromName String?
-  toName String
-  text String
-  approved Boolean @default(false)
-  createdAt DateTime @default(now())
-  @@index([schoolId, approved])
-}
 model OfficeHour {
   id String @id @default(cuid())
   schoolId String
@@ -3227,19 +3213,6 @@ model PodcastEpisode {
   date String
   createdAt DateTime @default(now())
   @@index([schoolId, date])
-}
-model BikeRegistry {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  studentId String
-  kind String @default("دوچرخه")
-  color String?
-  serial String?
-  spot String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([schoolId, studentId])
 }
 
 /// اتصال ربات/مینی‌اپ یک مدرسه به یک پلتفرم پیام‌رسان یا درگاه عمومی.
