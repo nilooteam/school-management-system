@@ -72,10 +72,11 @@ async function loadBahar() {
   }
 
   try {
-    await mainWindow.loadURL(serverUrl);
     activeOrigin = serverUrl;
+    await mainWindow.loadURL(serverUrl);
     return true;
   } catch {
+    activeOrigin = null;
     await showSetup("اتصال به سامانه برقرار نشد. اینترنت و نشانی سامانه را بررسی کنید.");
     return false;
   }
