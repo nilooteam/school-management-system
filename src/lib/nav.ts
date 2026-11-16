@@ -8,9 +8,9 @@ import {
   Home, MessagesSquare, Coins, SlidersHorizontal, Building2, FileUp,
   IdCard, Repeat,
   Bus, FileText, Video, Armchair, MessageSquareText, Landmark,
-  CalendarSync, MessageSquare, UserPlus, Network, Trophy, UtensilsCrossed,
+  CalendarSync, MessageSquare, UserPlus, Network, Trophy,
   Compass, MonitorPlay, Flame, Album, Terminal, Accessibility, FlaskConical, Puzzle,
-  Eye, NotebookText, Bot, FileSignature, Package, FileBadge, BookMarked, PackageSearch, Cake, ShieldCheck, Lock, Shirt, Sunrise, Megaphone, UserCheck, KeyRound, SprayCan, Target, BookCopy, Medal, HandHeart, PhoneCall, Scale, PackagePlus, Printer, CalendarPlus, Library, ArrowLeftRight, Heart, Clock, Siren, Podcast, Bike,
+  Eye, NotebookText, Bot, FileSignature, Package, FileBadge, BookMarked, PackageSearch, Cake, ShieldCheck, Lock, Shirt, Sunrise, Megaphone, UserCheck, KeyRound, SprayCan, Target, BookCopy, Medal, HandHeart, PhoneCall, Scale, PackagePlus, Printer, CalendarPlus, Library, ArrowLeftRight, Heart, Clock, Podcast, Bike,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -69,11 +69,9 @@ export const NAV: NavItem[] = [
   { href: "/app/help-board", label: "پرسش و پاسخ درسی", tKey: "nav.help", short: "پرسش درسی", icon: MessagesSquare, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/science-fair", label: "جشنوارهٔ علمی", tKey: "nav.science", short: "جشنواره", icon: FlaskConical, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/sports-league", label: "لیگ داخلی", tKey: "nav.league", short: "لیگ", icon: Trophy, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
-  { href: "/app/meal-orders", label: "پیش‌سفارش غذا", tKey: "nav.meals2", short: "غذا", icon: UtensilsCrossed, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/safety-reports", label: "گزارش ناشناس", tKey: "nav.safety", short: "گزارش ناشناس", icon: ShieldAlert, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/kindness-wall", label: "دیوار مهربانی", tKey: "nav.kindness", short: "مهربانی", icon: Heart, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/office-hours", label: "ساعات مراجعهٔ معلم", tKey: "nav.hours", short: "مراجعه", icon: Clock, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
-  { href: "/app/drill-log", label: "مانورهای ایمنی", tKey: "nav.drills", short: "مانور", icon: Siren, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/asset-loans", label: "امانت تجهیزات", tKey: "nav.loans", short: "امانت", icon: Wrench, roles: ["MANAGER", "DEPUTY", "TEACHER", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "admin" },
   { href: "/app/podcast", label: "رادیو و پادکست", tKey: "nav.podcast", short: "پادکست", icon: Podcast, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
   { href: "/app/bike-registry", label: "دوچرخه و اسکوتر", tKey: "nav.bikes", short: "دوچرخه", icon: Bike, roles: ["MANAGER", "DEPUTY", "TEACHER", "PARENT", "STUDENT", "CUSTODIAN", "ADMIN", "SUPER_ADMIN"], tint: 3, group: "education" },
