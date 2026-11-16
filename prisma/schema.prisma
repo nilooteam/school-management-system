@@ -233,11 +233,9 @@ model School {
   scienceProjects ScienceProject[]
   leagueTeams LeagueTeam[]
   leagueMatches LeagueMatch[]
-  mealOrders MealOrder[]
   safetyReports SafetyReport[]
   kindnessNotes KindnessNote[]
   officeHours OfficeHour[]
-  drillLogs DrillLog[]
   assetLoans AssetLoan[]
   podcastEpisodes PodcastEpisode[]
   bikeRegistries BikeRegistry[]
@@ -3165,20 +3163,6 @@ model LeagueMatch {
   createdAt DateTime @default(now())
   @@index([schoolId, date])
 }
-model MealOrder {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  studentId String
-  requesterId String
-  date String
-  item String
-  status String @default("ORDERED")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([schoolId, date])
-  @@index([studentId])
-}
 model SafetyReport {
   id String @id @default(cuid())
   schoolId String
@@ -3216,18 +3200,6 @@ model OfficeHour {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([schoolId])
-}
-model DrillLog {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  kind String
-  date String
-  durationMin Int?
-  notes String?
-  createdById String?
-  createdAt DateTime @default(now())
-  @@index([schoolId, date])
 }
 model AssetLoan {
   id String @id @default(cuid())
