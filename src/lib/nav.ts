@@ -116,7 +116,6 @@ export const NAV: NavItem[] = [
   { href: "/app/quizzes", label: "آزمون آنلاین", tKey: "nav.quizzes", short: "آزمون", icon: ClipboardList, roles: ["MANAGER", "DEPUTY", "TEACHER", "STUDENT"], tint: 1, group: "education" },
   { href: "/app/library", label: "کتابخانه", tKey: "nav.library", short: "کتابخانه", icon: LibraryBig, roles: ["*"], tint: 2, group: "education" },
   { href: "/app/clubs", label: "باشگاه‌ها", tKey: "nav.clubs", short: "باشگاه", icon: Trophy, roles: ["*"], tint: 3, group: "services" },
-  { href: "/app/meals", label: "برنامه غذایی", tKey: "nav.meals", short: "غذا", icon: UtensilsCrossed, roles: ["*"], tint: 1, group: "services" },
   { href: "/app/wallet", label: "بوفه و کیف پول", tKey: "nav.wallet", short: "کیف پول", icon: Wallet, roles: ["*"], tint: 0, group: "services" },
   { href: "/app/portfolio", label: "پورتفولیو", tKey: "nav.portfolio", short: "پورتفولیو", icon: Sparkles, roles: ["STUDENT", "PARENT"], tint: 2, group: "personal" },
   { href: "/app/study", label: "برنامه مطالعه", tKey: "nav.study", short: "مطالعه", icon: Flame, roles: ["STUDENT", "PARENT"], tint: 1, group: "personal" },
