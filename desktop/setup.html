@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+<title>راه‌اندازی بهار</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f1f5f9;color:#0f172a;font-family:Tahoma,Arial,sans-serif;line-height:1.9;padding:24px}.panel{width:min(100%,520px);background:white;border:1px solid #e2e8f0;border-radius:18px;padding:32px;box-shadow:0 18px 50px #0f172a12}h1{font-size:24px;margin:0 0 8px}p{color:#475569;margin:0 0 22px}label{display:block;font-weight:700;margin-bottom:8px}input{width:100%;height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:0 12px;font:inherit;direction:ltr;text-align:left}button{width:100%;height:48px;margin-top:16px;border:0;border-radius:10px;background:#0f766e;color:white;font:inherit;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.hint{font-size:13px;margin-top:12px;color:#64748b}.error{color:#b91c1c;margin-top:12px;min-height:24px}
+</style>
+</head>
+<body>
+<main class="panel">
+<h1>بهار؛ همراه مدرسه شما</h1>
+<p>برای اتصال نسخه ویندوز، نشانی اینترنتی سامانه بهار را وارد کنید. اطلاعات در همین دستگاه ذخیره می‌شود.</p>
+<form id="setup">
+<label for="server">نشانی سامانه</label>
+<input id="server" type="url" placeholder="https://your-school-domain.example" autocomplete="url" required>
+<button id="save" type="submit">اتصال به سامانه</button>
+<div class="hint">نشانی باید با https شروع شود. برای محیط آزمایشی، localhost نیز پذیرفته می‌شود.</div>
+<div class="error" id="error" role="alert"></div>
+</form>
+</main>
+<script>
+const form=document.getElementById("setup"), input=document.getElementById("server"), button=document.getElementById("save"), error=document.getElementById("error");
+form.addEventListener("submit",async(event)=>{event.preventDefault();button.disabled=true;error.textContent="";const result=await window.baharDesktop.saveServerUrl(input.value);if(!result.ok){error.textContent=result.error;button.disabled=false;}});
+</script>
+</body>
+</html>
