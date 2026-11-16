@@ -30,3 +30,7 @@ jobs:
           bunx wrangler d1 execute bahar-db --remote --command "PRAGMA foreign_key_list(\"Asset\");" || echo "PRAGMA foreign_key_list unsupported here"
           echo "== Asset row count =="
           bunx wrangler d1 execute bahar-db --remote --command "SELECT COUNT(*) AS asset_rows FROM \"Asset\";"
+          echo "== Backup rows (all + latest AUTO) =="
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT COUNT(*) AS backup_rows FROM \"Backup\";"
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT id, filename, kind, sizeBytes, recordCount, createdAt FROM \"Backup\" ORDER BY createdAt DESC LIMIT 5;"
+          bunx wrangler d1 execute bahar-db --remote --command "SELECT id, filename, kind, sizeBytes, recordCount, createdAt FROM \"Backup\" WHERE kind = 'AUTO' ORDER BY createdAt DESC LIMIT 5;"
