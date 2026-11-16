@@ -4,6 +4,7 @@ const path = require("node:path");
 
 const CONFIG_PATH = () => path.join(app.getPath("userData"), "config.json");
 let mainWindow;
+let activeOrigin = null;
 
 function normalizeServerUrl(value) {
   let parsed;
@@ -64,13 +65,16 @@ function createWindow() {
     } catch {}
     return { action: "deny" };
   });
-  mainWindow.webContents.on("will-navigate", async (event, targetUrl) => {
-    let current;
-    try { current = new URL(targetUrl); } catch { event.preventDefault(); return; }
-    if (current.protocol === "file:") return;
-    const allowed = await readServerUrl();
-    if (!allowed || current.origin !== allowed) event.preventDefault();
-  });
+  const guardNavigation = (event, targetUrl) => {
+    let target;
+    try { target = new URL(targetUrl); } catch { event.preventDefault(); return; }
+    const isSetupPage = target.protocol === "file:" &&
+      target.pathname === path.join(__dirname, "setup.html").replace(/\\\\/g, "/");
+    if (isSetupPage && activeOrigin === null) return;
+    if (!activeOrigin || target.origin !== activeOrigin) event.preventDefault();
+  };
+  mainWindow.webContents.on("will-navigate", guardNavigation);
+  mainWindow.webContents.on("will-redirect", guardNavigation);
   loadBahar();
 }
 
