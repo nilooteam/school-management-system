@@ -2940,19 +2940,6 @@ CREATE TABLE IF NOT EXISTS "OfficeHour" (
     CONSTRAINT "OfficeHour_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 -- CreateTable
-CREATE TABLE IF NOT EXISTS "MedicationLog" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "schoolId" TEXT NOT NULL,
-    "studentId" TEXT NOT NULL,
-    "medicine" TEXT NOT NULL,
-    "dose" TEXT,
-    "givenAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "givenById" TEXT,
-    "note" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "MedicationLog_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
--- CreateTable
 CREATE TABLE IF NOT EXISTS "DrillLog" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "schoolId" TEXT NOT NULL,
@@ -3090,7 +3077,6 @@ CREATE INDEX IF NOT EXISTS "KindnessNote_schoolId_approved_idx" ON "KindnessNote
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "OfficeHour_schoolId_idx" ON "OfficeHour"("schoolId");
 -- CreateIndex
-CREATE INDEX IF NOT EXISTS "MedicationLog_schoolId_studentId_idx" ON "MedicationLog"("schoolId", "studentId");
 -- CreateIndex
 CREATE INDEX IF NOT EXISTS "DrillLog_schoolId_date_idx" ON "DrillLog"("schoolId", "date");
 -- CreateIndex
