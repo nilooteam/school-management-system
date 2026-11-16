@@ -25,6 +25,7 @@ import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { ConfirmProvider } from "@/components/shared/pickers";
 import { useCountry } from "@/lib/country/client";
 import { AccessibilityProvider, SkipLink } from "@/lib/accessibility";
+import { BaharPage } from "@/components/bahar/motion/motion-primitives";
 
 export type ShellUser = {
   id: string;
@@ -324,7 +325,7 @@ function AppShellInner({ user, children }: { user: ShellUser; children: React.Re
                   title={collapsed ? (n.tKey ? t(n.tKey) : n.label) : undefined}
                   className={`relative flex items-center gap-3 rounded-full ${collapsed ? "justify-center py-2.5 px-0" : "py-2.5 px-4"} text-[14px] font-bold z-[1] transition-colors duration-200 ${
                     active
-                      ? "text-invert-foreground"
+                      ? "text-primary-foreground"
                       : "text-ink hover:bg-spring-tint dark:hover:bg-spring-tint hover:text-spring-deep"
                   }`}
                   style={{ isolation: "isolate" }}
@@ -333,7 +334,7 @@ function AppShellInner({ user, children }: { user: ShellUser; children: React.Re
                     {active && (
                       <motion.span
                         layoutId="sidebar-capsule"
-                        className="absolute inset-0 rounded-full bg-invert"
+                        className="absolute inset-0 rounded-full bg-primary"
                         transition={springRubber}
                         style={{ zIndex: -1 }}
                         initial={{ opacity: 0 }}
@@ -600,8 +601,8 @@ function AppShellInner({ user, children }: { user: ShellUser; children: React.Re
               />
             )}
           </header>
-          <main id="main-content" tabIndex={-1} className="flex-1 min-w-0 px-4 md:px-8 py-6 md:py-8 pb-10 lg:pb-8 w-full">
-            <div className="max-w-6xl mx-auto b-page-in" key={pathname}>
+          <main id="main-content" tabIndex={-1} className="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-7 md:py-9 pb-10 lg:pb-8 w-full">
+            <BaharPage className="max-w-7xl mx-auto" key={pathname}>
               {/* سربرگ رسمی چاپ — فقط روی کاغذ/PDF دیده می‌شود */}
               <div className="print-only b-print-head" aria-hidden>
                 <div>
@@ -637,7 +638,7 @@ function AppShellInner({ user, children }: { user: ShellUser; children: React.Re
               <div className="print-only b-print-foot" aria-hidden>
                 این گزارش به‌صورت خودکار از سامانه مدیریت مدرسه بهار تولید شده است · bahar
               </div>
-            </div>
+            </BaharPage>
           </main>
         </div>
       </div>
