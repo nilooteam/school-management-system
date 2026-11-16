@@ -217,7 +217,6 @@ model School {
   makeupClasses MakeupClass[]
   classVisits ClassVisit[]
   installmentRequests InstallmentRequest[]
-  idReissueRequests IdReissueRequest[]
   bookSuggestions BookSuggestion[]
   clubProposals ClubProposal[]
   tutorOffers TutorOffer[]
@@ -2787,19 +2786,6 @@ model InstallmentRequest {
   requesterId String
   parts Int @default(3)
   reason String?
-  status String @default("PENDING")
-  handledById String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@index([schoolId, status])
-}
-model IdReissueRequest {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  studentId String
-  requesterId String
-  reason String
   status String @default("PENDING")
   handledById String?
   createdAt DateTime @default(now())
