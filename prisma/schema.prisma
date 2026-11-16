@@ -3227,19 +3227,6 @@ model OfficeHour {
   updatedAt DateTime @updatedAt
   @@index([schoolId])
 }
-model MedicationLog {
-  id String @id @default(cuid())
-  schoolId String
-  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  studentId String
-  medicine String
-  dose String?
-  givenAt DateTime @default(now())
-  givenById String?
-  note String?
-  createdAt DateTime @default(now())
-  @@index([schoolId, studentId])
-}
 model DrillLog {
   id String @id @default(cuid())
   schoolId String
