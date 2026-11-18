@@ -1,5 +1,5 @@
-// ماژول اپلیکیشن اندروید بهار — بدون هیچ وابستگی بیرونی
-// (نیازی به androidx یا material نیست؛ دانلود از dl.google.com هم لازم نمی‌شود)
+// ماژول اپلیکیشن اندروید بهار — بدون وابستگی زمان اجرای AndroidX یا Material
+// دریافت Android Gradle Plugin، Gradle و Android SDK ممکن است به اینترنت نیاز داشته باشد.
 plugins {
     id 'com.android.application'
 }
