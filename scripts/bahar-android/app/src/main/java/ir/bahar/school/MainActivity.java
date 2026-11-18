@@ -14,7 +14,6 @@ import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -22,6 +21,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.Locale;
 
@@ -198,7 +198,7 @@ public class MainActivity extends Activity {
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, params.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE);
                 startActivityForResult(intent, FILE_CHOOSER_REQUEST);
                 return true;
-            } catch (ActivityNotFoundException | IllegalArgumentException e) {
+            } catch (RuntimeException e) {
                 filePathCallback.onReceiveValue(null);
                 filePathCallback = null;
                 Toast.makeText(MainActivity.this, R.string.no_app_for_file, Toast.LENGTH_SHORT).show();
@@ -318,6 +318,8 @@ public class MainActivity extends Activity {
         if (webView != null) {
             webView.setWebChromeClient(null);
             webView.setWebViewClient(null);
+            ViewGroup parent = (ViewGroup) webView.getParent();
+            if (parent != null) parent.removeView(webView);
             webView.destroy();
             webView = null;
         }
