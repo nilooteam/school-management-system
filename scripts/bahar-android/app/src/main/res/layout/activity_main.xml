@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:indeterminate="true"
-        android:indeterminateTint="@color/bahar_spring"
+        android:indeterminateTint="@color/bahar_blue"
         android:visibility="gone" />
 
     <WebView
@@ -19,7 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- صفحه خطا / بی‌ارتباطی -->
     <ScrollView
         android:id="@+id/error_pane"
         android:layout_width="match_parent"
@@ -67,7 +66,7 @@
                 android:minHeight="52dp"
                 android:paddingStart="28dp"
                 android:paddingEnd="28dp"
-                android:backgroundTint="@color/bahar_spring"
+                android:backgroundTint="@color/bahar_blue"
                 android:textColor="#FFFFFF"
                 android:text="@string/retry" />
         </LinearLayout>

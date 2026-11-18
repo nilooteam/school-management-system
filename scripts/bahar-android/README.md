@@ -1,123 +1,57 @@
-# Bahar Android App
+# اپ اندروید بهار
 
-The official Android app for **Bahar — School Management System**. It wraps
-the full Bahar web app in a native shell and builds to an APK with Android
-Studio.
+اپ اندروید بهار، پوسته‌ای بومی بر پایه WebView برای دسترسی به سامانه مدیریت هنرستان است. رابط اصلی و داده‌ها از سرور بهار بارگذاری می‌شوند؛ بنابراین این اپ به یک نصب در دسترس از سامانه نیاز دارد.
 
-> This project has **no external dependencies** (no androidx / material), so
-> the common `Could not find com.google.android.material:material` or
-> `androidx.core:core` build errors cannot occur — the build works even
-> without access to `dl.google.com`.
+## تنظیم آدرس سرور
 
----
+پیش از انتشار، فایل زیر را باز کنید:
 
-## 1) Before building — set your server URL
+`app/src/main/java/ir/bahar/school/MainActivity.java`
 
-Open:
-
-```
-app/src/main/java/ir/bahar/school/MainActivity.java
-```
-
-Find this line near the top and replace `bahar.example.com` with your own
-server address:
+مقدار `SERVER_URL` را با آدرس واقعی سامانه جایگزین کنید:
 
 ```java
-private static final String SERVER_URL = "https://bahar.example.com";
+private static final String SERVER_URL = "https://your-school-domain.example";
 ```
 
-Examples:
+آدرس باید شامل `https://` یا `http://` و بدون مسیر اضافی باشد. برای استفادهٔ عمومی، HTTPS توصیه می‌شود. آدرس نمونهٔ بالا صرفاً نمونه است و به سرور واقعی اشاره نمی‌کند.
 
-| Setup | URL |
-|---|---|
-| Internet server with a domain | `https://bahar.myschool.ir` |
-| Server on the school LAN | `http://192.168.1.10:3000` |
-| Local dev on the same machine | `http://10.0.2.2:3000` (emulator's localhost) |
+## باز کردن در Android Studio
 
-> If your server is plain `http` (no SSL), nothing else is needed — cleartext
-> traffic is already enabled in the manifest.
+1. Android Studio را نصب کنید.
+2. پوشهٔ `scripts/bahar-android` را با گزینهٔ Open باز کنید.
+3. صبر کنید Gradle Sync کامل شود.
+4. در صورت درخواست، نسخهٔ Gradle و Android SDK موردنیاز را دریافت کنید.
 
-## 2) Open the project in Android Studio
+این پروژه کتابخانهٔ AndroidX یا Material به‌عنوان وابستگی اپ ندارد؛ بااین‌حال اولین همگام‌سازی ممکن است برای دریافت Android Gradle Plugin، Gradle و SDK به اینترنت یا نسخه‌های کش‌شده نیاز داشته باشد.
 
-1. Install Android Studio (Koala or newer).
-2. **File → Open** and select this folder.
-3. Wait for Gradle Sync to finish.
-4. If prompted to download Gradle, click **OK**.
+## قابلیت‌ها
 
-> If Sync gets stuck downloading the Gradle distribution, set **File →
-> Settings → Build Tools → Gradle → Gradle from: 'Wrapper task in build
-> file'**, or point `gradle/wrapper/gradle-wrapper.properties` at a cached
-> distribution.
+- ورود و استفاده از بخش‌های سامانه از طریق WebView
+- نگهداری نشست ورود در کوکی‌های WebView
+- نمایش خطای عدم دسترسی به سرور و امکان تلاش مجدد
+- باز کردن لینک‌های وب بیرونی، تماس و ایمیل در برنامهٔ مناسب
+- انتخاب یک یا چند فایل برای بارگذاری
+- دانلود فایل‌ها در پوشهٔ Downloads با استفاده از Download Manager
+- بازگشت در تاریخچهٔ صفحات و خروج با دو بار فشردن دکمهٔ بازگشت
+- رابط خطای فارسی با رنگ‌بندی سفید، آبی و مشکی
 
-## 3) Build the APK
+## نکات فنی و امنیتی
 
-**Quick debug APK:**
+- شناسهٔ بسته: `ir.bahar.school`
+- حداقل نسخه: Android 7.0 (API 24)
+- هدف: Android 14 (API 34)
+- زبان: Java
+- نسخهٔ Gradle: 8.7
+- نسخهٔ Android Gradle Plugin: 8.5.2
+- Java/JDK: 17
+- فقط مبدأ دقیق تنظیم‌شده در `SERVER_URL` داخل WebView باز می‌شود؛ مبدأهای دیگر وب در مرورگر باز می‌شوند.
+- طرح‌های ناشناخته و دسترسی مستقیم `file://` از WebView مسدود هستند.
+- محتوای مختلط ناامن در صفحهٔ HTTPS مسدود است.
+- مجوز مکان به اپ داده نشده و درخواست مکان وب‌سایت رد می‌شود.
 
-- **Build → Build App Bundle(s) / APK(s) → Build APK(s)**
-- Click **locate** in the success message; the file is:
-  ```
-  app/build/outputs/apk/debug/app-debug.apk
-  ```
-- Install this file on phones (a debug build is fine for school use).
+## ساخت نسخهٔ نصب
 
-**Signed release:**
+پس از تنظیم آدرس سرور و باز کردن پروژه در Android Studio، می‌توانید از منوی Build خروجی APK بگیرید. برای انتشار عمومی، نسخهٔ امضاشده و کلید انتشار اختصاصی لازم است.
 
-- **Build → Generate Signed App Bundle / APK → APK**
-- Create (or pick) a keystore and finish the wizard.
-- Output: `app/release/app-release.apk`
-
-## 4) Install on a phone
-
-- Copy the APK to the phone (USB or a messenger).
-- On the phone: **Settings → Security → allow installs from unknown sources**.
-- Tap the file and install.
-
-## Technical specs
-
-| Item | Value |
-|---|---|
-| Package ID | `ir.bahar.school` |
-| Minimum Android | 7.0 (API 24) |
-| Target Android | 14 (API 34) |
-| Language | Java, no third-party dependencies |
-| Gradle | 8.7 — AGP 8.5.2 |
-| JDK | 17 (bundled with Android Studio) |
-
-## App features
-
-- The full Bahar system (national-ID login, dashboard, grades, attendance,
-  messages, …)
-- RTL with Persian fonts (Arad + Vazirmatn), loaded from the server itself
-- File uploads from pages (file picker, camera, …)
-- Downloads through the Android download manager
-- External links (e.g. Shad) open in the browser
-- Back button: page history first, then exit with a second press
-- "Server unreachable" screen with a retry button
-- Page state preserved on rotation
-- Bahar icon in all densities + adaptive icon (Android 8+)
-
-## Common build errors
-
-| Error | Cause / fix |
-|---|---|
-| `Could not find com.google.android.material:material` / `androidx.core:core` | Fixed in this version — the project has no dependencies. If you opened an old copy, make sure the `dependencies` block in `app/build.gradle` is **empty**. |
-| `Unsupported class file major version` | Set the project JDK to 17 (Settings → Build Tools → Gradle → Gradle JDK). |
-| Stuck downloading Gradle | In the Android Studio terminal: `gradlew --offline assembleDebug` — builds from cache. |
-| `ERROR_HOST_LOOKUP` on the phone | `SERVER_URL` is wrong, or the server is not reachable from the internet. |
-
-## FAQ
-
-**Do I need to rebuild the APK after changing SERVER_URL?**
-Yes — any code change needs a new build.
-
-**How do I publish on Google Play / local stores?**
-Build a signed release and bump `versionCode` in `app/build.gradle` by one.
-
-**Does it have push notifications?**
-Bahar notifications reach users through Shad and the built-in messenger. OS
-push (FCM) needs Google servers, which are usually unavailable to Iranian
-schools.
-
-**Why does the login persist in the app?**
-The Bahar session cookie is stored in the WebView and stays until sign-out
-or session expiry — same as a browser.
+**توجه:** در این تغییرات هیچ Build یا تولید APK انجام نشده است.
